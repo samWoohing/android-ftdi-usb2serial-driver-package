@@ -1,6 +1,5 @@
-#summary One-sentence summary of this page.
 #labels Phase-Design
-
+#put all useful links here
 = Links that are useful to project development =
 
 = FTDI hardware related =
