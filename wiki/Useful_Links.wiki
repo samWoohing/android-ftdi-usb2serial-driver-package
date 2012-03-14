@@ -15,6 +15,10 @@ Application notes of FTDI. The D2xx library function definitions and JTAG librar
 
 http://www.ftdichip.com/Support/Documents/AppNotes.htm
 
+FTDI document that shows how to configure the MPSSE engine in a FT2232H to JTAG port:
+
+http://www.ftdichip.com/Support/Documents/AppNotes/AN_129_FTDI_Hi_Speed_USB_To_JTAG_Example.pdf
+
 = Libftdi related =
 
 Libftdi is a C library that provides functions to operate FTDI chips. It works on Windows and Linux. It relies on Libusb, an open-source USB library. Libftdi provides similar functions to FTDI's D2xx library. But while FTDI doesn't open their source code, Libftdi is definitely the good place to find how to operate FTDI chips over USB:
