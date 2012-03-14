@@ -3,5 +3,26 @@
 = Links that are useful to project development =
 
 = FTDI hardware related =
+FT2232H chip that is a comparatively new product of FTDI and with most functionalities:
+
+http://www.ftdichip.com/Products/ICs/FT2232H.html
+
+FTDI's D2xx driver page. They provide Windows, Linux and Android drivers. However, then Android driver is only a JNI wrapper of C library, and needs root priviledge to use...
+
+http://www.ftdichip.com/Drivers/D2XX.htm
+
+Application notes of FTDI. The D2xx library function definitions and JTAG library function definitions are worth to look at:
+
+http://www.ftdichip.com/Support/Documents/AppNotes.htm
+
 = Libftdi related =
+
+Libftdi is a C library that provides functions to operate FTDI chips. It works on Windows and Linux. It relies on Libusb, an open-source USB library. Libftdi provides similar functions to FTDI's D2xx library. But while FTDI doesn't open their source code, Libftdi is definitely the good place to find how to operate FTDI chips over USB:
+
+http://www.intra2net.com/en/developer/libftdi/
+
+The source code of libftdi. It's source code is pretty simple, just a libftdi.c and libftdi.h:
+
+http://developer.intra2net.com/git/?p=libftdi
+
 = Android related =
