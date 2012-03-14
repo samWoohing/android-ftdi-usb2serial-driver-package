@@ -1,5 +1,5 @@
-#summary One-sentence summary of this page.
 #labels Phase-Requirements
+#Top-level-down detailed requirements here
 D2xx class design requirements.
 
 =General Description=
