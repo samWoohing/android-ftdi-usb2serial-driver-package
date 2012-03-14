@@ -1,4 +1,4 @@
-#labels Phase-Design
+#labels Phase-Design,Featured
 #Summary put all useful links here
 = Links that are useful to project development =
 
