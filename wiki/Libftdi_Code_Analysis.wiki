@@ -6,7 +6,7 @@
 ==usb_control_msg: ==
 
 Send a control message to a device. The interface definition is:
-int usb_control_msg(usb_dev_handle *dev, int requesttype, int request, int value, int index, char *bytes, int size, int timeout);
+int usb_control_msg(usb_dev_handle * dev, int requesttype, int request, int value, int index, char * bytes, int size, int timeout);
 
 This is a function used to send usb control info to the device. This function is used widely in Libftdi to modifiy the configuration of the chip and port. Functions that use usb_control_msg includes:
 	* ftdi_usb_reset
@@ -17,139 +17,139 @@ This is a function used to send usb control info to the device. This function is
 	* ftdi_enable_bitbang
 	* ftdi_disable_bitbang
 	* ftdi_set_bitmode
-	*ftdi_read_pins
-	*ftdi_set_latency_timer
-	*ftdi_get_latency_timer
-	*ftdi_poll_modem_status
-	*ftdi_setflowctrl
-	*ftdi_setdtr
-	*ftdi_setrts
-	*ftdi_setdtr_rts
-	*ftdi_set_event_char
-	*ftdi_set_error_char
-	*ftdi_read_eeprom_location
-	*ftdi_read_eeprom
-	*ftdi_read_chipid
-	*ftdi_read_eeprom_getsize
-	*ftdi_write_eeprom_location
-	*ftdi_write_eeprom
-	*ftdi_erase_eeprom
+	* ftdi_read_pins
+	* ftdi_set_latency_timer
+	* ftdi_get_latency_timer
+	* ftdi_poll_modem_status
+	* ftdi_setflowctrl
+	* ftdi_setdtr
+	* ftdi_setrts
+	* ftdi_setdtr_rts
+	* ftdi_set_event_char
+	* ftdi_set_error_char
+	* ftdi_read_eeprom_location
+	* ftdi_read_eeprom
+	* ftdi_read_chipid
+	* ftdi_read_eeprom_getsize
+	* ftdi_write_eeprom_location
+	* ftdi_write_eeprom
+	* ftdi_erase_eeprom
 	
 ==usb_bulk_read:==
 Read data from a bulk endpoint. The interface definition is 
-int usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int usb_bulk_read(usb_dev_handle * dev, int ep, char * bytes, int size, int timeout);
 The function is ONLY used to read bulk data from usb endpoint. So there's only one function calls it:
-	*ftdi_read_data
+	* ftdi_read_data
 	
 ==usb_bulk_write:==
 Write data to a bulk endpoint. The interface definition is:
-int usb_bulk_write(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int usb_bulk_write(usb_dev_handle * dev, int ep, char * bytes, int size, int timeout);
 The function is ONLY used to write bulk data to usb endpoint. So there's only one function calls it:
-	*ftdi_write_data
+	* ftdi_write_data
 	
 ==usb_open:==
 Opens a USB device.
-usb_dev_handle *usb_open(struct *usb_device dev);
+usb_dev_handle * usb_open(struct * usb_device dev);
 This function is used in following Libftdi functions:
-	*ftdi_usb_open_dev
-	*ftdi_usb_open_desc_index
-	*ftdi_usb_get_strings
+	* ftdi_usb_open_dev
+	* ftdi_usb_open_desc_index
+	* ftdi_usb_get_strings
 
 ==usb_close:==
 Closes a USB device
-int usb_close(usb_dev_handle *dev);
+int usb_close(usb_dev_handle * dev);
 This function is ONLY used in following Libftdi function:
-	*ftdi_usb_close_internal
+	* ftdi_usb_close_internal
 	
 ==usb_init:==
 Initialize libusb
 void usb_init(void);
 This function is used in following libftdi functions:
-	*ftdi_usb_find_all
-	*ftdi_usb_open_desc_index
-	*ftdi_usb_open_string
+	* ftdi_usb_find_all
+	* ftdi_usb_open_desc_index
+	* ftdi_usb_open_string
 
 ==usb_find_busses:==
 Finds all USB busses on system
 int usb_find_busses(void);
 The function is used in following libftdi functions:
-	*ftdi_usb_find_all
-	*ftdi_usb_open_desc
-	*ftdi_usb_open_desc_index
-	*ftdi_usb_open_string
-	*ftdi_usb_find_all
+	* ftdi_usb_find_all
+	* ftdi_usb_open_desc
+	* ftdi_usb_open_desc_index
+	* ftdi_usb_open_string
+	* ftdi_usb_find_all
 	
 ==usb_find_devices:==
 Find all devices on all USB devices
 This function is used in following libftdi functions:
 int usb_find_devices(void);
-	*ftdi_usb_find_all
-	*ftdi_usb_open_desc_index
-	*ftdi_usb_open_string
+	* ftdi_usb_find_all
+	* ftdi_usb_open_desc_index
+	* ftdi_usb_open_string
 
 ==usb_get_busses==
 Return the list of USB busses found
-struct usb_bus *usb_get_busses(void);
+struct usb_bus * usb_get_busses(void);
 This function is used in following libftdi functions:
-	*ftdi_usb_find_all
-	*ftdi_usb_open_desc_index
-	*ftdi_usb_open_string
+	* ftdi_usb_find_all
+	* ftdi_usb_open_desc_index
+	* ftdi_usb_open_string
 
 ==usb_strerror==
 
 ==usb_get_string_simple==
 Retrieves a string descriptor from a device using the first language
-int usb_get_string_simple(usb_dev_handle *dev, int index, char *buf, size_t buflen);
+int usb_get_string_simple(usb_dev_handle * dev, int index, char * buf, size_t buflen);
 This function is used in following libftdi functions:
-	*ftdi_usb_get_strings
-	*ftdi_usb_open_desc_index
+	* ftdi_usb_get_strings
+	* ftdi_usb_open_desc_index
 
 ==usb_detach_kernel_driver_np==
 Detach kernel driver from interface
-int usb_detach_kernel_driver_np(usb_dev_handle *dev, int interface);
+int usb_detach_kernel_driver_np(usb_dev_handle * dev, int interface);
 This function is used in following libftdi functions:
-	*ftdi_usb_open_dev
+	* ftdi_usb_open_dev
 
 ==usb_set_configuration==
 Sets the active configuration of a device
-int usb_set_configuration(usb_dev_handle *dev, int configuration);
+int usb_set_configuration(usb_dev_handle * dev, int configuration);
 This function is used in following libftdi functions:
-	*ftdi_usb_open_dev
+	* ftdi_usb_open_dev
 
 ==usb_claim_interface==
 Claim an interface of a device
-int usb_claim_interface(usb_dev_handle *dev, int interface);
+int usb_claim_interface(usb_dev_handle * dev, int interface);
 This function is used in following libftdi functions:
-	*ftdi_usb_open_dev
+	* ftdi_usb_open_dev
 
 ==usb_release_interface==
 Releases a previously claimed interface
-int usb_release_interface(usb_dev_handle *dev, int interface);
+int usb_release_interface(usb_dev_handle * dev, int interface);
 This function is used in following libftdi functions:
-	*ftdi_usb_close
+	* ftdi_usb_close
 
 =Importance of the above functions=
 Below functions are those we must have, in order to perform the FTDI device operation,
 So we have to find what Android functions exactly implements these functionalities.:
-	*usb_control_msg
-	*usb_bulk_read
-	*usb_bulk_write
-	*usb_open
-	*usb_close
-	*usb_claim_interface: used to claim more than one interface on a device. We have to find functions that does the same thing in Android.
-	*usb_release_interface: similar to above reason.
-	*usb_set_configuration: This function sets the USB port configuration, such as support 100mA, or more. Android may have something similar to this.
+	* usb_control_msg
+	* usb_bulk_read
+	* usb_bulk_write
+	* usb_open
+	* usb_close
+	* usb_claim_interface: used to claim more than one interface on a device. We have to find functions that does the same thing in Android.
+	* usb_release_interface: similar to above reason.
+	* usb_set_configuration: This function sets the USB port configuration, such as support 100mA, or more. Android may have something similar to this.
 
 Below functions are for USB infromation retrieving, Doesn't matter if Android provides exactly the same thing.
-	*usb_find_busses
-	*usb_find_devices
-	*usb_get_busses
-	*usb_get_string_simple
+	* usb_find_busses
+	* usb_find_devices
+	* usb_get_busses
+	* usb_get_string_simple
 
 usb_init is only for libusb internal use only. we don't need it at all.
 
 And these functions needs further look into:
-	*usb_detach_kernel_driver_np: This function will detach a kernel driver from the interface specified by parameter interface. usually used before opening a device. We don't need it cause android will handle these things.
+	* usb_detach_kernel_driver_np: This function will detach a kernel driver from the interface specified by parameter interface. usually used before opening a device. We don't need it cause android will handle these things.
 	
 	
 	
