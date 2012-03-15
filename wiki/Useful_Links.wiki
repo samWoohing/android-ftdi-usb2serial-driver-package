@@ -30,3 +30,7 @@ The source code of libftdi. It's source code is pretty simple, just a libftdi.c 
 http://developer.intra2net.com/git/?p=libftdi
 
 = Android related =
+
+Some idea on Android FTDI support:
+
+http://android.serverbox.ch/?p=370
