@@ -34,3 +34,7 @@ http://developer.intra2net.com/git/?p=libftdi
 Some idea on Android FTDI support:
 
 http://android.serverbox.ch/?p=370
+
+Android USB host develop guide
+
+http://developer.android.com/guide/topics/usb/host.html
