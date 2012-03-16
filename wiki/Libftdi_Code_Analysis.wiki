@@ -140,7 +140,7 @@ So we have to find what Android functions exactly implements these functionaliti
 	* usb_release_interface: similar to above reason.
 	* usb_set_configuration: This function sets the USB port configuration, such as support 100mA, or more. Android may have something similar to this.
 
-Below functions are for USB infromation retrieving, Doesn't matter if Android provides exactly the same thing.
+Below functions are for USB infromation retrieving, Doesn't matter if Android provides exactly the same thing. We can always use what Android provides.
 	* usb_find_busses
 	* usb_find_devices
 	* usb_get_busses
@@ -152,7 +152,58 @@ And these functions needs further look into:
 	* usb_detach_kernel_driver_np: This function will detach a kernel driver from the interface specified by parameter interface. usually used before opening a device. We don't need it cause android will handle these things.
 	
 	
-	
+=What Android functions could be used=
+Below are the corrisponding Android equivalent of the above must-have libusb functions. Note that Android put everything in java classes. So the actual usage of these functions shall follow the objective-oriented style of coding, no need to be too ridgid to C-style.
+==usb_control_msg:==
+This libusb function can be replaced by Android function:
+
+public class UsbDeviceConnection
+
+public int controlTransfer (int requestType, int request, int value, int index, byte[] buffer, int length, int timeout) 
+
+==usb_bulk_read and usb_bulk_write==
+Both of these two functions can be replaced by Android function:
+
+public class UsbDeviceConnection
+
+public int bulkTransfer (UsbEndpoint endpoint, byte[] buffer, int length, int timeout) 
+
+==usb_open:==
+This libusb function can be replaced by Android function:
+
+public class UsbManager
+
+public UsbDeviceConnection openDevice (UsbDevice device) 
+
+
+
+==usb_close:==
+This libusb function can be replaced by Android function:
+
+public class UsbDeviceConnection
+
+public void close () 
+
+Note that Android's USB device open and close are implemented in different classes, which makes sense. The UsbManager class opens the device. The UsbDeviceConnection class closes itself.
+
+==usb_claim_interface==
+This libusb function can be replaced by Android function:
+
+public class UsbDeviceConnection
+
+public boolean claimInterface (UsbInterface intf, boolean force) 
+
+==usb_release_interface==
+This libusb function can be replaced by Android function:
+
+public class UsbDeviceConnection
+
+public boolean releaseInterface (UsbInterface intf) 
+
+==usb_set_configuration==
+
+Don't know yet if Android has such capabilities or not...
+
 
 
 =Data structures used in libFTDI that is from Libusb=
