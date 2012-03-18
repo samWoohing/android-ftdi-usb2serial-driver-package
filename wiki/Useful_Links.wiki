@@ -29,6 +29,10 @@ The source code of libftdi. It's source code is pretty simple, just a libftdi.c 
 
 http://developer.intra2net.com/git/?p=libftdi
 
+A very useful link that describes the FTDI chip's USB command set. Check it out and save a copy to your self:
+
+http://yosemitefoothills.com/Electronics/FTDI_Chip_Commands.html
+
 = Android related =
 
 Some idea on Android FTDI support:
