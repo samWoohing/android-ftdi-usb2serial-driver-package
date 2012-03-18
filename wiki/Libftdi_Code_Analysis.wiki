@@ -217,3 +217,24 @@ Don't know yet if Android has such capabilities or not...
 ==usb_bus==
 
 ==usb_device==
+
+=How the usb_control_msg set DTR, RTS or other stuff for each individual channels on a FTDI chip?=
+Since usb_control_msg is only for "control message", or say it transmitt only on usb endpoint 0. 
+Then the question rises: How by calling such a function can set individual channel's DTR, RTS and other stuff??
+
+The answer turns out to be as following:
+
+The usb_control_msg function has following prototype:
+
+int usb_control_msg(usb_dev_handle *dev, int requesttype, int request, int value, int index, char *bytes, int size, int timeout);
+
+The first parameter is definitely the device context pointer.
+
+The second is requesttype, for FTDI chip control, it's usually FTDI_DEVICE_OUT_REQTYPE
+
+The third parameter is the request itself, or the command that directs FTDI chip what to do. e.g. for setDTR, the request is defined in ftdi.h as: SIO_SET_MODEM_CTRL_REQUEST
+
+The fourth parameter is the parameter to the request. e.g. for setDTR, the request is SIO_SET_MODEM_CTRL_REQUEST, the value is SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW in order to set DTR to high or low.
+
+The fifth parameter is the KEY POINT here, the index is corrisponding to WHICH FTDI CHIP CHANNEL YOU WANT TO SEND THE USB CONTROL MESSAGE TO.
+so this is how the control message is differentiated by different channels.
