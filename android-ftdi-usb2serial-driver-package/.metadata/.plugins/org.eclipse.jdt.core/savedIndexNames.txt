@@ -1,0 +1,1 @@
+INDEX VERSION 1.126+D:\ShanSong\Android-FTDI-usb2serial\trunk\android-ftdi-usb2serial-driver-package\.metadata\.plugins\org.eclipse.jdt.core
