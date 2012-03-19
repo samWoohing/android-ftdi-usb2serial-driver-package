@@ -22,21 +22,21 @@ public class FTDI_Interface {
 	//==================================================================
 	//contains the usb interface as class member, but it shall be given by FTDI_Device
 	/** The usb interface. */
-	private UsbInterface usbInterface;
+	private UsbInterface mUsbInterface;
 	//I still think device connection shall belong to the FTDI_Device class,
 	//but this FTDI_interface class need to know it anyway...
 	/** The usb device connection. */
-	private UsbDeviceConnection usbDeviceConnection;
+	private UsbDeviceConnection mUsbDeviceConnection;
 	
 	/** The endpoint used for reading data. */
-	private UsbEndpoint epRead;
+	private UsbEndpoint mEndpointRead;
 	
 	/** The endpoint used for writing data. */
-	private UsbEndpoint epWrite;
+	private UsbEndpoint mEndpointWrite;
 	
 	/** The Usb time out setting. it'll be used by usbBulkTransfer or usbControlTransfer. 
 	 * But the question is... shall we maintain different timeout value for each?? */
-	private int UsbTimeOut;
+	private int mUsbTimeOut;
 	//TODO: decide if we need separated timeout value setting later.
 	
 	//==================================================================
@@ -49,7 +49,7 @@ public class FTDI_Interface {
 	 */
 	public FTDI_Interface(UsbInterface newUsbInterface)
 	{
-		usbInterface = newUsbInterface;
+		mUsbInterface = newUsbInterface;
 		
 		//verify if this interface has 2 endpoints, one is reading and one is writing. If else, it's NOT a FTDI channel endpoint.
 	}
@@ -61,7 +61,7 @@ public class FTDI_Interface {
 	 */
 	public void setUsbDeviceConnection(UsbDeviceConnection newUsbDeviceConnection)
 	{
-		usbDeviceConnection = newUsbDeviceConnection;
+		mUsbDeviceConnection = newUsbDeviceConnection;
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class FTDI_Interface {
 	 */
 	public void clrUsbDeviceConnection()
 	{
-		usbDeviceConnection = null;
+		mUsbDeviceConnection = null;
 	}
 	
 	//==================================================================
