@@ -22,8 +22,6 @@ public class FTDI_Device{
 	//==================================================================
 	//	1. USB command codes
 	//==================================================================
-
-	
 	
 	//==================================================================
 	//	2. member objects
@@ -47,10 +45,13 @@ public class FTDI_Device{
 	private FTDI_EEPROM mFTDI_EEPROM;
 	
 	/** The read timeout. */
-	private int mReadTimeout	=5000;
+	private int mReadTimeout	= 5000;
 	
 	/** The write timeout. */
-	private int mWriteTimeout	=5000;
+	private int mWriteTimeout	= 5000;
+	
+	/** The device type defined by FTDI VID. */
+	private int mDeviceType = 0;
 	//==================================================================
 	//	3. The section of member methods
 	//==================================================================
@@ -74,8 +75,48 @@ public class FTDI_Device{
 	 */
 	public int initDevice(UsbDevice dev)
 	{
-
-		//check VID and PID, see if this is a valid FTDI device, and decide the chip type
+		//check VID is the FTDI VID
+		if(dev.getVendorId() != FTDI_Constants.VID_FTDI)
+		{
+			Log.e(TAG, "Failed to recognize the Vendor ID: " + Integer.toString(dev.getVendorId()) + " on UsbDevice"+dev.toString());
+			return -1;
+		}
+		
+		//PID, see if this is a valid FTDI device, and decide the chip type
+		int expectedNumOfInterfaces = 0;
+		
+		switch(dev.getProductId())
+		{
+		case FTDI_Constants.PID_FT232B_FT245B_FT232R_FT245R:
+			expectedNumOfInterfaces = 1;
+			break;
+			
+		case FTDI_Constants.PID_FT232H:
+			expectedNumOfInterfaces = 1;
+			break;
+			
+		case FTDI_Constants.PID_FT2232C_FT2232D_FT2232L_FT2232H:
+			expectedNumOfInterfaces = 2;
+			break;
+			
+		case FTDI_Constants.PID_FT4232H:
+			expectedNumOfInterfaces = 4;
+			break;
+			
+		default:
+			Log.e(TAG, "Failed to recognize the Product ID:"+Integer.toString(dev.getProductId())+" on UsbDevice"+dev.toString());
+			return -1;
+		}
+		
+		//check if the device really have that many interfaces:
+		if(dev.getInterfaceCount() != expectedNumOfInterfaces)
+		{
+			Log.e(TAG, "Expected "+Integer.toString(expectedNumOfInterfaces)+" Interfaces, but only find "
+					+Integer.toString(dev.getInterfaceCount())+" interfaces on UsbDevice: "+dev.toString());
+			return -1;
+		}
+		
+		//TODO: think how to initialize the interfaces...
 		
 		//After checking and making sure this is a FTDI chip, do the actual initialization of this class
 		mUsbDevice = dev;

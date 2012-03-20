@@ -41,7 +41,7 @@ public final class FTDI_Constants {
 	public static final int SIO_RESET_PURGE_TX		=0x02;
 
 	//Note: for set DTR and RTS, the *_HIGH and *_LOW sets the high and low value.
-	//the controlTransfer input parameter "index" represents the port A,B,C or D.
+	//the controlTransfer input parameter "index" represents the interface A,B,C or D.
 	public static final int SIO_SET_DTR_MASK		=0x1;
 	public static final int SIO_SET_DTR_HIGH		=( 1 | ( SIO_SET_DTR_MASK  << 8));
 	public static final int SIO_SET_DTR_LOW 		=( 0 | ( SIO_SET_DTR_MASK  << 8));
@@ -51,6 +51,8 @@ public final class FTDI_Constants {
 	
 	/* pre-defined Index: */
 	//The FTDI channel(interface) is the most commonly used as Index parameter in usb control message tranmitting.
+	//Different sources designates different index for interfaces. Some says it begins with 0 for A and ends 3 for D.
+	//While some says it begine with 1 for A and 4 for D. After a while of searching, I tend to believe it 1 for A and 4 for D.
 	public static final int INTERFACE_ANY = 0;
 	public static final int INTERFACE_A = 1;
 	public static final int INTERFACE_B = 2;
@@ -76,4 +78,11 @@ public final class FTDI_Constants {
 	public static final int INTERFACE_D_ENDPOINT_IN 	= 0x08;
 	public static final int INTERFACE_D_ENDPOINT_OUT	= 0x87;
 	
+	/*Default Vendor ID FTDI*/
+	public static final int VID_FTDI = 0x0403;
+	/*Default Product ID for FTDI chips*/
+	public static final int PID_FT232B_FT245B_FT232R_FT245R		= 0x6001;
+	public static final int PID_FT2232C_FT2232D_FT2232L_FT2232H	= 0x6010;
+	public static final int PID_FT4232H 						= 0x6011;
+	public static final int PID_FT232H 							= 0x6014;
 }

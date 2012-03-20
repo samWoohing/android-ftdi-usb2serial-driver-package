@@ -5,6 +5,7 @@
 package shansong.ftdi.d2xx;
 
 import android.hardware.usb.UsbInterface;
+import android.util.Log;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbConstants;
@@ -22,6 +23,10 @@ public class FTDI_Interface {
 	//	2. The section of member objects
 	//==================================================================
 	//contains the usb interface as class member, but it shall be given by FTDI_Device
+	
+	/** The Constant TAG string used for incident logging. */
+	private static final String TAG = "FTDI_Interface";
+	
 	/** The usb interface. */
 	private UsbInterface mUsbInterface;
 	//I still think device connection shall belong to the FTDI_Device class,
@@ -30,10 +35,10 @@ public class FTDI_Interface {
 	private UsbDeviceConnection mUsbDeviceConnection;
 	
 	/** The endpoint used for reading data. */
-	private UsbEndpoint mEndpointRead;
+	private UsbEndpoint mEndpointIn;
 	
 	/** The endpoint used for writing data. */
-	private UsbEndpoint mEndpointWrite;
+	private UsbEndpoint mEndpointOut;
 	
 	/** The Usb time out setting. it'll be used by usbBulkTransfer or usbControlTransfer. 
 	 * But the question is... shall we maintain different timeout value for each?? */
@@ -56,52 +61,26 @@ public class FTDI_Interface {
 	 *
 	 * @param newUsbInterface: the usb interface that we'd like to create a FTDI_interface on. It shall be given by FTDI_Device.
 	 */
-	public FTDI_Interface()
+	protected FTDI_Interface()
 	{
 		//TODO: anything else
 	}
 	
-	public int initInterface(UsbInterface newUsbInterface)
-	{
-		//verify if this interface has 2 endpoints, one is reading and one is writing. If else, it's NOT a FTDI channel endpoint.
-		//give mInterface the proper value.
-		
-		//give mEndpointRead and mEndpointWrite the proper value.
-		
-		//finally the interface is OK.
-		mUsbInterface = newUsbInterface;
-		return 0;
-	}
 	/**
-	 * Sets the usb device connection.  This method shall be used by FTDI_Device when open the device.
-	 *
-	 * @param newUsbDeviceConnection: the new usb device connection that is created by FTDI_Device class when open the ftdi device.
+	 * Inits the interface instance according to the given newUsbInterface. 
+	 * Recognize interface is A, B C or D by its endpoint type. 
+	 * If checking shows OK, assign the recognized endpoints
+	 * to member endpoints mEndpointIn and mEndpointOut.
+	 * 
+	 * @param newUsbInterface: The usb interface we'd like to recognize if it is a FTDI device interface.
+	 * @return 0 if everything is OK. -1 if anything is wrong.
 	 */
-	public void setUsbDeviceConnection(UsbDeviceConnection newUsbDeviceConnection)
-	{
-		mUsbDeviceConnection = newUsbDeviceConnection;
-	}
-	
-	/**
-	 * Clr usb device connection. This method shall be used by FTDI_Device when close the device.
-	 */
-	public void clrUsbDeviceConnection()
-	{
-		mUsbDeviceConnection = null;
-	}
-	
-	/**
-	 * Recognize interface is A, B C or D by its endpoint type.
-	 *
-	 * @param newUsbInterface: the usb interface 
-	 * @return INTERFACE_A, B, C or D. -1 if the endpoint is not recognized.
-	 */
-	private int recognizeInterfaceByEndpoint(UsbInterface newUsbInterface)
+	protected int initInterface(UsbInterface newUsbInterface)
 	{
 		//verify only 2 endpoints on the interface
-		int numOfEndpoint = newUsbInterface.getEndpointCount();
-		if(numOfEndpoint!=2)
+		if(newUsbInterface.getEndpointCount()!=2)
 		{
+			Log.e(TAG, "Total number of endpoints does not equal to 2 on UsbInterface: "+newUsbInterface.toString());
 			return -1;
 		}
 		
@@ -121,29 +100,65 @@ public class FTDI_Interface {
 		}
 		else
 		{
+			Log.e(TAG, "The 2 endpoints are not 1 input and 1 output on UsbInterface: "+newUsbInterface.toString());
 			return -1;
 		}
 		
 		//check by endpoint address
 		if(epIn.getAddress()==FTDI_Constants.INTERFACE_A_ENDPOINT_IN && epOut.getAddress()==FTDI_Constants.INTERFACE_A_ENDPOINT_OUT)
 		{
-			return FTDI_Constants.INTERFACE_A;
+			mUsbInterface = newUsbInterface;
+			mEndpointIn = epIn;
+			mEndpointOut = epOut;
+			mInterface = FTDI_Constants.INTERFACE_A;
+			return 0;
 		}
 		if(epIn.getAddress()==FTDI_Constants.INTERFACE_B_ENDPOINT_IN && epOut.getAddress()==FTDI_Constants.INTERFACE_B_ENDPOINT_OUT)
 		{
-			return FTDI_Constants.INTERFACE_B;
+			mUsbInterface = newUsbInterface;
+			mEndpointIn = epIn;
+			mEndpointOut = epOut;
+			mInterface = FTDI_Constants.INTERFACE_B;
+			return 0;
 		}
 		if(epIn.getAddress()==FTDI_Constants.INTERFACE_C_ENDPOINT_IN && epOut.getAddress()==FTDI_Constants.INTERFACE_C_ENDPOINT_OUT)
 		{
-			return FTDI_Constants.INTERFACE_C;
+			mUsbInterface = newUsbInterface;
+			mEndpointIn = epIn;
+			mEndpointOut = epOut;
+			mInterface = FTDI_Constants.INTERFACE_C;
+			return 0;
 		}
 		if(epIn.getAddress()==FTDI_Constants.INTERFACE_D_ENDPOINT_IN && epOut.getAddress()==FTDI_Constants.INTERFACE_D_ENDPOINT_OUT)
 		{
-			return FTDI_Constants.INTERFACE_D;
+			mUsbInterface = newUsbInterface;
+			mEndpointIn = epIn;
+			mEndpointOut = epOut;
+			mInterface = FTDI_Constants.INTERFACE_D;
+			return 0;
 		}
-		
+		Log.e(TAG, "The 2 endpoints addresses are incorrect on UsbInterface: "+newUsbInterface.toString());
 		return -1;
 	}
+	
+	/**
+	 * Sets the usb device connection.  This method shall be used by FTDI_Device when open the device.
+	 *
+	 * @param newUsbDeviceConnection: the new usb device connection that is created by FTDI_Device class when open the ftdi device.
+	 */
+	public void setUsbDeviceConnection(UsbDeviceConnection newUsbDeviceConnection)
+	{
+		mUsbDeviceConnection = newUsbDeviceConnection;
+	}
+	
+	/**
+	 * Clr usb device connection. This method shall be used by FTDI_Device when close the device.
+	 */
+	public void clrUsbDeviceConnection()
+	{
+		mUsbDeviceConnection = null;
+	}
+	
 	//==================================================================
 	//	3.x Serial port control and operation methods
 	//==================================================================
