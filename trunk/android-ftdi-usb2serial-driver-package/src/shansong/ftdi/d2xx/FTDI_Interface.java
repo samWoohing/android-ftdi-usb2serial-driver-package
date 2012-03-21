@@ -146,7 +146,7 @@ public class FTDI_Interface {
 	 *
 	 * @param newUsbDeviceConnection: the new usb device connection that is created by FTDI_Device class when open the ftdi device.
 	 */
-	public void setUsbDeviceConnection(UsbDeviceConnection newUsbDeviceConnection)
+	protected void setUsbDeviceConnection(UsbDeviceConnection newUsbDeviceConnection)
 	{
 		mUsbDeviceConnection = newUsbDeviceConnection;
 	}
@@ -154,21 +154,25 @@ public class FTDI_Interface {
 	/**
 	 * Clr usb device connection. This method shall be used by FTDI_Device when close the device.
 	 */
-	public void clrUsbDeviceConnection()
+	protected void clrUsbDeviceConnection()
 	{
 		mUsbDeviceConnection = null;
 	}
 	
+	public int getWhichInterfaceThisIs()
+	{
+		return mInterface;
+	}
 	//==================================================================
 	//	3.x Serial port control and operation methods
 	//==================================================================
 	int readData(byte[] buffer, int length)
 	{
-		return 0;//TODO: detailed implementation
+		return mUsbDeviceConnection.bulkTransfer(mEndpointIn, buffer, length, mReadTimeout);//TODO: detailed implementation
 	}
 	int writeData(byte[] buffer, int length)
 	{
-		return 0;//TODO: detailed implementation
+		return mUsbDeviceConnection.bulkTransfer(mEndpointOut, buffer, length, mReadTimeout);//TODO: detailed implementation
 	}
 	//TODO: decide if we need a asynchronous write method. I think we shall provide one.
 	

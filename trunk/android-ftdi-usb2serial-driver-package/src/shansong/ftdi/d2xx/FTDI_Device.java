@@ -8,10 +8,10 @@ import android.content.Context;
 import android.util.Log;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbConstants;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class FTDI_Device.
  *
@@ -60,7 +60,6 @@ public class FTDI_Device{
 	 *
 	 * @param dev the dev
 	 */
-	//TODO: shall we give a separated constructor and init function for both FTDI_Device and FTDI_Interface?? Think!
 	public FTDI_Device(Context context, UsbDevice dev)
 	{
 		//Write down the caller Activity or Service's context
@@ -75,7 +74,10 @@ public class FTDI_Device{
 	 */
 	public int initDevice(UsbDevice dev)
 	{
-		//check VID is the FTDI VID
+		//////////////////////////////////////////////////
+		//Step1: check VID is the FTDI VID. Decide the device type from VID. And design how many interfaces the device should have
+		//////////////////////////////////////////////////
+		//VID check
 		if(dev.getVendorId() != FTDI_Constants.VID_FTDI)
 		{
 			Log.e(TAG, "Failed to recognize the Vendor ID: " + Integer.toString(dev.getVendorId()) + " on UsbDevice"+dev.toString());
@@ -108,6 +110,10 @@ public class FTDI_Device{
 			return -1;
 		}
 		
+		//////////////////////////////////////////////////
+		//Step2: Initialize the FTDI device Interfaces, recognize the interfaces and write information into mFTDI_Interfaces[]
+		//////////////////////////////////////////////////
+		
 		//check if the device really have that many interfaces:
 		if(dev.getInterfaceCount() != expectedNumOfInterfaces)
 		{
@@ -116,25 +122,108 @@ public class FTDI_Device{
 			return -1;
 		}
 		
-		//TODO: think how to initialize the interfaces...
+		//Initialize the mFTDI_Interfaces
+		mFTDI_Interfaces = new FTDI_Interface[expectedNumOfInterfaces];
+		UsbInterface tempUsbInterface = null;
+		FTDI_Interface tempFTDI_Interface = null;
+		for(int i=0; i<expectedNumOfInterfaces; i++)
+		{
+			tempUsbInterface = dev.getInterface(i);
+			tempFTDI_Interface = new FTDI_Interface();
+			if(tempFTDI_Interface.initInterface(tempUsbInterface) < 0)
+			{
+				//Initialization of this FTDI_Interface failed. For some reason, 
+				//this UsbInterface cannot be recognized as a FTDI_Interface.
+				Log.e(TAG,"Cannot recogonize the UsbInterface: "+tempUsbInterface.toString()+" as FTDI_Interface.");
+				return -1;
+			}
+			
+			//Now the tempFTDI_Interface is recognized as a valid FTDI_Interface.
+			//We check which channel it is, and put it in the correct location of mFTDI_Interface array.
+			switch(tempFTDI_Interface.getWhichInterfaceThisIs())
+			{
+			case FTDI_Constants.INTERFACE_A:
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_A)
+				{
+					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
+							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_A));
+					return -1;
+				}
+				mFTDI_Interfaces[0]=tempFTDI_Interface;
+				break;
+				
+			case FTDI_Constants.INTERFACE_B:
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_B)
+				{
+					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
+							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_B));
+					return -1;
+				}
+				mFTDI_Interfaces[1]=tempFTDI_Interface;
+				break;
+				
+			case FTDI_Constants.INTERFACE_C:
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_C)
+				{
+					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
+							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_C));
+					return -1;
+				}
+				mFTDI_Interfaces[2]=tempFTDI_Interface;
+				break;
+				
+			case FTDI_Constants.INTERFACE_D:
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_D)
+				{
+					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
+							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_D));
+					return -1;
+				}
+				mFTDI_Interfaces[3]=tempFTDI_Interface;
+				break;
+			default:
+				Log.e(TAG,"Unrecognized FTDI device port index:"+Integer.toString(tempFTDI_Interface.getWhichInterfaceThisIs()));
+				return -1;
+			}
+		}
+		
+		//////////////////////////////////////////////////
+		//Step3: Initialize the EEPROM
+		//////////////////////////////////////////////////
+		//TODO: design the EEPROM initialization here.
 		
 		//After checking and making sure this is a FTDI chip, do the actual initialization of this class
 		mUsbDevice = dev;
 		
-		//Initialize the correct numbers of interfaces
-		
-		//Initialize the EEPROM
-		
-		return 0;//TODO: revise returnvalue, detailed implementation
+		return 0;//TODO: revise return value, detailed implementation
 	}
+	
 	/**
 	 * Gets the interfaces.
 	 *
-	 * @return the interfaces
+	 * @param whichFTDI_Interface: should be FTDI_Constants.INTERFACE_A, B, C, or D.
+	 * @return the corresponding interface. If required interfaces doesn't exist: 
+	 * 			e.g. only have interface A and B but request interface D, the function returns null.
 	 */
-	public FTDI_Interface[] getInterfaces()
+	public FTDI_Interface getInterfaces(int whichFTDI_Interface)
 	{
-		return mFTDI_Interfaces;
+		if(mFTDI_Interfaces.length<whichFTDI_Interface)
+		{	//TODO: shall we generate any log.d here?
+			return null;
+		}
+		switch(whichFTDI_Interface)
+		{
+		case FTDI_Constants.INTERFACE_A:
+			return mFTDI_Interfaces[0];
+		case FTDI_Constants.INTERFACE_B:
+			return mFTDI_Interfaces[1];
+		case FTDI_Constants.INTERFACE_C:
+			return mFTDI_Interfaces[2];
+		case FTDI_Constants.INTERFACE_D:
+			return mFTDI_Interfaces[3];
+		default:
+			return null;
+		}
 	}
 	
 	//==================================================================
@@ -144,6 +233,8 @@ public class FTDI_Device{
 	//openDevice, closeDevice, resetDevice
 	public int openDevice()
 	{
+		//TODO: decide if we need a check if device is initialized or not.
+		
 		UsbManager mManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
 		//check if we have the permission to this device
 		if(!mManager.hasPermission(mUsbDevice))
@@ -154,7 +245,7 @@ public class FTDI_Device{
 		}
 		
 		mUsbDeviceConnection = mManager.openDevice(mUsbDevice);
-		//TODO: consider if we need to reset the device, purge TX/RX buffer.
+		
 		if(resetDevice()!=0)
 		{
 			Log.e(TAG,"Failed to reset device:"+mUsbDevice.toString());
@@ -179,9 +270,10 @@ public class FTDI_Device{
 	{
 		mUsbDeviceConnection.close();
 		mUsbDeviceConnection = null;
+		//TODO: decide if there's more cleaning up jobs to do when closing the device.
 	}
 	
-	//TODO: decide if we shall define these 3 resetting functions as private.
+	//TODO: resetDevice, usbPurgeRXBuffer, usbPurgeTXBuffer, Hmm... maybe this shall be defined as private functions just for internal use only?
 	private int resetDevice()
 	{
 		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_RESET_REQUEST, 
@@ -189,7 +281,7 @@ public class FTDI_Device{
 		//TODO: I give it a INTERFACE_ANY as parameter. Need to verify if it is correct. I believe the Index doesn't matter.
 	}
 	
-	//usbPurgeRXBuffer, usbPurgeTXBuffer, Hmm... maybe this shall be defined as private functions just for internal use only?
+	
 	private int usbPurgeRXBuffer()
 	{
 		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_RESET_PURGE_RX,
