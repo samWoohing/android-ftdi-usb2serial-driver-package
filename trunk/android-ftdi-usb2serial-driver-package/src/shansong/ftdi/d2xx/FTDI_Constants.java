@@ -85,4 +85,37 @@ public final class FTDI_Constants {
 	public static final int PID_FT2232C_FT2232D_FT2232L_FT2232H	= 0x6010;
 	public static final int PID_FT4232H 						= 0x6011;
 	public static final int PID_FT232H 							= 0x6014;
+	
+	/*Pre-defined constants for Line properties. Use these to set up line property*/
+	public static final int PARITY_NONE	=0;
+	public static final int PARITY_ODD	=1;
+	public static final int PARITY_EVEN	=2;
+	public static final int PARITY_MARK	=3;
+	public static final int PARITY_SPACE=4;
+	
+	public static final int STOP_BITS_1	=0;
+	public static final int STOP_BITS_15	=1;
+	public static final int STOP_BITS_2	=2;
+	
+	//The FTDI D2XX programming guide says this must be 7 or 8 data bits length.
+	//So i didn't list more here. And I let the program claim error when the setting is not 7 or 8.
+	//But Microsoft's SerialPort class does support data bits = 5. Need to gether more information on this.
+	public static final int DATA_BITS_7	=7;
+	public static final int DATA_BITS_8	=8;
+	
+	public static final int BREAK_OFF	=0;
+	public static final int BREAK_ON	=1;
+	
+	/*Pre-defined MPSSE bitbang modes */
+    public static final byte MPSSE_BITMODE_RESET  = 0x00;    /**< switch off bitbang mode, back to regular serial/FIFO */
+    public static final byte MPSSE_BITMODE_BITBANG= 0x01;    /**< classical asynchronous bitbang mode, introduced with B-type chips */
+    public static final byte MPSSE_BITMODE_MPSSE  = 0x02;    /**< MPSSE mode, available on 2232x chips */
+    public static final byte MPSSE_BITMODE_SYNCBB = 0x04;    /**< synchronous bitbang mode, available on 2232x and R-type chips  */
+    public static final byte MPSSE_BITMODE_MCU    = 0x08;    /**< MCU Host Bus Emulation mode, available on 2232x chips */
+    /* CPU-style fifo mode gets set via EEPROM */
+    public static final byte MPSSE_BITMODE_OPTO   = 0x10;    /**< Fast Opto-Isolated Serial Interface Mode, available on 2232x chips  */
+    public static final byte MPSSE_BITMODE_CBUS   = 0x20;    /**< Bitbang on CBUS pins of R-type chips, configure in EEPROM before */
+    public static final byte MPSSE_BITMODE_SYNCFF = 0x40;    /**< Single Channel Synchronous FIFO mode, available on 2232H chips */
+    
+
 }
