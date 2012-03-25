@@ -50,7 +50,7 @@ public class FTDI_Device{
 	/** The write timeout. */
 	private int mWriteTimeout	= 5000;
 	
-	/** The device type defined by FTDI VID. */
+	/** The device type defined by FTDI VID and Device release number. */
 	private int mDeviceType = 0;
 	//==================================================================
 	//	3. The section of member methods
@@ -129,7 +129,7 @@ public class FTDI_Device{
 		for(int i=0; i<expectedNumOfInterfaces; i++)
 		{
 			tempUsbInterface = dev.getInterface(i);
-			tempFTDI_Interface = new FTDI_Interface();
+			tempFTDI_Interface = new FTDI_Interface(this);
 			if(tempFTDI_Interface.initInterface(tempUsbInterface) < 0)
 			{
 				//Initialization of this FTDI_Interface failed. For some reason, 
@@ -224,6 +224,26 @@ public class FTDI_Device{
 		default:
 			return null;
 		}
+	}
+	
+	/**
+	 * Gets the device type.
+	 *
+	 * @return the device type
+	 */
+	public int getDeviceType()
+	{
+		return mDeviceType;
+	}
+	
+	/**
+	 * Sets the device type.
+	 *
+	 * @param newDeviceType the new device type
+	 */
+	protected void setDeviceType(int newDeviceType)
+	{
+		mDeviceType = newDeviceType;
 	}
 	
 	//==================================================================

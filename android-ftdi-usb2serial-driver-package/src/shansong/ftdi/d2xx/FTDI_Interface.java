@@ -16,6 +16,11 @@ import android.hardware.usb.UsbConstants;
  */
 public class FTDI_Interface {
 	
+	//TODO: define a convention for function return values.
+	//Currently I suggest the following:
+	//	-1: usb operation error in usb control transfer, or usb bulk transfer.
+	//	-2: the given input parameter is not reasonable.
+	//
 	//==================================================================
 	//	1. The section that defines the FTDI USB command for chip control
 	//==================================================================
@@ -27,6 +32,9 @@ public class FTDI_Interface {
 	
 	/** The Constant TAG string used for incident logging. */
 	private static final String TAG = "FTDI_Interface";
+	
+	/** The mFTDI_Device specifies which device this interface belongs to. */
+	private FTDI_Device mFTDI_Device;
 	
 	/** The usb interface. */
 	private UsbInterface mUsbInterface;
@@ -61,8 +69,9 @@ public class FTDI_Interface {
 	 * Instantiates a new fTD i_ interface.
 	 *
 	 */
-	protected FTDI_Interface()
+	protected FTDI_Interface(FTDI_Device newFTDI_Device)
 	{
+		mFTDI_Device = newFTDI_Device;
 		//TODO: anything else
 	}
 	
@@ -197,15 +206,189 @@ public class FTDI_Interface {
 	//TODO: decide if we need a asynchronous write method. I think we shall provide one.
 	
 	//setBaudRate, setLineProperty, readPins, setDTR, setRTS, setDtrRts getModemStatus
+	
+	/**
+	 * Convert baud rate. This function is for internal use only.
+	 *
+	 * @param baudrate the baudrate
+	 * @param value_index: values that gives to usb control transfer. First int is "value", second is "index"
+	 * @return the int
+	 * @return: the actual baud rate we get. The actual baud rate cannot always equals to the desired baud rate
+	 * due to clock pre-scale stuff inside the FTDI chips.
+	 */
+	private int convertBaudRate(int baudrate, int[] value_index)
+	{
+	    final byte[] am_adjust_up = {0, 0, 0, 1, 0, 3, 2, 1};
+	    final byte[] am_adjust_dn = {0, 0, 0, 1, 0, 1, 2, 3};
+	    final byte[] frac_code = {0, 3, 2, 4, 1, 5, 6, 7};
+	    int divisor, best_divisor, best_baud, best_baud_diff, value, index;
+	    long encoded_divisor;
+	    
+	    int deviceType = mFTDI_Device.getDeviceType();
+
+	    if (baudrate <= 0)
+	    {
+	        // Return error
+	        return -1;
+	    }
+
+	    divisor = 24000000 / baudrate;
+
+	    if (deviceType == FTDI_Constants.DEVICE_TYPE_AM)
+	    {
+	        // Round down to supported fraction (AM only)
+	        divisor -= am_adjust_dn[divisor & 7];
+	    }
+
+	    // Try this divisor and the one above it (because division rounds down)
+	    best_divisor = 0;
+	    best_baud = 0;
+	    best_baud_diff = 0;
+	    for (int i = 0; i < 2; i++)
+	    {
+	        int try_divisor = divisor + i;
+	        int baud_estimate;
+	        int baud_diff;
+
+	        // Round up to supported divisor value
+	        if (try_divisor <= 8)
+	        {
+	            // Round up to minimum supported divisor
+	            try_divisor = 8;
+	        }
+	        else if (deviceType != FTDI_Constants.DEVICE_TYPE_AM && try_divisor < 12)
+	        {
+	            // BM doesn't support divisors 9 through 11 inclusive
+	            try_divisor = 12;
+	        }
+	        else if (divisor < 16)
+	        {
+	            // AM doesn't support divisors 9 through 15 inclusive
+	            try_divisor = 16;
+	        }
+	        else
+	        {
+	            if (deviceType == FTDI_Constants.DEVICE_TYPE_AM)
+	            {
+	                // Round up to supported fraction (AM only)
+	                try_divisor += am_adjust_up[try_divisor & 7];
+	                if (try_divisor > 0x1FFF8)
+	                {
+	                    // Round down to maximum supported divisor value (for AM)
+	                    try_divisor = 0x1FFF8;
+	                }
+	            }
+	            else
+	            {
+	                if (try_divisor > 0x1FFFF)
+	                {
+	                    // Round down to maximum supported divisor value (for BM)
+	                    try_divisor = 0x1FFFF;
+	                }
+	            }
+	        }
+	        // Get estimated baud rate (to nearest integer)
+	        baud_estimate = (24000000 + (try_divisor / 2)) / try_divisor;
+	        // Get absolute difference from requested baud rate
+	        if (baud_estimate < baudrate)
+	        {
+	            baud_diff = baudrate - baud_estimate;
+	        }
+	        else
+	        {
+	            baud_diff = baud_estimate - baudrate;
+	        }
+	        if (i == 0 || baud_diff < best_baud_diff)
+	        {
+	            // Closest to requested baud rate so far
+	            best_divisor = try_divisor;
+	            best_baud = baud_estimate;
+	            best_baud_diff = baud_diff;
+	            if (baud_diff == 0)
+	            {
+	                // Spot on! No point trying
+	                break;
+	            }
+	        }
+	    }
+	    // Encode the best divisor value
+	    encoded_divisor = (best_divisor >> 3) | (frac_code[best_divisor & 7] << 14);
+	    // Deal with special cases for encoded value
+	    if (encoded_divisor == 1)
+	    {
+	        encoded_divisor = 0;    // 3000000 baud
+	    }
+	    else if (encoded_divisor == 0x4001)
+	    {
+	        encoded_divisor = 1;    // 2000000 baud (BM only)
+	    }
+	    // Split into "value" and "index" values
+	    value = (short)(encoded_divisor & 0xFFFF);
+	    if (deviceType == FTDI_Constants.DEVICE_TYPE_2232C || deviceType == FTDI_Constants.DEVICE_TYPE_2232H || deviceType == FTDI_Constants.DEVICE_TYPE_4232H)
+	    {
+	        index = (short)(encoded_divisor >> 8);
+	        index &= 0xFF00;
+	        index |= mInterface;
+	    }
+	    else
+	    {
+	        index = (short)(encoded_divisor >> 16);
+	    }
+	    value_index[0]=value;
+	    value_index[1]=index;
+	    // Return the nearest baud rate
+	    return best_baud;
+	}
 	/**
 	 * Sets the baud rate.
 	 *
 	 * @param baudrate the baudrate
 	 * @return the int
 	 */
+	//TODO: this function is not finished yet.
 	int setBaudRate(int baudrate)
 	{
-		return 0;//TODO: detailed implementation
+	    int value, index;
+	    int actual_baudrate;
+	    int[] value_index = {0,0};
+
+	    //TODO: the FTDI_Interface need to know if the bitbang mode is enabled or not.
+	    //		Let's read more about FTDI hardware documents.
+	    //		So far it seems set, as long as the bitmode is NOT MPSSE_BITMODE_RESET, it shall be classified as "bigbang_enabled"
+	    
+//	    if (ftdi->bitbang_enabled)
+//	    {
+//	        baudrate = baudrate*4;
+//	    }
+
+	    actual_baudrate = convertBaudRate(baudrate, value_index);
+	    value = value_index[0];
+	    index = value_index[1];
+	    
+	    if (actual_baudrate <= 0)
+	    {
+	    	//write to log, this is a impossible baudrate
+	    	return -2;
+	    }
+
+	    // Check within tolerance (about 5%)
+	    if ((actual_baudrate * 2 < baudrate /* Catch overflows */ )
+	            || ((actual_baudrate < baudrate) ? (actual_baudrate * 21 < baudrate * 20) : (baudrate * 21 < actual_baudrate * 20)))
+	    {
+	        //Unsupported baudrate. Note: bitbang baudrates are automatically multiplied by 4
+	    	return -3;
+	    }
+	    
+	    if(mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BAUDRATE_REQUEST,
+	    		value, index, null, 0, mWriteTimeout)!=0)
+	    {
+	    	//write to log: setting new baudrate failed
+	    	return -1;
+	    }
+	    
+	    //ftdi->baudrate = baudrate;
+	    //TODO: need to keep a record of what baudrate is setup.
+	    return 0;
 	}
 	
 	/**
@@ -239,7 +422,7 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the stop bits setting: "+ Integer.toString(stop_bits_type));
-			return -1;
+			return -2;
 		}
 		
 		//check if the parity type is valid
@@ -253,7 +436,7 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the parity setting: "+ Integer.toString(parity_type));
-			return -1;
+			return -2;
 		}
 		
 		//check if the break type is valid
@@ -264,7 +447,7 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the break setting: "+ Integer.toString(break_type));
-			return -1;
+			return -2;
 		}
 		
 		//if we run to here, then every setting is valid. Just throw it through usb control message.
@@ -300,15 +483,153 @@ public class FTDI_Interface {
 	}
 	
 	/**
-	 * Read pins.
+	 * Read pins status from GPIO pins.
 	 *
-	 * @return the byte
+	 * @return 0 or positive value: The lower byte is the pin status. Can only be 0~255.
+	 * negative value: The error value returned by usb control msg operation.
 	 */
-	byte readPins()//Well, I do believe the method shall return the actual value directly.
+	int readPins()//Well, I do believe the method shall return the actual value directly.
 	{
-		return 0;//TODO: Detailed implementation. Shall return pin status in return value directly. Note that Byte shall be a referenced type!!
+		byte[] buf = new byte[1];
+		int returnval = 0;
+		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
+								0, mInterface, buf, 1, mReadTimeout);
+		if(returnval < 0)
+		{
+			return returnval;
+		}
+		else
+		{
+			return buf[1];//TODO: this reture value is questionable. It can be negative, when directly converted from "byte" to "int"
+		}
 	}
 	
+	/**
+	 * Gets the modem status.
+	 * This function allows the retrieve the two status bytes of the device.
+	 * The device sends these bytes also as a header for each read access
+	 * where they are discarded by ftdi_read_data(). The chip generates
+	 * the two stripped status bytes in the absence of data every 40 ms
+	 * Layout of the first byte:
+	 * - B0..B3 - must be 0
+	 * - B4       Clear to send (CTS)
+	 * 		0 = inactive
+	 * 		1 = active
+	 * - B5       Data set ready (DTS)
+	 * 		0 = inactive
+	 * 		1 = active
+	 * - B6       Ring indicator (RI)
+	 * 		0 = inactive
+	 * 		1 = active
+	 * - B7       Receive line signal detect (RLSD)
+	 * 		0 = inactive
+	 * 		1 = active
+	 * 
+	 * Layout of the second byte:
+	 * - B0       Data ready (DR)
+	 * - B1       Overrun error (OE)
+	 * - B2       Parity error (PE)
+	 * - B3       Framing error (FE)
+	 * - B4       Break interrupt (BI)
+	 * - B5       Transmitter holding register (THRE)
+	 * - B6       Transmitter empty (TEMT)
+	 * - B7       Error in RCVR FIFO
+	 *
+	 * @return postivie values: The 2-byte modem status, included in lower 2 bytes of the return value.
+	 * negative values: the error information from usb control tranfer
+	 */
+	int getModemStatus()
+	{
+		byte[] buf = new byte[2];
+		int returnval = 0;
+		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
+								0, mInterface, buf, 2, mReadTimeout);
+		if(returnval < 0)//TODO: the logical perfect judgement is returnval != 2. Think about this!
+		{
+			return returnval;
+		}
+		else
+		{
+			return buf[1] | (buf[2]<<8);
+		}
+	}
+	
+	/**
+	 * Sets the dtr.
+	 *
+	 * @param dtr the dtr
+	 * @return 0 or positive: All right.
+	 * negative value: error.
+	 */
+	int setDTR(int dtr)
+	{
+		switch(dtr)
+		{
+		case FTDI_Constants.SIO_SET_DTR_HIGH:
+		case FTDI_Constants.SIO_SET_DTR_LOW:
+			break;
+		default:
+			Log.e(TAG,"The DTR value can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW: "+ Integer.toString(dtr));
+			return -1;
+		}
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+									dtr, mInterface, null, 0, mWriteTimeout);
+	}
+	
+	/**
+	 * Sets the rts.
+	 *
+	 * @param rts the rts
+	 * @return 0 or positive: All right.
+	 * negative value: error.
+	 */
+	int setRTS(int rts)
+	{
+		switch(rts)
+		{
+		case FTDI_Constants.SIO_SET_RTS_HIGH:
+		case FTDI_Constants.SIO_SET_RTS_LOW:
+			break;
+		default:
+			Log.e(TAG,"The DTR value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			return -1;
+		}
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+									rts, mInterface, null, 0, mWriteTimeout);
+	}
+	
+	/**
+	 * Sets the dtr and rts in one single function.
+	 *
+	 * @param dtr the dtr
+	 * @param rts the rts
+	 * @return 0 or positive: All right.
+	 * negative value: error.
+	 */
+	int setDTR_RTS(int dtr, int rts)
+	{
+		switch(dtr)
+		{
+		case FTDI_Constants.SIO_SET_DTR_HIGH:
+		case FTDI_Constants.SIO_SET_DTR_LOW:
+			break;
+		default:
+			Log.e(TAG,"The DTR value can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW: "+ Integer.toString(dtr));
+			return -1;
+		}
+		switch(rts)
+		{
+		case FTDI_Constants.SIO_SET_RTS_HIGH:
+		case FTDI_Constants.SIO_SET_RTS_LOW:
+			break;
+		default:
+			Log.e(TAG,"The DTR value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			return -1;
+		}
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+				(dtr|rts), mInterface, null, 0, mWriteTimeout);
+	}
+	//setBitMode
 	/**
 	 * Sets the bit mask bit mode.
 	 *
@@ -342,7 +663,6 @@ public class FTDI_Interface {
 		//TODO: I think we need to keep a record of the bitmode, and let upper level fucntions to poll the bitmode status.
 	}
 	
-	//setBitMode
 	/**
 	 * Sets the bit mode.
 	 *
@@ -360,34 +680,56 @@ public class FTDI_Interface {
 	 * Sets the latency timer.
 	 *
 	 * @param latency the latency
-	 * @return the int
+	 * @return 0 or positive if successful. Negative value if failed.
 	 */
-	int setLatencyTimer(byte latency)
+	int setLatencyTimer(int latency)
 	{
-		return 0;//TODO: Detailed implementation
+		if(latency < 1 || latency > 255)
+		{
+			Log.e(TAG,"latency must be a 1~255, but the parameter gives: "+ Integer.toString(latency));
+			return -1;
+		}
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_LATENCY_TIMER_REQUEST,
+								latency, mInterface, null, 0, mWriteTimeout);
 	}
 	
 	/**
 	 * Gets the latency timer.
 	 *
-	 * @return the latency timer
+	 * @return positive number: The latency timer value. Can be 1~255.
+	 * negative number: The usb control msg error message. And this function will never return 0.
 	 */
-	byte getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
+	int getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
 	{
-		return 0;//TODO: detailed implementation
+		byte[] buf = new byte[1];
+		int returnval = 0;
+		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_GET_LATENCY_TIMER_REQUEST,
+								0, mInterface, buf, 1, mReadTimeout);
+		if(returnval < 0)
+		{
+			return returnval;
+		}
+		else
+		{
+			return buf[1];
+		}
 	}
 	
 	//setEventChar, setErrorChar
 	/**
-	 * Sets the event char.
+	 * Set or reset the event char.
 	 *
 	 * @param eventChar the event char
 	 * @param enable the enable
 	 * @return the int
+	 * @return: 0 or positive if successful. Negative value if failed.
 	 */
-	int setEventChar(byte eventChar, byte enable)
+	int setEventChar(byte eventChar, boolean enable)
 	{
-		return 0;//TODO: detailed implementation
+		int combinedValue = eventChar;
+		if(enable) combinedValue |= (0x01<<8);
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_EVENT_CHAR_REQUEST,
+						combinedValue, mInterface, null, 0, mWriteTimeout);
 	}
 	
 	/**
@@ -397,8 +739,11 @@ public class FTDI_Interface {
 	 * @param enable the enable
 	 * @return the int
 	 */
-	int setErrorChar(byte errorChar, byte enable)
+	int setErrorChar(byte errorChar, boolean enable)
 	{
-		return 0;//TODO: detailed implementation
+		int combinedValue = errorChar;
+		if(enable) combinedValue |= (0x01<<8);
+		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_ERROR_CHAR_REQUEST,
+						combinedValue, mInterface, null, 0, mWriteTimeout);
 	}
 }
