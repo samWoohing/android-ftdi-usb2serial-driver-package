@@ -117,5 +117,12 @@ public final class FTDI_Constants {
     public static final byte MPSSE_BITMODE_CBUS   = 0x20;    /**< Bitbang on CBUS pins of R-type chips, configure in EEPROM before */
     public static final byte MPSSE_BITMODE_SYNCFF = 0x40;    /**< Single Channel Synchronous FIFO mode, available on 2232H chips */
     
-
+    /*Pre-defined device type*/
+    public static final int DEVICE_TYPE_AM		=0;
+    public static final int DEVICE_TYPE_BM		=1;
+    public static final int DEVICE_TYPE_2232C	=2;
+    public static final int DEVICE_TYPE_R		=3;
+    public static final int DEVICE_TYPE_2232H	=4;
+    public static final int DEVICE_TYPE_4232H	=5;
+    
 }
