@@ -16,7 +16,7 @@ import android.hardware.usb.UsbConstants;
  */
 public class FTDI_Interface {
 	
-	//TODO: define a convention for function return values.
+	//define a convention for function return values.
 	//Currently I suggest the following:
 	//	-1: usb operation error in usb control transfer, or usb bulk transfer.
 	//	-2: the given input parameter is not reasonable.
@@ -49,10 +49,6 @@ public class FTDI_Interface {
 	/** The endpoint used for writing data. */
 	private UsbEndpoint mEndpointOut;
 	
-	/** The Usb time out setting. it'll be used by usbBulkTransfer or usbControlTransfer. 
-	 * But the question is... shall we maintain different timeout value for each?? */
-	private int mUsbTimeOut;
-	
 	/** The class shall know which interface itself is, A, B, C or D?. */
 	private int mInterface;
 	
@@ -62,6 +58,11 @@ public class FTDI_Interface {
 	/** The write timeout. */
 	private int mWriteTimeout	=5000;
 	
+	/** The baud rate. This member is kept synchronized with FTDI chip's setting */
+	private int mBaudRate = -1;
+	
+	/** The bit bang mode. This member is kept synchronized with FTDI chip's setting*/
+	private int mBitMode = 0;
 	//==================================================================
 	//	3. The section of member methods
 	//==================================================================
@@ -90,7 +91,7 @@ public class FTDI_Interface {
 		if(newUsbInterface.getEndpointCount()!=2)
 		{
 			Log.e(TAG, "Total number of endpoints does not equal to 2 on UsbInterface: "+newUsbInterface.toString());
-			return -1;
+			return -2;
 		}
 		
 		//verify the 2 endpoints is one input and one output
@@ -110,7 +111,7 @@ public class FTDI_Interface {
 		else
 		{
 			Log.e(TAG, "The 2 endpoints are not 1 input and 1 output on UsbInterface: "+newUsbInterface.toString());
-			return -1;
+			return -2;
 		}
 		
 		//check by endpoint address
@@ -147,7 +148,7 @@ public class FTDI_Interface {
 			return 0;
 		}
 		Log.e(TAG, "The 2 endpoints addresses are incorrect on UsbInterface: "+newUsbInterface.toString());
-		return -1;
+		return -2;
 	}
 	
 	/**
@@ -177,15 +178,70 @@ public class FTDI_Interface {
 	{
 		return mInterface;
 	}
+	
+	/**
+	 * Sets the usb read timeout.
+	 *
+	 * @param newtimeout the new usb read timeout
+	 */
+	public void setUsbReadTimeout(int newtimeout)
+	{
+		mReadTimeout = newtimeout;
+	}
+	
+	/**
+	 * Gets the usb read timeout.
+	 *
+	 * @return the usb read timeout
+	 */
+	public int getUsbReadTimeout()
+	{
+		return mReadTimeout;
+	}
+	
+	/**
+	 * Sets the usb write timeout.
+	 *
+	 * @param newtimeout the new usb write timeout
+	 */
+	public void setUsbWriteTimeout(int newtimeout)
+	{
+		mWriteTimeout = newtimeout;
+	}
+	
+	/**
+	 * Gets the usb write timeout.
+	 *
+	 * @return the usb write timeout
+	 */
+	public int getUsbWriteTimeout()
+	{
+		return mWriteTimeout;
+	}
 	//==================================================================
 	//	3.x Serial port control and operation methods
 	//==================================================================
+	//TODO: Need to find a proper function definition to place claimInterface and releaseInterface.
+	public int openInterface()
+	{
+		//Things I believe we need to do here: 
+		//	1. give a reset to the device
+		//	2. set bitmode to known state, should know its default setting after reset.
+		//	3. set baudrate to known state, should know its default setting after reset
+		//Question is: how do these sync with all other member methods here.
+		return 0;
+	}
+	
+	public int closeInterface()
+	{
+		return 0;
+	}
 	/**
 	 * Read data.
 	 *
 	 * @param buffer the buffer
 	 * @param length the length
-	 * @return the int
+	 * @return the return value of bulkTransfer method.
 	 */
 	int readData(byte[] buffer, int length)
 	{
@@ -197,7 +253,7 @@ public class FTDI_Interface {
 	 *
 	 * @param buffer the buffer
 	 * @param length the length
-	 * @return the int
+	 * @return the return value of bulkTransfer method.
 	 */
 	int writeData(byte[] buffer, int length)
 	{
@@ -343,7 +399,10 @@ public class FTDI_Interface {
 	 * Sets the baud rate.
 	 *
 	 * @param baudrate the baudrate
-	 * @return the int
+	 * @return 0: Everything is OK.
+	 * @return -1: the usb controlTransfer function has failed.
+	 * @return -2: Cannot implement the desired baud rate.
+	 * @return -3: The error between implemented baud rate and desired baud rate >5 percent.
 	 */
 	//TODO: this function is not finished yet.
 	int setBaudRate(int baudrate)
@@ -368,6 +427,7 @@ public class FTDI_Interface {
 	    if (actual_baudrate <= 0)
 	    {
 	    	//write to log, this is a impossible baudrate
+	    	Log.e(TAG,"The actual baud rate calculated as zero or negative value, impossible to implement: " + Integer.toString(actual_baudrate));
 	    	return -2;
 	    }
 
@@ -376,19 +436,34 @@ public class FTDI_Interface {
 	            || ((actual_baudrate < baudrate) ? (actual_baudrate * 21 < baudrate * 20) : (baudrate * 21 < actual_baudrate * 20)))
 	    {
 	        //Unsupported baudrate. Note: bitbang baudrates are automatically multiplied by 4
+	    	Log.e(TAG, "The actual baud rate: "+ Integer.toString(actual_baudrate)+" has >5% error from desired baud rate: "+ Integer.toString(baudrate));
 	    	return -3;
 	    }
 	    
-	    if(mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BAUDRATE_REQUEST,
-	    		value, index, null, 0, mWriteTimeout)!=0)
+	    int r;
+	    if(( r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BAUDRATE_REQUEST,
+	    		value, index, null, 0, mWriteTimeout)) != 0)
 	    {
 	    	//write to log: setting new baudrate failed
+	    	Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 	    	return -1;
 	    }
-	    
-	    //ftdi->baudrate = baudrate;
-	    //TODO: need to keep a record of what baudrate is setup.
-	    return 0;
+	    else
+	    {
+		    //need to keep a record of what baudrate is setup.
+	    	mBaudRate = actual_baudrate;
+		    return 0;
+	    }
+	}
+	
+	/**
+	 * Gets the baud rate.
+	 *
+	 * @return the mBaudRate. The actual baud rate calculated and set when calling setBaudRate method.
+	 */
+	int getBaudRate()
+	{
+		return mBaudRate;
 	}
 	
 	/**
@@ -399,7 +474,9 @@ public class FTDI_Interface {
 	 * @param stop_bits_type the stop_bits_type
 	 * @param parity_type the parity_type
 	 * @param break_type the break_type
-	 * @return integer value. 0 or positive value if successful. Return negative value if anything goes wrong.
+	 * @return 0: everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: one input parameter is not reasonable.
 	 */
 	int setLineProperty(int data_bits_type, int stop_bits_type, int parity_type, int break_type)
 	{
@@ -411,7 +488,7 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the data bits setting: "+ Integer.toString(data_bits_type));
-			return -1;
+			return -2;
 		}
 		//check if the stop bits type is valid
 		switch(stop_bits_type)
@@ -452,16 +529,24 @@ public class FTDI_Interface {
 		
 		//if we run to here, then every setting is valid. Just throw it through usb control message.
 		int combinedSetupValue = data_bits_type|(parity_type << 8)|(stop_bits_type << 11)|(break_type << 14);
-		
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_DATA_REQUEST,
-											combinedSetupValue, mInterface, null, 0, mWriteTimeout);
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_DATA_REQUEST,
+											combinedSetupValue, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
+		}
+		else
+			return 0;
 	}
 	
 	/**
 	 * Sets the flow control.
 	 *
 	 * @param flow_ctrl_type the flow_ctrl_type
-	 * @return integer value. 0 or positive if successful. Negative value if failed.
+	 * @return 0: everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: one input parameter is not reasonable.
 	 */
 	int setFlowControl(int flow_ctrl_type)
 	{
@@ -475,32 +560,39 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the flow control type: "+ Integer.toString(flow_ctrl_type));
+			return -2;
+		}
+		int r;
+		if ((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_FLOW_CTRL_REQUEST, 
+										0, (flow_ctrl_type|mInterface), null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 			return -1;
 		}
-		
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_FLOW_CTRL_REQUEST, 
-										0, (flow_ctrl_type|mInterface), null, 0, mWriteTimeout);
+		else
+			return 0;
 	}
 	
 	/**
 	 * Read pins status from GPIO pins.
 	 *
 	 * @return 0 or positive value: The lower byte is the pin status. Can only be 0~255.
-	 * negative value: The error value returned by usb control msg operation.
+	 * @return -1: negative value: The error value returned by usb control msg operation.
 	 */
 	int readPins()//Well, I do believe the method shall return the actual value directly.
 	{
 		byte[] buf = new byte[1];
-		int returnval = 0;
-		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
+		int r = 0;
+		r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
 								0, mInterface, buf, 1, mReadTimeout);
-		if(returnval < 0)
+		if(r != 1)
 		{
-			return returnval;
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
 		}
 		else
 		{
-			return buf[1];//TODO: this reture value is questionable. It can be negative, when directly converted from "byte" to "int"
+			return ((int)buf[1]) & (int)0x000000ff;//TODO: verify and make sure this return value is non-negative.
 		}
 	}
 	
@@ -535,31 +627,33 @@ public class FTDI_Interface {
 	 * - B6       Transmitter empty (TEMT)
 	 * - B7       Error in RCVR FIFO
 	 *
-	 * @return postivie values: The 2-byte modem status, included in lower 2 bytes of the return value.
-	 * negative values: the error information from usb control tranfer
+	 * @return non-negative value: lower 2 bytes represents the modem status.
+	 * @return -1: USB controlTransfer operation failed.
 	 */
 	int getModemStatus()
 	{
 		byte[] buf = new byte[2];
-		int returnval = 0;
-		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
+		int r = 0;
+		r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_READ_PINS_REQUEST,
 								0, mInterface, buf, 2, mReadTimeout);
-		if(returnval < 0)//TODO: the logical perfect judgement is returnval != 2. Think about this!
+		if(r != 2)
 		{
-			return returnval;
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
 		}
 		else
 		{
-			return buf[1] | (buf[2]<<8);
+			return ((int)buf[1]) | (buf[2]<<8);//TODO: verify if this return value is truely a non-negative value of Modem status.
 		}
 	}
 	
 	/**
 	 * Sets the dtr.
 	 *
-	 * @param dtr the dtr
-	 * @return 0 or positive: All right.
-	 * negative value: error.
+	 * @param dtr: DTR setting. Can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW.
+	 * @return 0: Everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: input value cannot be recognized.
 	 */
 	int setDTR(int dtr)
 	{
@@ -570,18 +664,26 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"The DTR value can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW: "+ Integer.toString(dtr));
+			return -2;
+		}
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+									dtr, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 			return -1;
 		}
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
-									dtr, mInterface, null, 0, mWriteTimeout);
+		else
+			return 0;
 	}
 	
 	/**
 	 * Sets the rts.
 	 *
-	 * @param rts the rts
-	 * @return 0 or positive: All right.
-	 * negative value: error.
+	 * @param rts: the RTS setting. Can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW.
+	 * @return 0: Everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: input value cannot be recognized.
 	 */
 	int setRTS(int rts)
 	{
@@ -591,20 +693,28 @@ public class FTDI_Interface {
 		case FTDI_Constants.SIO_SET_RTS_LOW:
 			break;
 		default:
-			Log.e(TAG,"The DTR value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			Log.e(TAG,"The RTS value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			return -2;
+		}
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+									rts, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 			return -1;
 		}
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
-									rts, mInterface, null, 0, mWriteTimeout);
+		else
+			return 0;
 	}
 	
 	/**
 	 * Sets the dtr and rts in one single function.
 	 *
-	 * @param dtr the dtr
-	 * @param rts the rts
-	 * @return 0 or positive: All right.
-	 * negative value: error.
+	 * @param dtr: the DTR setting. Can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW.
+	 * @param rts: the RTS setting. Can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW.
+	 * @return 0: Everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: input value cannot be recognized.
 	 */
 	int setDTR_RTS(int dtr, int rts)
 	{
@@ -615,7 +725,7 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"The DTR value can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW: "+ Integer.toString(dtr));
-			return -1;
+			return -2;
 		}
 		switch(rts)
 		{
@@ -623,11 +733,18 @@ public class FTDI_Interface {
 		case FTDI_Constants.SIO_SET_RTS_LOW:
 			break;
 		default:
-			Log.e(TAG,"The DTR value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			Log.e(TAG,"The RTS value can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW: "+ Integer.toString(rts));
+			return -2;
+		}
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
+				(dtr|rts), mInterface, null, 0, mWriteTimeout)) != 0 )
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 			return -1;
 		}
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_MODEM_CTRL_REQUEST,
-				(dtr|rts), mInterface, null, 0, mWriteTimeout);
+		else
+			return 0;
 	}
 	//setBitMode
 	/**
@@ -637,7 +754,9 @@ public class FTDI_Interface {
 	 * @param bitmode : set the bitbang mode. Must be MPSSE_BITMODE_RESET, MPSSE_BITMODE_BITBANG, 
 	 * 					MPSSE_BITMODE_MPSSE, MPSSE_BITMODE_SYNCBB, MPSSE_BITMODE_MCU,MPSSE_BITMODE_OPTO
 	 * 					MPSSE_BITMODE_CBUS, or MPSSE_BITMODE_SYNCFF
-	 * @return the int
+	 * @return 0: Everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: input value cannot be recognized.
 	 */
 	int SetBitMaskBitMode(byte bitmask, byte bitmode)
 	{
@@ -654,64 +773,94 @@ public class FTDI_Interface {
 			break;
 		default:
 			Log.e(TAG,"Cannot recognize the bit mode: "+ Integer.toString(bitmode));
-			return -1;
+			return -2;
 		}
 		
 		int combinedSetupValue = (bitmode << 8) | bitmask;
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BITMODE_REQUEST, 
-										combinedSetupValue, mInterface, null, 0, mWriteTimeout);
-		//TODO: I think we need to keep a record of the bitmode, and let upper level fucntions to poll the bitmode status.
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BITMODE_REQUEST, 
+										combinedSetupValue, mInterface, null, 0, mWriteTimeout))  != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
+		}
+		else
+		{
+			//need to keep a record of the bitmode, and let upper level methods be able to poll the bitmode status.
+			mBitMode = bitmode;
+			return 0;
+		}
 	}
 	
 	/**
-	 * Sets the bit mode.
+	 * Gets the bit mode.
 	 *
-	 * @param bitmask the bitmask
-	 * @param bitmode the bitmode
-	 * @return the int
+	 * @return the int represents mBitMode
 	 */
-	int setBitMode(byte bitmask, byte bitmode)
+	int getBitMode()
 	{
-		return 0;//TODO: revise input parameter definition. Detailed implementation
+		return mBitMode;
 	}
 	
+	/**
+	 * Checks if bitbang mode is enabled.
+	 *
+	 * @return true, if bit bang mode is enabled
+	 */
+	boolean isBitBangEnabled()
+	{
+		if(mBitMode == FTDI_Constants.MPSSE_BITMODE_RESET)
+			return false;
+		else
+			return true;
+	}
 	//setLatencyTimer, getLatencyTimer	
 	/**
 	 * Sets the latency timer.
 	 *
-	 * @param latency the latency
-	 * @return 0 or positive if successful. Negative value if failed.
+	 * @param latency: the desired latency in ms. Must be 1~255
+	 * @return 0: Everything is OK.
+	 * @return -1: USB controlTransfer method failed.
+	 * @return -2: input value cannot be recognized.
 	 */
 	int setLatencyTimer(int latency)
 	{
 		if(latency < 1 || latency > 255)
 		{
 			Log.e(TAG,"latency must be a 1~255, but the parameter gives: "+ Integer.toString(latency));
+			return -2;
+		}
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_LATENCY_TIMER_REQUEST,
+								latency, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
 			return -1;
 		}
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_LATENCY_TIMER_REQUEST,
-								latency, mInterface, null, 0, mWriteTimeout);
+		else
+			return 0;
 	}
 	
 	/**
 	 * Gets the latency timer.
 	 *
-	 * @return positive number: The latency timer value. Can be 1~255.
-	 * negative number: The usb control msg error message. And this function will never return 0.
+	 * @return positive number: The latency timer value. Can only be 1~255. By design, this method WILL NOT return 0.
+	 * @return -1: USB controlTransfer method failed.
 	 */
 	int getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
 	{
 		byte[] buf = new byte[1];
-		int returnval = 0;
-		returnval = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_GET_LATENCY_TIMER_REQUEST,
+		int r = 0;
+		r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_IN_REQTYPE, FTDI_Constants.SIO_GET_LATENCY_TIMER_REQUEST,
 								0, mInterface, buf, 1, mReadTimeout);
-		if(returnval < 0)
+		if(r!= 1)
 		{
-			return returnval;
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
 		}
 		else
 		{
-			return buf[1];
+			return ((int)buf[1] & 0x000000ff);//TODO: verify this function returns a non-negative value as latency timer setup.
 		}
 	}
 	
@@ -719,31 +868,48 @@ public class FTDI_Interface {
 	/**
 	 * Set or reset the event char.
 	 *
-	 * @param eventChar the event char
-	 * @param enable the enable
-	 * @return the int
-	 * @return: 0 or positive if successful. Negative value if failed.
+	 * @param eventChar: the byte that is used as the event char.
+	 * @param enable: indicate the event char is enabled or not.
+	 * @return 0: everything is fine.
+	 * @return -1: USB controlTransfer method failed.
 	 */
 	int setEventChar(byte eventChar, boolean enable)
 	{
-		int combinedValue = eventChar;
+		//make sure the high bits doesn't set to 1 during type casting.
+		int combinedValue = ((int)eventChar) & 0x000000ff;//TODO: make sure the combined value is as what we've desired
 		if(enable) combinedValue |= (0x01<<8);
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_EVENT_CHAR_REQUEST,
-						combinedValue, mInterface, null, 0, mWriteTimeout);
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_EVENT_CHAR_REQUEST,
+						combinedValue, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
+		}
+		else
+			return 0;
 	}
 	
 	/**
 	 * Sets the error char.
 	 *
-	 * @param errorChar the error char
-	 * @param enable the enable
-	 * @return the int
+	 * @param errorChar: the byte that is used as the error char.
+	 * @param enable: indicate the error char is enabled or not.
+	 * @return 0: everything is fine.
+	 * @return -1: USB controlTransfer method failed.
 	 */
 	int setErrorChar(byte errorChar, boolean enable)
 	{
-		int combinedValue = errorChar;
+		//make sure the high bits doesn't set to 1 during type casting.
+		int combinedValue = ((int)errorChar & 0x000000ff);//TODO: make sure the combined value is as what we've desired
 		if(enable) combinedValue |= (0x01<<8);
-		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_ERROR_CHAR_REQUEST,
-						combinedValue, mInterface, null, 0, mWriteTimeout);
+		int r;
+		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_ERROR_CHAR_REQUEST,
+						combinedValue, mInterface, null, 0, mWriteTimeout)) != 0)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			return -1;
+		}
+		else
+			return 0;
 	}
 }
