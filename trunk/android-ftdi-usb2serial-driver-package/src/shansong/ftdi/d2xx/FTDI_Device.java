@@ -192,6 +192,7 @@ public class FTDI_Device{
 		//////////////////////////////////////////////////
 		//TODO: design the EEPROM initialization here.
 		
+		//TODO: get the device type here.
 		//After checking and making sure this is a FTDI chip, do the actual initialization of this class
 		mUsbDevice = dev;
 		
@@ -265,7 +266,12 @@ public class FTDI_Device{
 		}
 		
 		mUsbDeviceConnection = mManager.openDevice(mUsbDevice);
+		for(int i=0; i < mFTDI_Interfaces.length; i++)
+		{
+			mFTDI_Interfaces[i].setUsbDeviceConnection(mUsbDeviceConnection);
+		}		
 		
+		//Reset and initialize the device to a known state.
 		if(resetDevice()!=0)
 		{
 			Log.e(TAG,"Failed to reset device:"+mUsbDevice.toString());
@@ -281,6 +287,9 @@ public class FTDI_Device{
 			Log.e(TAG,"Failed to purge TX buffer on device:"+mUsbDevice.toString());
 			return -1;
 		}
+		
+		//TODO: also need to keep sync with FTDI_Interfaces' baud rate, bit mode, etc.
+		
 		//arrive here then everything is fine.
 		Log.d(TAG,"USB device opened:"+mUsbDevice.toString());
 		return 0;
@@ -290,6 +299,11 @@ public class FTDI_Device{
 	{
 		mUsbDeviceConnection.close();
 		mUsbDeviceConnection = null;
+		//Also teh device connection kept by mFTDI_Interfaces are not valid any more.
+		for(int i=0; i < mFTDI_Interfaces.length; i++)
+		{
+			mFTDI_Interfaces[i].setUsbDeviceConnection(null);
+		}
 		//TODO: decide if there's more cleaning up jobs to do when closing the device.
 	}
 	
