@@ -414,12 +414,11 @@ public class FTDI_Interface {
 	    //TODO: the FTDI_Interface need to know if the bitbang mode is enabled or not.
 	    //		Let's read more about FTDI hardware documents.
 	    //		So far it seems set, as long as the bitmode is NOT MPSSE_BITMODE_RESET, it shall be classified as "bigbang_enabled"
+	    if(this.isBitBangEnabled())
+	    {
+	    	baudrate = baudrate*4;
+	    }
 	    
-//	    if (ftdi->bitbang_enabled)
-//	    {
-//	        baudrate = baudrate*4;
-//	    }
-
 	    actual_baudrate = convertBaudRate(baudrate, value_index);
 	    value = value_index[0];
 	    index = value_index[1];
