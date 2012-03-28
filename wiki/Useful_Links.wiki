@@ -48,3 +48,7 @@ http://developer.android.com/guide/topics/usb/host.html
 This "USB in a nutshell" is very useful. Following page explains what is bcdDevice, etc, and all the details of a USB descriptor:
 
 http://www.beyondlogic.org/usbnutshell/usb5.shtml
+
+MUST LOOK AT THIS PAGE!! The standard USB request list in this page gives the chance to get bcdDevice even if Android does not provide a function to do this:
+
+http://www.beyondlogic.org/usbnutshell/usb6.shtml#StandardDeviceRequests
