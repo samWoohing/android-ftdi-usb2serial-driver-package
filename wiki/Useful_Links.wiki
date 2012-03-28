@@ -42,3 +42,9 @@ http://android.serverbox.ch/?p=370
 Android USB host develop guide
 
 http://developer.android.com/guide/topics/usb/host.html
+
+= USB related =
+
+This "USB in a nutshell" is very useful. Following page explains what is bcdDevice, etc, and all the details of a USB descriptor:
+
+http://www.beyondlogic.org/usbnutshell/usb5.shtml
