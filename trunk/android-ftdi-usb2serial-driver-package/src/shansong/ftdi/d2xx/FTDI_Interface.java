@@ -243,7 +243,7 @@ public class FTDI_Interface {
 	 * @param length the length
 	 * @return the return value of bulkTransfer method.
 	 */
-	int readData(byte[] buffer, int length)
+	public int readData(byte[] buffer, int length)
 	{
 		return mUsbDeviceConnection.bulkTransfer(mEndpointIn, buffer, length, mReadTimeout);//TODO: detailed implementation
 	}
@@ -255,7 +255,7 @@ public class FTDI_Interface {
 	 * @param length the length
 	 * @return the return value of bulkTransfer method.
 	 */
-	int writeData(byte[] buffer, int length)
+	public int writeData(byte[] buffer, int length)
 	{
 		return mUsbDeviceConnection.bulkTransfer(mEndpointOut, buffer, length, mReadTimeout);//TODO: detailed implementation
 	}
@@ -405,7 +405,7 @@ public class FTDI_Interface {
 	 * @return -3: The error between implemented baud rate and desired baud rate >5 percent.
 	 */
 	//TODO: this function is not finished yet.
-	int setBaudRate(int baudrate)
+	public int setBaudRate(int baudrate)
 	{
 	    int value, index;
 	    int actual_baudrate;
@@ -460,7 +460,7 @@ public class FTDI_Interface {
 	 *
 	 * @return the mBaudRate. The actual baud rate calculated and set when calling setBaudRate method.
 	 */
-	int getBaudRate()
+	public int getBaudRate()
 	{
 		return mBaudRate;
 	}
@@ -477,7 +477,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: one input parameter is not reasonable.
 	 */
-	int setLineProperty(int data_bits_type, int stop_bits_type, int parity_type, int break_type)
+	public int setLineProperty(int data_bits_type, int stop_bits_type, int parity_type, int break_type)
 	{
 		//check the number of data bits is valid.
 		switch(data_bits_type)//FTDI document D2xx programming guide says it only supports 7 or 8.
@@ -547,7 +547,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: one input parameter is not reasonable.
 	 */
-	int setFlowControl(int flow_ctrl_type)
+	public int setFlowControl(int flow_ctrl_type)
 	{
 		//Only allow the pre-defined flow control type.
 		switch(flow_ctrl_type)
@@ -578,7 +578,7 @@ public class FTDI_Interface {
 	 * @return 0 or positive value: The lower byte is the pin status. Can only be 0~255.
 	 * @return -1: negative value: The error value returned by usb control msg operation.
 	 */
-	int readPins()//Well, I do believe the method shall return the actual value directly.
+	public int readPins()//Well, I do believe the method shall return the actual value directly.
 	{
 		byte[] buf = new byte[1];
 		int r = 0;
@@ -629,7 +629,7 @@ public class FTDI_Interface {
 	 * @return non-negative value: lower 2 bytes represents the modem status.
 	 * @return -1: USB controlTransfer operation failed.
 	 */
-	int getModemStatus()
+	public int getModemStatus()
 	{
 		byte[] buf = new byte[2];
 		int r = 0;
@@ -654,7 +654,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: input value cannot be recognized.
 	 */
-	int setDTR(int dtr)
+	public int setDTR(int dtr)
 	{
 		switch(dtr)
 		{
@@ -684,7 +684,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: input value cannot be recognized.
 	 */
-	int setRTS(int rts)
+	public int setRTS(int rts)
 	{
 		switch(rts)
 		{
@@ -715,7 +715,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: input value cannot be recognized.
 	 */
-	int setDTR_RTS(int dtr, int rts)
+	public int setDTR_RTS(int dtr, int rts)
 	{
 		switch(dtr)
 		{
@@ -757,7 +757,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: input value cannot be recognized.
 	 */
-	int SetBitMaskBitMode(byte bitmask, byte bitmode)
+	public int SetBitMaskBitMode(byte bitmask, byte bitmode)
 	{
 		switch(bitmode)
 		{
@@ -796,7 +796,7 @@ public class FTDI_Interface {
 	 *
 	 * @return the int represents mBitMode
 	 */
-	int getBitMode()
+	public int getBitMode()
 	{
 		return mBitMode;
 	}
@@ -806,7 +806,7 @@ public class FTDI_Interface {
 	 *
 	 * @return true, if bit bang mode is enabled
 	 */
-	boolean isBitBangEnabled()
+	public boolean isBitBangEnabled()
 	{
 		if(mBitMode == FTDI_Constants.MPSSE_BITMODE_RESET)
 			return false;
@@ -822,7 +822,7 @@ public class FTDI_Interface {
 	 * @return -1: USB controlTransfer method failed.
 	 * @return -2: input value cannot be recognized.
 	 */
-	int setLatencyTimer(int latency)
+	public int setLatencyTimer(int latency)
 	{
 		if(latency < 1 || latency > 255)
 		{
@@ -846,7 +846,7 @@ public class FTDI_Interface {
 	 * @return positive number: The latency timer value. Can only be 1~255. By design, this method WILL NOT return 0.
 	 * @return -1: USB controlTransfer method failed.
 	 */
-	int getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
+	public int getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
 	{
 		byte[] buf = new byte[1];
 		int r = 0;
@@ -872,7 +872,7 @@ public class FTDI_Interface {
 	 * @return 0: everything is fine.
 	 * @return -1: USB controlTransfer method failed.
 	 */
-	int setEventChar(byte eventChar, boolean enable)
+	public int setEventChar(byte eventChar, boolean enable)
 	{
 		//make sure the high bits doesn't set to 1 during type casting.
 		int combinedValue = ((int)eventChar) & 0x000000ff;//TODO: make sure the combined value is as what we've desired
@@ -896,7 +896,7 @@ public class FTDI_Interface {
 	 * @return 0: everything is fine.
 	 * @return -1: USB controlTransfer method failed.
 	 */
-	int setErrorChar(byte errorChar, boolean enable)
+	public int setErrorChar(byte errorChar, boolean enable)
 	{
 		//make sure the high bits doesn't set to 1 during type casting.
 		int combinedValue = ((int)errorChar & 0x000000ff);//TODO: make sure the combined value is as what we've desired

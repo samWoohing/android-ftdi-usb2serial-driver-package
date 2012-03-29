@@ -18,7 +18,8 @@ import android.hardware.usb.UsbConstants;
  * @author 307004396
  */
 public class FTDI_Device{
-
+	//TODO: Design the method to retrieve bcdDevice using standard USB request.
+	
 	//==================================================================
 	//	1. USB command codes
 	//==================================================================
@@ -68,7 +69,7 @@ public class FTDI_Device{
 	
 	/**
 	 * Inits the FTDI_Device class according to the device information given by dev.
-	 *
+	 * TODO: revise the return value here
 	 * @param dev the dev
 	 * @return the int
 	 */
@@ -195,8 +196,9 @@ public class FTDI_Device{
 		//TODO: get the device type here.
 		//After checking and making sure this is a FTDI chip, do the actual initialization of this class
 		mUsbDevice = dev;
+		mFTDI_EEPROM = new FTDI_EEPROM();
 		
-		return 0;//TODO: revise return value, detailed implementation
+		return 0;
 	}
 	
 	/**
@@ -269,7 +271,8 @@ public class FTDI_Device{
 		for(int i=0; i < mFTDI_Interfaces.length; i++)
 		{
 			mFTDI_Interfaces[i].setUsbDeviceConnection(mUsbDeviceConnection);
-		}		
+		}
+		mFTDI_EEPROM.setUsbDeviceConnection(mUsbDeviceConnection);
 		
 		//Reset and initialize the device to a known state.
 		if(resetDevice()!=0)
@@ -304,6 +307,8 @@ public class FTDI_Device{
 		{
 			mFTDI_Interfaces[i].setUsbDeviceConnection(null);
 		}
+		//And mFTDI_EEPROM's mUsbDeviceConnection needs to be cleared.
+		mFTDI_EEPROM.clrUsbDeviceConnection();
 		//TODO: decide if there's more cleaning up jobs to do when closing the device.
 	}
 	
@@ -327,5 +332,102 @@ public class FTDI_Device{
 		return mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_RESET_PURGE_TX, 
 				FTDI_Constants.SIO_RESET_SIO, FTDI_Constants.INTERFACE_ANY, null, 0, mWriteTimeout);
 		//TODO: I give it a INTERFACE_ANY as parameter. Need to verify if it is correct. I believe the Index doesn't matter.
+	}
+	
+	//==================================================================
+	//	3. The section of privately used methods
+	//==================================================================
+	/*Special definitions ONLY used for FTDI_Device.getbcdDevice*/
+    protected static final int STD_USB_REQUEST_GET_DESCRIPTOR = 0x06;//This is a standard usb request. Used ONLY in FTDI_Device.getbcdDevice().
+	protected static final int STD_USB_DT_DEVICE = 0x01;//Description type: device
+	protected static final int STD_USB_DT_DEVICE_LEN = 18;//standard device descriptor length is 18
+	protected static final int STD_USB_BCDDEVICE_OFFSET=12;//offset of bcdDevice in the entire descriptor.
+	protected static final int STD_USB_ISERIALNUMBER_OFFSET=16;//offset of bcdDevice in the entire descriptor.
+	/**
+	 * Gets the entire device descriptor. We need bcdDevice and iSerialNum to decide the chip type, but android does not give this function interface.
+	 * So let's do it by ourselves, by sending standard USB controlTransfer command.
+	 *
+	 * @return the buffer that contains the DeviceDescriptor.
+	 * @return null:if anything goes wrong
+	 */
+	private byte[] getDeviceDescriptor()
+	{
+		//This is how libusb implement it:
+	//static inline int libusb_get_descriptor(libusb_device_handle *dev,
+	//		uint8_t desc_type, uint8_t desc_index, unsigned char *data, int length)
+	//{
+	//	return libusb_control_transfer(dev, LIBUSB_ENDPOINT_IN,
+	//			LIBUSB_REQUEST_GET_DESCRIPTOR, (desc_type << 8) | desc_index, 0, data,
+	//			length, 1000);
+	//}
+		//Note: in above code:
+		//		LIBUSB_ENDPOINT_IN = UsbConstants.USB_DIR_IN = 0x80.
+		// 		LIBUSB_REQUEST_GET_DESCRIPTOR = 0x06 is the standard usb request to get descriptor.
+		//		desc_type is the descriptor type, refer to libusb's "libusb_descriptor_type" for more details. 
+		//			In this case, we need to get device descriptor, so desc_type = LIBUSB_DT_DEVICE = 0x01
+		//		desc_index, since for usb device descriptor, there's only one. so I believe desc_index=0 is the only choice.
+		
+		UsbManager mManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
+		//check if we have the permission to this device
+		if(!mManager.hasPermission(mUsbDevice))
+		{
+			//write the permission problem to Android log, and return -1
+			Log.e(TAG,"Permission denied when opening the device:"+mUsbDevice.toString());
+			return null;
+		}
+		//use a temporary connection to open the device
+		UsbDeviceConnection tempConn = mManager.openDevice(mUsbDevice);
+		if(tempConn == null)
+		{
+			Log.e(TAG,"Cannot open the device:"+mUsbDevice.toString());
+			return null;
+		}
+
+		//Device descriptor total size is 18 byte. So prepare a 18 byte array
+		byte[] buf = new byte[STD_USB_DT_DEVICE_LEN];
+		int r;
+		
+		if ((r = tempConn.controlTransfer(UsbConstants.USB_DIR_IN, STD_USB_REQUEST_GET_DESCRIPTOR, 
+				(STD_USB_DT_DEVICE << 8), 0, buf, STD_USB_DT_DEVICE_LEN, mReadTimeout)) 
+				!= STD_USB_DT_DEVICE_LEN)
+		{
+			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+			tempConn.close();
+			return null;
+		}
+		
+		//always remember to close the temporary connection
+		tempConn.close();
+		return buf;
+	}
+	
+	/**
+	 * Gets the bcdDevice from a raw device descriptor retrieved by getDeviceDescriptor.
+	 *
+	 * @param dev_desc the device descriptor retrieved by getDeviceDescriptor.
+	 * @return the bcdDevice from device descriptor
+	 */
+	private int getBcdDeviceFromDeviceDescriptor(byte[] dev_desc)
+	{
+		return ((int)dev_desc[STD_USB_BCDDEVICE_OFFSET] & 0xff) |
+				(((int)dev_desc[STD_USB_BCDDEVICE_OFFSET+1] & 0xff)<< 8);
+	}
+	
+	/**
+	 * Gets the iSerialNumber from a raw device descriptor retrieved by getDeviceDescriptor.
+	 *
+	 * @param dev_desc the device descriptor retrieved by getDeviceDescriptor.
+	 * @return the iSerialNumber from device descriptor
+	 */
+	private int getiSerialNumberFromDeviceDescriptor(byte[] dev_desc)
+	{
+		return ((int)dev_desc[STD_USB_ISERIALNUMBER_OFFSET] & 0xff);
+	}
+	
+	//TODO: now it's time for us to define the data representation for device types. Check the device types defined in FTDI_Constants.
+	//		Make the definition simple and tidy pls!!!
+	private int decideDeviceType()
+	{
+		return 0;
 	}
 }
