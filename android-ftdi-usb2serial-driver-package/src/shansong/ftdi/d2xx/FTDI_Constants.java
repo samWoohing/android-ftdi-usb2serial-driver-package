@@ -13,10 +13,10 @@ public final class FTDI_Constants {
 	
 	/* Pre-defined RequestType: */
 	//FTDI usb-to-serial chips only use 2 request types. In request and out request:
-	public static final int USB_RECIP_DEVICE = 0x00;
+	protected static final int USB_RECIP_DEVICE = 0x00;
 	public static final int FTDI_DEVICE_OUT_REQTYPE = UsbConstants.USB_TYPE_VENDOR|USB_RECIP_DEVICE|UsbConstants.USB_DIR_OUT;
 	public static final int FTDI_DEVICE_IN_REQTYPE = UsbConstants.USB_TYPE_VENDOR|USB_RECIP_DEVICE|UsbConstants.USB_DIR_IN ;
-	
+		
 	/* Pre-defined Requests:  */	
 	public static final int SIO_RESET_REQUEST				=0x00;
 	public static final int SIO_SET_MODEM_CTRL_REQUEST		=0x01;
@@ -124,5 +124,5 @@ public final class FTDI_Constants {
     public static final int DEVICE_TYPE_R		=3;
     public static final int DEVICE_TYPE_2232H	=4;
     public static final int DEVICE_TYPE_4232H	=5;
-    
+            
 }
