@@ -73,7 +73,7 @@ public class FTDI_Interface {
 	protected FTDI_Interface(FTDI_Device newFTDI_Device)
 	{
 		mFTDI_Device = newFTDI_Device;
-		//TODO: anything else
+		//TODO: anything else?
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public class FTDI_Interface {
 	public int openInterface()
 	{
 		//Things I believe we need to do here: 
-		//	1. give a reset to the device
+		//	1. give a reset to the device (already handled by OpenDevice function)
 		//	2. set bitmode to known state, should know its default setting after reset.
 		//	3. set baudrate to known state, should know its default setting after reset
 		//Question is: how do these sync with all other member methods here.
@@ -404,14 +404,13 @@ public class FTDI_Interface {
 	 * @return -2: Cannot implement the desired baud rate.
 	 * @return -3: The error between implemented baud rate and desired baud rate >5 percent.
 	 */
-	//TODO: this function is not finished yet.
 	public int setBaudRate(int baudrate)
 	{
 	    int value, index;
 	    int actual_baudrate;
 	    int[] value_index = {0,0};
 
-	    //TODO: the FTDI_Interface need to know if the bitbang mode is enabled or not.
+	    //TODO: Verify if this works fine. the FTDI_Interface need to know if the bitbang mode is enabled or not.
 	    //		Let's read more about FTDI hardware documents.
 	    //		So far it seems set, as long as the bitmode is NOT MPSSE_BITMODE_RESET, it shall be classified as "bigbang_enabled"
 	    if(this.isBitBangEnabled())

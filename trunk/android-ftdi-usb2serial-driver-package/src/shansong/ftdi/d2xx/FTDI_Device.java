@@ -15,7 +15,7 @@ import android.hardware.usb.UsbConstants;
 /**
  * The Class FTDI_Device.
  *
- * @author 307004396
+ * @author Shan Song
  */
 public class FTDI_Device{
 	//TODO: Design the method to retrieve bcdDevice using standard USB request.
@@ -189,12 +189,18 @@ public class FTDI_Device{
 		}
 		
 		//////////////////////////////////////////////////
-		//Step3: Initialize the EEPROM
-		//////////////////////////////////////////////////
-		//TODO: design the EEPROM initialization here.
+		//Step3: Decide the device type
+		//////////////////////////////////////////////////		
+		// get the device type here.
+		int temp_dev_type;
+		if ((temp_dev_type = decideDeviceType()) <0)
+		{
+			Log.e(TAG,"Cannot decide device type. decideDeviceType() failed.");
+			return -1;
+		}
 		
-		//TODO: get the device type here.
 		//After checking and making sure this is a FTDI chip, do the actual initialization of this class
+		mDeviceType = temp_dev_type;
 		mUsbDevice = dev;
 		mFTDI_EEPROM = new FTDI_EEPROM();
 		
@@ -237,16 +243,6 @@ public class FTDI_Device{
 	public int getDeviceType()
 	{
 		return mDeviceType;
-	}
-	
-	/**
-	 * Sets the device type.
-	 *
-	 * @param newDeviceType the new device type
-	 */
-	protected void setDeviceType(int newDeviceType)
-	{
-		mDeviceType = newDeviceType;
 	}
 	
 	//==================================================================
@@ -426,8 +422,40 @@ public class FTDI_Device{
 	
 	//TODO: now it's time for us to define the data representation for device types. Check the device types defined in FTDI_Constants.
 	//		Make the definition simple and tidy pls!!!
+	/**
+	 * Decide device type by reading bcdDevice and iSerialNumber.
+	 *
+	 * @return 0 or positive: the device type. The value can only be DEVICE_TYPE_AM,DEVICE_TYPE_BM,
+	 * 							DEVICE_TYPE_2232C,DEVICE_TYPE_R,DEVICE_TYPE_2232H,DEVICE_TYPE_4232H	
+	 * @return -1: something is wrong.
+	 */
 	private int decideDeviceType()
 	{
-		return 0;
+		byte[] dev_desc = getDeviceDescriptor();
+		if(dev_desc == null)
+		{
+			return -1;
+		}
+		
+		int bcdDevice = getBcdDeviceFromDeviceDescriptor(dev_desc);
+		int iSerialNumber = getiSerialNumberFromDeviceDescriptor(dev_desc);
+		// Try to guess chip type
+	    // Bug in the BM type chips: bcdDevice is 0x200 for serial == 0
+	    if (bcdDevice == 0x400 || (bcdDevice == 0x200
+	            && iSerialNumber == 0))
+	    	return FTDI_Constants.DEVICE_TYPE_BM;
+	    else if (bcdDevice == 0x200)
+	    	return FTDI_Constants.DEVICE_TYPE_AM;
+	    else if (bcdDevice == 0x500)
+	    	return FTDI_Constants.DEVICE_TYPE_2232C;
+	    else if (bcdDevice == 0x600)
+	    	return FTDI_Constants.DEVICE_TYPE_R;
+	    else if (bcdDevice == 0x700)
+	    	return FTDI_Constants.DEVICE_TYPE_2232H;
+	    else if (bcdDevice == 0x800)
+	        return FTDI_Constants.DEVICE_TYPE_4232H;
+	    else
+	    	return -1;//If cannot decide, return -1 for marking error
+	        
 	}
 }
