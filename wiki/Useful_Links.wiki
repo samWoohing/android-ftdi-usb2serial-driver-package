@@ -49,6 +49,9 @@ http://andbook.anddev.org/files/andbook.pdf
 
 http://www.scandevconf.se/db/Marakana-Android-UI.pdf
 
+Android's example of building tab-based GUI. Since TabActivity is deprecated, we'd better follow this new example:
+
+http://developer.android.com/reference/android/app/TabActivity.html
 
 = USB related =
 
