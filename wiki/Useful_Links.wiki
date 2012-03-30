@@ -53,6 +53,11 @@ Android's example of building tab-based GUI. Since TabActivity is deprecated, we
 
 http://developer.android.com/reference/android/app/TabActivity.html
 
+
+Since API 11 on, Android also has a better choice called "ActionBar". I would prefer to use this, but check and see first:
+
+http://developer.android.com/guide/topics/ui/actionbar.html
+
 = USB related =
 
 This "USB in a nutshell" is very useful. Following page explains what is bcdDevice, etc, and all the details of a USB descriptor:
