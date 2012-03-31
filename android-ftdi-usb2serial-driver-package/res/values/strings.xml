@@ -3,5 +3,7 @@
 
     <string name="hello">Hello World, SandboxAppActivity!</string>
     <string name="app_name">Android-ftdi-usb2serial-driver-package</string>
+    <string name="hyper_term_main_title">This is Hyper Terminal Main Tab</string>
+    <string name="serial_port_config_title">This is the serial port config tab title</string>
 
 </resources>
