@@ -16,19 +16,24 @@ public class SandboxAppActivity extends Activity {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.main);
         
-        //It seems that if we use action bar, we are NOT able to use any theme. Or the
+        //It seems that if we use action bar, we are NOT able to use any theme if the theme has NoTitle. 
+        //Or the getActionBar will return null.
         final ActionBar bar = this.getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-
+        
+        //disable the DISPLAY_SHOW_HOME and DISPLAY_SHOW_TITLE, then only tabs are shown on the top of screen.
+        //Note that this setDisplayOptions function is a little tricky. 
+        //First parameter is value, Second parameter is Mask
+        bar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE );
+               
         bar.addTab(bar.newTab()
-                .setText("Simple")
-                .setTabListener(new TabListener<Fragment>(
-                        this, "simple", Fragment.class)));
+                .setText("main")
+                .setTabListener(new TabListener<HyperTermMainFrag>(
+                        this, "simple", HyperTermMainFrag.class)));
         bar.addTab(bar.newTab()
-                .setText("Contacts")
-                .setTabListener(new TabListener<Fragment>(
-                        this, "contacts", Fragment.class)));
+                .setText("port config")
+                .setTabListener(new TabListener<SerialPortConfigFrag>(
+                        this, "contacts", SerialPortConfigFrag.class)));
         
     }
     
