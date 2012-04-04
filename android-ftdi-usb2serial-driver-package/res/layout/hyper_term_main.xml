@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:text="Button" />
     </LinearLayout>
-
+
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
@@ -51,7 +51,6 @@
         android:inputType="textMultiLine"
         android:singleLine="false"
         android:typeface="monospace" >
-
         <requestFocus />
     </EditText>
 
