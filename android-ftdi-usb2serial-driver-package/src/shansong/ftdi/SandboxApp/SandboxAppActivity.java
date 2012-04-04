@@ -9,8 +9,21 @@ import android.os.Bundle;
 import android.widget.Toast;
 import shansong.ftdi.d2xx.*;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SandboxAppActivity.
+ */
 public class SandboxAppActivity extends Activity {
-    /** Called when the activity is first created. */
+    
+	private FTDI_Device mFTDI_Device;
+	
+	//TODO: set this to private in future.
+	public boolean mIsSerialPortConnected;
+    /**
+     * Called when the activity is first created.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,17 +50,54 @@ public class SandboxAppActivity extends Activity {
         
     }
     
+    /**
+     * The listener interface for receiving tab events.
+     * The class that is interested in processing a tab
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addTabListener<code> method. When
+     * the tab event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @param <T> the generic type
+     * @see TabEvent
+     */
     public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
+        
+        /** The m activity. */
         private final Activity mActivity;
+        
+        /** The m tag. */
         private final String mTag;
+        
+        /** The m class. */
         private final Class<T> mClass;
+        
+        /** The m args. */
         private final Bundle mArgs;
+        
+        /** The m fragment. */
         private Fragment mFragment;
 
+        /**
+         * Instantiates a new tab listener.
+         *
+         * @param activity the activity
+         * @param tag the tag
+         * @param clz the clz
+         */
         public TabListener(Activity activity, String tag, Class<T> clz) {
             this(activity, tag, clz, null);
         }
 
+        /**
+         * Instantiates a new tab listener.
+         *
+         * @param activity the activity
+         * @param tag the tag
+         * @param clz the clz
+         * @param args the args
+         */
         public TabListener(Activity activity, String tag, Class<T> clz, Bundle args) {
             mActivity = activity;
             mTag = tag;
@@ -65,6 +115,9 @@ public class SandboxAppActivity extends Activity {
             }
         }
 
+        /* (non-Javadoc)
+         * @see android.app.ActionBar.TabListener#onTabSelected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
+         */
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             if (mFragment == null) {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
@@ -74,14 +127,32 @@ public class SandboxAppActivity extends Activity {
             }
         }
 
+        /* (non-Javadoc)
+         * @see android.app.ActionBar.TabListener#onTabUnselected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
+         */
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {
             if (mFragment != null) {
                 ft.detach(mFragment);
             }
         }
 
+        /* (non-Javadoc)
+         * @see android.app.ActionBar.TabListener#onTabReselected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
+         */
         public void onTabReselected(Tab tab, FragmentTransaction ft) {
             Toast.makeText(mActivity, "Reselected!", Toast.LENGTH_SHORT).show();
         }
+    }
+    
+    
+    /**
+     * Checks if the app has a serial port connected.
+     *
+     * @return true, if is serial port connected
+     * @return false, if no serial port is connected
+     */
+    protected boolean isSerialPortConnected()
+    {
+    	return mIsSerialPortConnected;
     }
 }

@@ -1,18 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="hello">Hello World, SandboxAppActivity!</string>
     <string name="app_name">Android-ftdi-usb2serial-driver-package</string>
     <string name="hyper_term_main_title">Terminal</string>
     <string name="serial_port_hw_select_title">Choose FTDI device:</string>
     <string name="serial_port_cfg_title">Serial port configure:</string>
     <string name="usb_dev_selection">USB Device:</string>
-    <string name="interface_selection">Interface:</string>
-    <string name="baud_rate">Baud rate:</string>
-    <string name="data_bits">Data bits:</string>
-    <string name="stop_bits">Stop bits:</string><string name="parity">Parity:</string>
-    <string name="flow_ctrl">Flow ctrl:</string>
-    <color name="port_cfg_title_color">#80FFFF</color>
+    <string name="usb_dev_selection_prompt">Choose a FTDI device:</string><string name="interface_selection">Interface:</string>
+    <string name="interface_selection_prompt">Choose a interface on the device:</string><string name="baud_rate">Baud rate:</string>
+    <string name="baud_rate_prompt">Select baud rate (bps):</string><string name="data_bits">Data bits:</string>
+    <string name="data_bits_prompt">Select number of data bits:</string><string name="stop_bits">Stop bits:</string><string name="stop_bits_prompt">Select num of stop bits:</string><string name="parity">Parity:</string>
+    <string name="parity_prompt">Select a parity option:</string><string name="flow_ctrl">Flow ctrl:</string>
+    <string name="flow_ctrl_prompt">Select a flow control option:</string><color name="port_cfg_title_color">#80FFFF</color>
+    <string-array name="baud_rate_list">
+        <item >300</item>
+        <item >600</item>
+        <item >1200</item>
+        <item>1800</item><item >2400</item>
+        <item >4800</item>
+        <item >9600</item>
+        <item >14400</item>
+        <item >19200</item>
+        <item >38400</item>
+        <item >57600</item>
+        <item >115200</item>
+        <item >230400</item>
+        <item >460800</item>
+        
+    </string-array>
+    <string-array name="data_bits_list">
+        <item >7</item>
+        <item >8</item>
+    </string-array>
+    <string-array name="stop_bits_list">
+        <item >1</item>
+        <item >1.5</item>
+        <item >2</item>
+    </string-array>
+    <string-array name="parity_list">
+        <item>None</item><item >Odd</item>
+        <item >Even</item>
+        <item >Mark</item>
+        <item >Space</item>
+        
+    </string-array>
+    <string-array name="flow_ctrl_list">
+        <item >None</item>
+        <item >RTS/CTS</item>
+        <item >DTR/DSR</item>
+        <item >Xon/Xoff</item>
+    </string-array>
+    
+    
+    
+    
+    
+    
+    
     
 
 </resources>
