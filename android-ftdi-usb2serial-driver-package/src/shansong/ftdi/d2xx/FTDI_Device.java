@@ -4,6 +4,9 @@
  */
 package shansong.ftdi.d2xx;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.Context;
 import android.util.Log;
 import android.hardware.usb.UsbDevice;
@@ -309,11 +312,12 @@ public class FTDI_Device{
 	}
 	
 	/**
-	 * Find all ftdi devices connected to USB host, and return them in an array
+	 * Find all ftdi devices connected to USB host, and return them in an array.
 	 *
-	 * @return array that includes all USB devices that are recognized as FTDI devices.
+	 * @param context the context
+	 * @return Hashmap that includes all USB devices that are recognized as FTDI devices.
 	 */
-	public UsbDevice[] findAllFTDIDevices()
+	public static HashMap<String, UsbDevice> findAllFTDIDevices(Context context)
 	{
 		//use UsbManager function:
 		//public HashMap<String, UsbDevice> getDeviceList () 
@@ -324,10 +328,21 @@ public class FTDI_Device{
 		//get all usb devce in a hashmap
 		//go through the hashmap and 
 		//TODO: detailed implementation.
-		UsbManager mManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
-		//mManager.getDeviceList().values().toArray();
+		UsbManager mManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
 		
-		return null;
+		HashMap<String, UsbDevice> deviceList = mManager.getDeviceList();
+		//ArrayList<UsbDevice> mFTDIDevArrayList = new ArrayList<UsbDevice>();
+		HashMap<String, UsbDevice> FTDIDeviceList = new HashMap<String, UsbDevice>();
+		for(UsbDevice dev : deviceList.values())//iterate through the values
+		{
+			if(is_FTDI_USB_to_Serial_Device(dev))
+			{
+				//If this is a FTDI usb to serial device, add it to the return list.
+				//mFTDIDevArrayList.add(dev);
+				FTDIDeviceList.put(dev.getDeviceName(), dev);
+			}
+		}
+		return FTDIDeviceList;
 	}
 	
 	//TODO: resetDevice, usbPurgeRXBuffer, usbPurgeTXBuffer, Hmm... maybe this shall be defined as private functions just for internal use only?
@@ -487,12 +502,25 @@ public class FTDI_Device{
 	 * @param dev: the UsbDevice we'd like to check.
 	 * @return true, if it is a FTDI USB-to-serial device supported by this library. false if not.
 	 */
-	private boolean is_FTDI_USB_to_Serial_Device(UsbDevice dev)
+	private static boolean is_FTDI_USB_to_Serial_Device(UsbDevice dev)
 	{
 		//check VID, 
+		if(dev.getVendorId() != FTDI_Constants.VID_FTDI)
+		{
+			return false;
+		}
 		//check PID,
+		switch(dev.getProductId())
+		{
+		case FTDI_Constants.PID_FT232B_FT245B_FT232R_FT245R:
+		case FTDI_Constants.PID_FT232H:
+		case FTDI_Constants.PID_FT2232C_FT2232D_FT2232L_FT2232H:
+		case FTDI_Constants.PID_FT4232H:
+			return true;
+
+		default:
+			return false;
+		}
 		//check bcdDevice, I... don't think we need to go this far...
-		//TODO: detailed implementation.
-		return false;
 	}
 }

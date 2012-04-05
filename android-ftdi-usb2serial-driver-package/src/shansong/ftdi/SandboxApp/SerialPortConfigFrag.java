@@ -1,16 +1,23 @@
 package shansong.ftdi.SandboxApp;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.app.Fragment;
+import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+import shansong.ftdi.d2xx.FTDI_Device;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -94,6 +101,8 @@ public class SerialPortConfigFrag extends Fragment {
     	//	2: Generate a SpinnerAdapter that includes this list
     	//	3: give the adapter to the spinner
     	//	4: Update the interface spinner accordingly. 
+    	//following functions did 1~3. still need to update interface spinner items accordingly.
+    	refreshUsbDevSpinner();
     }
     
     /**
@@ -151,11 +160,14 @@ public class SerialPortConfigFrag extends Fragment {
     		//	2. when user changes the selection from one item to another.
     		//	Important: choosing the same item will NOT trigger this function.
     		
-    		//TODO: decide what to do
+    		//
     		//Need to update the drop-down list of interface selection spinner, according to the device selected.
-    		
+    		UsbDevice dev = mFTDIDevHashMap.get(((Spinner)getView().findViewById(R.id.spinner_usb_dev)).getSelectedItem());
+    		//TODO: update the interface spinner. Need to have another function in FTDI_Device to decide a 
+    		//		Hashmap or string array of interfaces for a given usb device.
+    		//		
     		//test purpose
-    		Toast.makeText(parentView.getContext(), "Item selected!", Toast.LENGTH_SHORT).show();
+    		Toast.makeText(getActivity(), "Item selected!", Toast.LENGTH_SHORT).show();
     	}
     	
     	public void onNothingSelected(AdapterView<?> parentView){         
@@ -175,8 +187,26 @@ public class SerialPortConfigFrag extends Fragment {
 	private OnClickListener mRefreshUsbDevBtnListener = new OnClickListener() {
         public void onClick(View v) {
             //TODO: Whenever this button is clicked, refresh the Usb device list and the interface list.
+        	refreshUsbDevSpinner();
+        	
         	//testing purpose:
         	Toast.makeText(v.getContext(), "Usb device list updated!", Toast.LENGTH_SHORT).show();
         }
     };	
+    
+    private HashMap<String, UsbDevice> mFTDIDevHashMap;
+    
+    private void refreshUsbDevSpinner()
+    {
+    	//enumerate all FTDI devices
+    	mFTDIDevHashMap = FTDI_Device.findAllFTDIDevices(getActivity());
+    	//get the key values and use them as spinner's list items by creating an adapter.
+    	String[] items = new String[mFTDIDevHashMap.size()];
+    	mFTDIDevHashMap.keySet().toArray(items);
+    	SpinnerAdapter adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item, items);
+    	//"adapter" contains all device names.
+    	((Spinner)getView().findViewById(R.id.spinner_usb_dev)).setAdapter(adapter);
+    	
+    	//TODO: this fragment need to keep a record of mFTDIList, add a member hashmap is enough.
+    }
 }
