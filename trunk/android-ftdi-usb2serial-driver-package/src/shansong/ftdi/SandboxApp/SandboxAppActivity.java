@@ -123,7 +123,9 @@ public class SandboxAppActivity extends Activity {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
                 ft.add(android.R.id.content, mFragment, mTag);
             } else {
-                ft.attach(mFragment);
+                //ft.attach(mFragment);
+            	//I modified this class, to show and hide, not attach and detach.
+            	ft.show(mFragment);
             }
         }
 
@@ -132,7 +134,9 @@ public class SandboxAppActivity extends Activity {
          */
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {
             if (mFragment != null) {
-                ft.detach(mFragment);
+                //ft.detach(mFragment);
+            	//I modified this class, to show and hide, not attach and detach.
+            	ft.hide(mFragment);
             }
         }
 

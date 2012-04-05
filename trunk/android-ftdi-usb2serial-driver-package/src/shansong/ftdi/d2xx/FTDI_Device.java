@@ -298,7 +298,7 @@ public class FTDI_Device{
 	{
 		mUsbDeviceConnection.close();
 		mUsbDeviceConnection = null;
-		//Also teh device connection kept by mFTDI_Interfaces are not valid any more.
+		//Also the device connection kept by mFTDI_Interfaces are not valid any more.
 		for(int i=0; i < mFTDI_Interfaces.length; i++)
 		{
 			mFTDI_Interfaces[i].setUsbDeviceConnection(null);
@@ -306,6 +306,28 @@ public class FTDI_Device{
 		//And mFTDI_EEPROM's mUsbDeviceConnection needs to be cleared.
 		mFTDI_EEPROM.clrUsbDeviceConnection();
 		//TODO: decide if there's more cleaning up jobs to do when closing the device.
+	}
+	
+	/**
+	 * Find all ftdi devices connected to USB host, and return them in an array
+	 *
+	 * @return array that includes all USB devices that are recognized as FTDI devices.
+	 */
+	public UsbDevice[] findAllFTDIDevices()
+	{
+		//use UsbManager function:
+		//public HashMap<String, UsbDevice> getDeviceList () 
+		//Returns a HashMap containing all USB devices currently attached. 
+		//USB device name is the key for the returned HashMap. 
+		//The result will be empty if no devices are attached, or if USB host mode is inactive or unsupported.
+		
+		//get all usb devce in a hashmap
+		//go through the hashmap and 
+		//TODO: detailed implementation.
+		UsbManager mManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
+		//mManager.getDeviceList().values().toArray();
+		
+		return null;
 	}
 	
 	//TODO: resetDevice, usbPurgeRXBuffer, usbPurgeTXBuffer, Hmm... maybe this shall be defined as private functions just for internal use only?
@@ -457,5 +479,20 @@ public class FTDI_Device{
 	    else
 	    	return -1;//If cannot decide, return -1 for marking error
 	        
+	}
+	
+	/**
+	 * Checks if a given UsbDevice is a FTDI usb-to-serial device.
+	 *
+	 * @param dev: the UsbDevice we'd like to check.
+	 * @return true, if it is a FTDI USB-to-serial device supported by this library. false if not.
+	 */
+	private boolean is_FTDI_USB_to_Serial_Device(UsbDevice dev)
+	{
+		//check VID, 
+		//check PID,
+		//check bcdDevice, I... don't think we need to go this far...
+		//TODO: detailed implementation.
+		return false;
 	}
 }
