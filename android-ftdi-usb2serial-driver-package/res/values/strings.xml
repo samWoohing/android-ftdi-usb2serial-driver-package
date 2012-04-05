@@ -49,6 +49,7 @@
         <item >DTR/DSR</item>
         <item >Xon/Xoff</item>
     </string-array>
+    <string name="refresh_usb_dev_btn_label">refresh USB dev list</string>
     
     
     

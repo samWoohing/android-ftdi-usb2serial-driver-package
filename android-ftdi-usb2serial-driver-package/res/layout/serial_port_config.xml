@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+
     <TextView
         android:id="@+id/textView_hw_select"
         android:layout_width="match_parent"
@@ -23,7 +23,8 @@
             android:layout_row="0"
             android:text="@string/usb_dev_selection"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
+
+        
         <Spinner
             android:id="@+id/spinner_usb_dev"
             android:layout_column="1"
@@ -46,7 +47,13 @@
             android:spinnerMode="dialog" />
 
     </GridLayout>
-
+
+    <Button
+        android:id="@+id/button_refresh_usb_dev_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/refresh_usb_dev_btn_label" />
+
     <TextView
         android:id="@+id/textView_port_cfg"
         android:layout_width="wrap_content"
@@ -54,7 +61,7 @@
         android:text="@string/serial_port_cfg_title"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/port_cfg_title_color" />
-
+
     <GridLayout
         android:id="@+id/gridLayout2"
         android:layout_width="match_parent"
@@ -76,7 +83,6 @@
             android:prompt="@string/baud_rate_prompt"
             android:spinnerMode="dialog" >
 
-            <!-- Preview: listitem=@android:layout/simple_spinner_item -->
         </Spinner>
 
         <TextView

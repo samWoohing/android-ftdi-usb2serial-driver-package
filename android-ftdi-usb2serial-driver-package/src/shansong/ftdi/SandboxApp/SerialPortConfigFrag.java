@@ -4,8 +4,13 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.AdapterView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -41,13 +46,64 @@ public class SerialPortConfigFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.serial_port_config, container, false);
-        //TODO: put any GUI initialization needed into here
-        //Detect whether or not a serial port is already connected.
-        //if already connected, all items in this view shall be disabled.
-        //Only when no serial port is connected, the items in this view 
-        //is enabled and user can operate them.
+
+        //TODO: set the onItemClickListener for some spinner here. I believe sp_usb_dev and sp_interface need this.
+        //well, maybe sp_interface does not need one.
+        //Set the OnItemSelectedListener for usb device list spinner.
+        Spinner sp_usb_dev	= (Spinner)v.findViewById(R.id.spinner_usb_dev);
+        sp_usb_dev.setOnItemSelectedListener(mUsbDevItemSelectedListener);
         
-        //Get all the spinners
+        //Set the OnClick listener for the button
+        Button btn_refresh_usb_dev = (Button)v.findViewById(R.id.button_refresh_usb_dev_list);
+        btn_refresh_usb_dev.setOnClickListener(mRefreshUsbDevBtnListener);
+        
+        return v;
+    }
+    
+    @Override
+    public void onHiddenChanged (boolean hidden)
+    {
+    	//update the enable/disable of each spinner
+    	//Only when no serial port is connected, the items in this view 
+        //is enabled and user can operate them.
+    	if(hidden)
+    	{
+    		//TODO: if this is a hiding transition, we should let SandboxAppActivity know what options the user has chosen.
+        	//TBD...
+    		
+    	}
+    	else
+    	{	//if this is a showing transition. Just update spinner status and show them.
+    		updateSpinnerStatus();
+    		
+    		//TODO: update the USB device selection list here.
+    	}
+    }
+    
+    @Override
+    public void onViewCreated (View view, Bundle savedInstanceState) 
+    {
+    	//update the enable/disable of each spinner
+    	//Only when no serial port is connected, the items in this view 
+        //is enabled and user can operate them.
+    	updateSpinnerStatus();
+    	
+    	//TODO: update the USB device selection list here.
+    	//general steps:
+    	//	1: Enumerate the current list of FTDI devices connected to USB host
+    	//	2: Generate a SpinnerAdapter that includes this list
+    	//	3: give the adapter to the spinner
+    	//	4: Update the interface spinner accordingly. 
+    }
+    
+    /**
+     * Update spinner enable/disable status, according to SandboxAppActivity.isSerialPortConnected
+     * If there's already a serial port connected, all spinners in this GUI are disabled.
+     */
+    private void updateSpinnerStatus()
+    {
+    	View v = this.getView();
+    	//Get all the spinners
         Spinner sp_usb_dev		=(Spinner)v.findViewById(R.id.spinner_usb_dev);
         Spinner sp_interface	=(Spinner)v.findViewById(R.id.spinner_interface);
         Spinner sp_baud_rate	=(Spinner)v.findViewById(R.id.spinner_baud_rate);
@@ -55,9 +111,7 @@ public class SerialPortConfigFrag extends Fragment {
         Spinner sp_stop_bits	=(Spinner)v.findViewById(R.id.spinner_stop_bits);
         Spinner sp_parity		=(Spinner)v.findViewById(R.id.spinner_parity);
         Spinner sp_flow_ctrl	=(Spinner)v.findViewById(R.id.spinner_flow_ctrl);
-        
-        //TODO: set the onItemClickListener for some spinner here. I believe sp_usb_dev and sp_interface need this.
-        //well, maybe sp_interface does not need one.
+        Button btn_refresh_usb_dev = (Button)v.findViewById(R.id.button_refresh_usb_dev_list);
         
         //decide whether these spinners should be enabled or disabled.
         SandboxAppActivity mApp = (SandboxAppActivity)this.getActivity();
@@ -70,6 +124,7 @@ public class SerialPortConfigFrag extends Fragment {
         	sp_stop_bits.setEnabled(false);
         	sp_parity.setEnabled(false);
         	sp_flow_ctrl.setEnabled(false);
+        	btn_refresh_usb_dev.setEnabled(false);
         }
         else
         {	//if the interface is not connected, we need to allow port configuring.
@@ -81,7 +136,47 @@ public class SerialPortConfigFrag extends Fragment {
         	sp_stop_bits.setEnabled(true);
         	sp_parity.setEnabled(true);
         	sp_flow_ctrl.setEnabled(true);
+        	btn_refresh_usb_dev.setEnabled(true);
         }
-        return v;
     }
+    
+    /** The ItemSelectedListener for USB device list spinner. */
+    private OnItemSelectedListener mUsbDevItemSelectedListener = new OnItemSelectedListener(){
+    	
+    	public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+    		//This callback is invoked only when the newly selected position is different 
+        	//from the previously selected position or if there was no selected item.
+    		//Note: according to my test, the onItemSelected is called under following situation:
+    		//	1. when first setup the selection items in the spinner, e.g. in OnCreateView, the spinner points to the first item.
+    		//	2. when user changes the selection from one item to another.
+    		//	Important: choosing the same item will NOT trigger this function.
+    		
+    		//TODO: decide what to do
+    		//Need to update the drop-down list of interface selection spinner, according to the device selected.
+    		
+    		//test purpose
+    		Toast.makeText(parentView.getContext(), "Item selected!", Toast.LENGTH_SHORT).show();
+    	}
+    	
+    	public void onNothingSelected(AdapterView<?> parentView){         
+    		//Callback method to be invoked when the selection disappears from this view. 
+    		//The selection can disappear for instance when touch is activated or when the adapter becomes empty.
+    		//
+    		//I haven't tried out when this function is called yet...
+    		//Seems that giving no items cannot trigger this function. I think it may happen when we suddenly remove 
+    		//all the selection items from the list.
+    		//TODO: decide what to do
+    		//test purpose
+    		Toast.makeText(parentView.getContext(), "Nothing selected!", Toast.LENGTH_SHORT).show();
+    	}
+	};
+	
+	
+	private OnClickListener mRefreshUsbDevBtnListener = new OnClickListener() {
+        public void onClick(View v) {
+            //TODO: Whenever this button is clicked, refresh the Usb device list and the interface list.
+        	//testing purpose:
+        	Toast.makeText(v.getContext(), "Usb device list updated!", Toast.LENGTH_SHORT).show();
+        }
+    };	
 }
