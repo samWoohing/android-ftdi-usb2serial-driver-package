@@ -48,6 +48,21 @@ public class SandboxAppActivity extends Activity {
                 .setTabListener(new TabListener<SerialPortConfigFrag>(
                         this, "contacts", SerialPortConfigFrag.class)));
         
+        //retrieve the previously saved Tab status
+        if (savedInstanceState != null) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+    	//save the tab selection location.
+    	//TODO: I believe there are more to save at here when we change the screen orientation.
+        super.onSaveInstanceState(outState);
+        outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
     }
     
     /**
