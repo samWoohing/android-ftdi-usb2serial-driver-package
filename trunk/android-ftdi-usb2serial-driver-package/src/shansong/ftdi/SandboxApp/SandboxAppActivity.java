@@ -42,15 +42,17 @@ public class SandboxAppActivity extends Activity {
         bar.addTab(bar.newTab()
                 .setText("main")
                 .setTabListener(new TabListener<HyperTermMainFrag>(
-                        this, "simple", HyperTermMainFrag.class)));
+                        this, "main", HyperTermMainFrag.class)));
         bar.addTab(bar.newTab()
                 .setText("port config")
                 .setTabListener(new TabListener<SerialPortConfigFrag>(
-                        this, "contacts", SerialPortConfigFrag.class)));
-        
+                        this, "port config", SerialPortConfigFrag.class)));
+        //bar.setSelectedNavigationItem(0);
         //retrieve the previously saved Tab status
         if (savedInstanceState != null) {
-            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+        	int index = savedInstanceState.getInt("tab", 0);
+        	if(index != 0)
+        		bar.setSelectedNavigationItem(index);
         }
     }
     
@@ -122,10 +124,15 @@ public class SandboxAppActivity extends Activity {
             // Check to see if we already have a fragment for this tab, probably
             // from a previously saved state.  If so, deactivate it, because our
             // initial state is that a tab isn't shown.
+
             mFragment = mActivity.getFragmentManager().findFragmentByTag(mTag);
-            if (mFragment != null && !mFragment.isDetached()) {
+            //Original android sample uses isDetached() and Detach() here. But since we use show/hide 
+            //in onTabSelected/OnTabDeselected, we should change here to isHidden/Hide accordingly.
+            //This is very important and solves a lot of weird problem in UI behavior.
+            if (mFragment != null && !mFragment.isHidden()) 
+            {
                 FragmentTransaction ft = mActivity.getFragmentManager().beginTransaction();
-                ft.detach(mFragment);
+                ft.hide(mFragment);
                 ft.commit();
             }
         }
@@ -133,32 +140,42 @@ public class SandboxAppActivity extends Activity {
         /* (non-Javadoc)
          * @see android.app.ActionBar.TabListener#onTabSelected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
          */
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            if (mFragment == null) {
+        public void onTabSelected(Tab tab, FragmentTransaction ft) 
+        {
+            if (mFragment == null) 
+            {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
                 ft.add(android.R.id.content, mFragment, mTag);
-            } else {
+                //Toast.makeText(mActivity, "Fragment add: "+mTag, Toast.LENGTH_SHORT).show();
+            } 
+            else 
+            {
                 //ft.attach(mFragment);
             	//I modified this class, to show and hide, not attach and detach.
             	ft.show(mFragment);
+            	//Toast.makeText(mActivity, "Fragment show: "+mTag, Toast.LENGTH_SHORT).show();
             }
         }
 
         /* (non-Javadoc)
          * @see android.app.ActionBar.TabListener#onTabUnselected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
          */
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            if (mFragment != null) {
+        public void onTabUnselected(Tab tab, FragmentTransaction ft)
+        {
+            if (mFragment != null) 
+            {
                 //ft.detach(mFragment);
             	//I modified this class, to show and hide, not attach and detach.
             	ft.hide(mFragment);
+            	//Toast.makeText(mActivity, "Fragment hide: "+mTag, Toast.LENGTH_SHORT).show();
             }
         }
 
         /* (non-Javadoc)
          * @see android.app.ActionBar.TabListener#onTabReselected(android.app.ActionBar.Tab, android.app.FragmentTransaction)
          */
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+        public void onTabReselected(Tab tab, FragmentTransaction ft) 
+        {
             Toast.makeText(mActivity, "Reselected!", Toast.LENGTH_SHORT).show();
         }
     }
