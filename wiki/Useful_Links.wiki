@@ -33,6 +33,12 @@ A very useful link that describes the FTDI chip's USB command set. Check it out 
 
 http://yosemitefoothills.com/Electronics/FTDI_Chip_Commands.html
 
+A library that operates FTDI chip:
+
+http://hackage.haskell.org/packages/archive/ftdi/0.1/doc/html/System-FTDI.html#v%3AmsTransmitterHoldingRegister
+
+The above page mentioned something interesting about FTDI chip USB read: the first 2 bytes are always ModemStatus bytes. Need to verify this!
+
 = Android related =
 
 Some idea on Android FTDI support:
