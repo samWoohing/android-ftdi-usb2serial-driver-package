@@ -238,6 +238,7 @@ public class FTDI_Interface {
 	}
 	/**
 	 * Read data.
+	 * TODO: the first two bytes of read data are ModemStatus. Need to do something with that!
 	 *
 	 * @param buffer the buffer
 	 * @param length the length
@@ -600,6 +601,7 @@ public class FTDI_Interface {
 	 * The device sends these bytes also as a header for each read access
 	 * where they are discarded by ftdi_read_data(). The chip generates
 	 * the two stripped status bytes in the absence of data every 40 ms
+	 * 
 	 * Layout of the first byte:
 	 * - B0..B3 - must be 0
 	 * - B4       Clear to send (CTS)
@@ -617,10 +619,10 @@ public class FTDI_Interface {
 	 * 
 	 * Layout of the second byte:
 	 * - B0       Data ready (DR)
-	 * - B1       Overrun error (OE)
-	 * - B2       Parity error (PE)
-	 * - B3       Framing error (FE)
-	 * - B4       Break interrupt (BI)
+	 * - B1       *Overrun error (OE)
+	 * - B2       *Parity error (PE)
+	 * - B3       *Framing error (FE)
+	 * - B4       *Break interrupt (BI)
 	 * - B5       Transmitter holding register (THRE)
 	 * - B6       Transmitter empty (TEMT)
 	 * - B7       Error in RCVR FIFO
