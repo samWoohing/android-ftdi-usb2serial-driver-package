@@ -3,6 +3,7 @@ package shansong.ftdi.d2xx;
 import java.nio.ByteBuffer;
 
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -25,6 +26,11 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
     /** The flag used to exit the main loop. */
     private boolean mContinueToRun;
     
+    /** The ftdi interface that is used as serial port. */
+    FTDI_Interface mFTDI_Interface;
+    
+    /** The m run write data. */
+    private boolean mRunReadData,mRunWriteData;
     
     /**
      * The listener interface for receiving onDataReceived events.
@@ -35,7 +41,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
      * the onDataReceived event occurs, that object's appropriate
      * method is invoked.
      *
-     * 
+     * @see OnDataReceivedEvent
      */
     public interface OnDataReceivedListener {
         
@@ -83,7 +89,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
      * the onErrorReceived event occurs, that object's appropriate
      * method is invoked.
      *
-     * 
+     * @see OnErrorReceivedEvent
      */
     public interface OnErrorReceivedListener {
         
@@ -129,7 +135,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
 	 * the onPinChanged event occurs, that object's appropriate
 	 * method is invoked.
 	 *
-	 * 
+	 * @see OnPinChangedEvent
 	 */
 	public interface OnPinChangedListener {
         
@@ -137,7 +143,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
          * On data received.
          *
          * @param sender the sender
-         * @param error the error
+         * @param pinChange the pin change
          */
         void onPinChanged(Object sender, int pinChange);
         
@@ -161,12 +167,13 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
     /**
      * Instantiates a new fTD i_ serial port read task.
      *
+     * @param claimedFTDI_Interface the claimed ftd i_ interface
      * @param readBufferSize the read buffer size
      * @param readTimeOut the read time out
      * @param writeBufferSize the write buffer size
      * @param writeTimeOut the: write time out in ms.
      */
-    public FTDI_SerialPortReadWriteTask(int readBufferSize, int readTimeOut,int writeBufferSize, int writeTimeOut)
+    public FTDI_SerialPortReadWriteTask(FTDI_Interface claimedFTDI_Interface, int readBufferSize, int readTimeOut,int writeBufferSize, int writeTimeOut)
     {
     	mReadBuffer = ByteBuffer.allocate(readBufferSize);
     	mReadTimeOut = readTimeOut;
@@ -175,15 +182,72 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
     }
     
     /**
+     * The Class ReadDataAsyncTask, use this when reading more than existing num of bytes in buffer.
+     * TODO: revise parameter, return value definitions. Use this into readData() method.
+     */
+    private class ReadDataAsyncTask extends AsyncTask<Void, Integer, Integer> {
+    	
+	    /** The start index. */
+	    private int length, startIndex;
+    	
+	    /** The buffer. */
+	    private byte[] buffer;
+    	
+ 		/* (non-Javadoc)
+		  * @see android.os.AsyncTask#doInBackground(Params[])
+		  */
+		 @Override
+		protected Integer doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+ 			
+ 			do{
+ 	    		int numRemain = mReadBuffer.remaining();
+ 	    		int numToRead = (numRemain <= length)?numRemain:length;
+ 	    		mReadBuffer.get(buffer, startIndex, numToRead);
+ 	    		startIndex+=numToRead;
+ 	    		length-=numToRead;
+ 	    		
+ 	    	}while(length>0);
+			return null;
+		}
+    }
+    
+    /**
      * Read data.
      *
      * @param buffer the buffer
+     * @param startIndex the start index
      * @param length the length
      * @return the int
      */
     public int readData(byte[] buffer, int startIndex, int length)
     {
     	//TODO: detailed implementation
+    	//Another solution is to use the get(...) method in an AsyncTask.
+    	//I think we need to create a AsyncTask only when necessary.
+    	mRunReadData = true;
+    	new CountDownTimer(mReadTimeOut, mReadTimeOut) {
+    		public void onTick(long millisUntilFinished)
+    		{
+    			return;
+    		}
+    		public void onFinish() 
+    		{         
+    			mRunReadData=false;     
+    		}
+    	};
+    	
+    	do{
+    		int numRemain = mReadBuffer.remaining();
+    		int numToRead = (numRemain <= length)?numRemain:length;
+    		mReadBuffer.get(buffer, startIndex, numToRead);
+    		startIndex+=numToRead;
+    		length-=numToRead;
+    		
+    	}while(length>0 && mRunReadData);
+    	
+    	//TODO: through out a Timeout exception if mRunReadData = false;
+    	
     	return 0;
     }
     
@@ -191,6 +255,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<FTDI_Interface, Inte
      * Write data.
      *
      * @param buffer the buffer
+     * @param startIndex the start index
      * @param length the length
      * @return the int
      */
