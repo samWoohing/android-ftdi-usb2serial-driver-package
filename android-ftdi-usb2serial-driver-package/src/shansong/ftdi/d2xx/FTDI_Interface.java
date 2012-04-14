@@ -238,7 +238,8 @@ public class FTDI_Interface {
 	}
 	/**
 	 * Read data.
-	 * TODO: the first two bytes of read data are ModemStatus. Need to do something with that!
+	 * Note that this method does not strip the two modem status bits automatically.
+	 * User has to handle this after calling this function.
 	 *
 	 * @param buffer the buffer
 	 * @param length the length
