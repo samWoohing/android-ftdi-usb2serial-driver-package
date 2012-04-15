@@ -1,11 +1,11 @@
 package shansong.ftdi.d2xx;
 
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import shansong.ftdi.d2xx.FTDI_Constants.FTDI_CommErroEnum;
+import shansong.ftdi.d2xx.FTDI_Constants.FTDI_PinChangeEnum;
 
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
@@ -37,13 +37,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     /** The ftdi interface that is used as serial port. */
     FTDI_Interface mFTDI_Interface;
     
-    /** The flag of whether or not the background task shall be kept running. */
-    private boolean mKeepRunning;
-    
-    public void stop()
-    {
-    	mKeepRunning = false;
-    }
     /**
      * The listener interface for receiving onDataReceived events.
      * The class that is interested in processing a onDataReceived
@@ -112,7 +105,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
          * @param sender the sender
          * @param error the error
          */
-        void onErrorReceived(Object sender, int error);
+        void onErrorReceived(Object sender, FTDI_CommErroEnum error);
         
         //to call the Listener within this class: mOnErrorReceivedListener.onDataReceived(this);
     }
@@ -159,7 +152,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
          * @param sender the sender
          * @param pinChange the pin change
          */
-        void onPinChanged(Object sender, int pinChange);
+        void onPinChanged(Object sender, FTDI_PinChangeEnum pinChange, boolean isPinActive);
         
         //to call the Listener within this class: mOnErrorReceivedListener.onDataReceived(this);
     }
@@ -197,7 +190,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	mReadTimeOut = readTimeOut;
     	mWriteTimeOut = writeTimeOut;
     	mFTDI_Interface = claimedFTDI_Interface;
-    	mKeepRunning = true;
     	
     }
     
@@ -213,6 +205,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    /** The buffer. */
 	    private byte[] buffer;
 	    
+	    private CountDownTimer mTimer;
+	    
+	    boolean isTimeOut;
 	    /**
     	 * Instantiates a new ReadDataAsyncTask.
     	 *
@@ -220,11 +215,21 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	 * @param stIdx the st idx
     	 * @param len the len
     	 */
-    	public ReadDataAsyncTask(byte[] buf, int stIdx, int len)
+    	public ReadDataAsyncTask(byte[] buf, int stIdx, int len, int readTimeOut)
 	    {
 	    	buffer = buf;
 	    	startIndex = stIdx;
 	    	length = len;
+	    	isTimeOut=false;
+	    	mTimer = new CountDownTimer(readTimeOut, readTimeOut+1){
+	    		public void onTick(long millisUntilFinished) {
+	    			//do nothing
+	    		}
+	    		public void onFinish() {
+	    			  ReadDataAsyncTask.this.cancel(true);
+	    			  isTimeOut=true;
+	    		}
+	    	};
 	    }
     	
  		/* (non-Javadoc)
@@ -235,6 +240,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     		int numAlreadyRead=0;
     		int numLeftToRead = length;
     		int currentStartIndex = startIndex;
+    		mTimer.start();
     		do{
     			int numOccupied = mRxFifo.occupiedLength();
     			
@@ -249,6 +255,10 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     			}
  	    		
     		}while(numLeftToRead>0 && !isCancelled());
+    		
+    		if(isTimeOut){
+    			//TODO: throw out Timeout exception.
+    		}
     		return numAlreadyRead;//TODO: review if this return value makes sense.
     	}
 	}
@@ -279,10 +289,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	}
     	else
     	{
-    		ReadDataAsyncTask readTask = new ReadDataAsyncTask(buffer, startIndex, length);
+    		ReadDataAsyncTask readTask = new ReadDataAsyncTask(buffer, startIndex, length, mReadTimeOut);
     		readTask.execute();
-    		result = readTask.get(mReadTimeOut, TimeUnit.MILLISECONDS);//this may throw the exception directly.
-    		
+    		result = readTask.get();//this may throw the exception directly.
     	}
        	return result;
     }
@@ -298,6 +307,10 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    /** The buffer. */
 	    private byte[] buffer;
 	    
+	    private CountDownTimer mTimer;
+	    
+	    boolean isTimeOut;
+	    
 	    /**
     	 * Instantiates a new write data async task.
     	 *
@@ -305,10 +318,20 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	 * @param stIdx the st idx
     	 * @param len the len
     	 */
-    	public WriteDataAsyncTask(byte[] buf, int stIdx, int len){
+    	public WriteDataAsyncTask(byte[] buf, int stIdx, int len, int writeTimeOut){
 	    	buffer = buf;
 	    	startIndex = stIdx;
 	    	length = len;
+	    	isTimeOut=false;
+	    	mTimer = new CountDownTimer(writeTimeOut, writeTimeOut+1){
+	    		public void onTick(long millisUntilFinished) {
+	    			//do nothing
+	    		}
+	    		public void onFinish() {
+	    			  WriteDataAsyncTask.this.cancel(true);
+	    			  isTimeOut=true;
+	    		}
+	    	};
 	    }
     	
     	/* (non-Javadoc)
@@ -321,7 +344,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     		int currentStartIndex = startIndex;
     		do{
     			int numFree = mTxFifo.freeLength();
-    			
+    			mTimer.start();
     			if(numFree>0)
     			{
     				int numToWriteOnce = (numFree <= numLeftToWrite)? numFree:numLeftToWrite;
@@ -331,7 +354,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     				numLeftToWrite -= numToWriteOnce;
     			}
     		}while(numLeftToWrite > 0 && !isCancelled());//when user cancel the operation, break the loop
-    		
+    		if(isTimeOut){
+    			//TODO: throw out Timeout exception.
+    		}
     		return numAlreadyWritten;
     	}
     }
@@ -356,9 +381,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	else
     	{
     		//TODO: call the async task.
-    		WriteDataAsyncTask mWriteDataAsyncTask = new WriteDataAsyncTask(buffer, startIndex, length);
+    		WriteDataAsyncTask mWriteDataAsyncTask = new WriteDataAsyncTask(buffer, startIndex, length, mWriteTimeOut);
     		mWriteDataAsyncTask.execute();
-    		result = mWriteDataAsyncTask.get(mWriteTimeOut, TimeUnit.MILLISECONDS);//this may throw the exception directly.
+    		result = mWriteDataAsyncTask.get();//this may throw the exception directly.
     		//TODO: still need to catch the timeout exception, and cancel the execution
     	}
     	return result;
@@ -374,40 +399,113 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	//attention: the exception handling of this task is tricky. 
 		//We should handle as much as possible for the task to continue without breaking.
     	
-    	//1. prepare the usb bulk read/write buffer
+    	//1. prepare the usb bulk read/write buffer, and other variables needed in the loop
     	byte[] bulkReadBuf = new byte[mBulkReadSize];
     	byte[] bulkWriteBuf = new byte[mBulkWriteSize];
+    	int numTxBytes,numRxFree, modemStatus;
+    	int oldModemStatus;
+    	if((oldModemStatus = mFTDI_Interface.getModemStatus())<0)
+    	{
+    		//this is error branch, should throw a exception and end the execution of this task.
+    	}
+    	
     	//2. check if the interface is claimed?? seems that we don't have a method to check this
     	
     	//3. the main loop
     	do{
     		//3.1 if there's anything remained in transmit buffer, do the transmit
-    		int numTxBytes,numRxFree, modemStatus=0;
     		if((numTxBytes = mTxFifo.occupiedLength()) > 0)//if there's anything to send
     		{
     			int numToWrite = (numTxBytes <= mBulkWriteSize)? numTxBytes:mBulkWriteSize;
     			mTxFifo.readData(bulkWriteBuf, 0, numToWrite);
     			int numActuallyWritten = mFTDI_Interface.writeData(bulkWriteBuf, numToWrite);
-    			//after this, all bytes in bulkWriteBuf are written out to FTDI chip, nothing useful left.
-    			//TODO: handle the possible usb writing error. 
+    			//TODO: handle the possible usb writing error represented by numActuallyWritten 
     			//the desired behavior is to handle the exception/mistakes and call the callbacks later.
     			//so that this thread can keep running rather than exit with exception.
+    			if(numActuallyWritten < numToWrite)
+    			{
+    				//this is error branch, should through a exception and end the execution of this task.
+    			}
+    			//after this, all bytes in bulkWriteBuf are written out to FTDI chip, nothing useful left.
     		}
     		//3.2 do a receive USB read, note that we get the modem status at the same time
     		if((numRxFree = mRxFifo.freeLength())>0)
     		{
     			int numToRead = (numRxFree <= mBulkReadSize)? numRxFree:mBulkReadSize;
     			int numActuallyRead = mFTDI_Interface.readData(bulkReadBuf, numToRead);
-    			modemStatus = ((bulkReadBuf[1] << 8) | (bulkReadBuf[0] & 0xFF));//assembly the 2 bytes for modemStatus
-    			mRxFifo.writeData(bulkReadBuf, 2, numActuallyRead-2);//the remaining are actual bytes read from rx.
-    			//TODO: modify FTDI_Interface.readData, think about what is the good way to get modem status update.
+    			modemStatus = ((bulkReadBuf[1] << 8) | (bulkReadBuf[0] & 0xFF));
+    			if(numActuallyRead >2)//Data received
+    			{
+    				mRxFifo.writeData(bulkReadBuf, 2, numActuallyRead-2);//the remaining are actual bytes read from rx.
+        			if(mOnDataReceivedListener != null)//call the event listener
+    	    			mOnDataReceivedListener.onDataReceived(this);
+    			}
+    			else if(numActuallyRead < 2)
+    			{
+    				//this is error branch, should through a exception and end the execution of this task.
+    			}
+    		}
+    		else//if RX fifo is full and we cannot perform a read, at least read the modem status.
+    		{
+    			modemStatus = mFTDI_Interface.getModemStatus();
     		}
     		
     		//3.4 call the event listeners according to modem status and other status
+    		if(modemStatus >= 0)
+    		{    			
+    		    if(this.mOnPinChangedListener != null)
+    		    {
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_CTS_MSK) != 
+    		    			(oldModemStatus & FTDI_Constants.MODEM_STATUS_CTS_MSK))
+    		    		mOnPinChangedListener.onPinChanged(this, FTDI_Constants.FTDI_PinChangeEnum.CTS_CHANGED, 
+    		    				((modemStatus & FTDI_Constants.MODEM_STATUS_CTS_MSK) != 0)?true:false );
+
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_DSR_MSK) != 
+    		    			(oldModemStatus & FTDI_Constants.MODEM_STATUS_DSR_MSK))
+    		    		mOnPinChangedListener.onPinChanged(this, FTDI_Constants.FTDI_PinChangeEnum.DSR_CHANGED, 
+    		    				((modemStatus & FTDI_Constants.MODEM_STATUS_DSR_MSK) != 0)?true:false );
+
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_RI_MSK) != 
+    		    			(oldModemStatus & FTDI_Constants.MODEM_STATUS_RI_MSK))
+    		    		mOnPinChangedListener.onPinChanged(this, FTDI_Constants.FTDI_PinChangeEnum.RI_CHANGED, 
+    		    				((modemStatus & FTDI_Constants.MODEM_STATUS_RI_MSK) != 0)?true:false );
+
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_RLSD_MSK) != 
+    		    			(oldModemStatus & FTDI_Constants.MODEM_STATUS_RLSD_MSK))
+    		    		mOnPinChangedListener.onPinChanged(this, FTDI_Constants.FTDI_PinChangeEnum.CD_CHANGED, 
+    		    				((modemStatus & FTDI_Constants.MODEM_STATUS_RLSD_MSK) != 0)?true:false );
+    		    }
+    		    
+    		    if(this.mOnErrorReceivedListener != null)
+    		    {
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_DR_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.DATA_READY);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_OE_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.OVERRUN_ERR);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_PE_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.PARITY_ERR);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_FE_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.FRAME_ERR);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_BI_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.BREAK_INT);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_THRE_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.TRANS_HOLD_REG);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_TEMT_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.TRANS_EMPTY);
+    		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_ERFF_MSK) != 0)
+    		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.ERROR_RCVR_FIFO);
+    		    }
+    		    //update the oldModemStatus for next loop.
+    		    oldModemStatus = modemStatus;
+    		}
+    		else//(modemStatus<0)
+    		{
+    			//TODO: handle the exception in modem status reading
+    			//this is error branch, should through a exception and end the execution of this task.
+    			continue;
+    		}
     		
-    		
-    		
-    	}while(mKeepRunning);
+    	}while(this.isCancelled());
     	
 		return 0;
 	}

@@ -256,5 +256,52 @@ public final class FTDI_Constants {
     
     /** The Constant DEVICE_TYPE_4232H. */
     public static final int DEVICE_TYPE_4232H	=5;
-            
+    
+    
+//    Layout of the first byte:
+//    - B0..B3 - must be 0
+//    - B4       Clear to send (CTS)
+//                 0 = inactive
+//                 1 = active
+//    - B5       Data set ready (DSR)
+//                 0 = inactive
+//                 1 = active
+//    - B6       Ring indicator (RI)
+//                 0 = inactive
+//                 1 = active
+//    - B7       Receive line signal detect (RLSD) also called Carrier Detect
+//                 0 = inactive
+//                 1 = active
+//
+//    Layout of the second byte:
+//    - B0       Data ready (DR)
+//    - B1       Overrun error (OE)
+//    - B2       Parity error (PE)
+//    - B3       Framing error (FE)
+//    - B4       Break interrupt (BI)
+//    - B5       Transmitter holding register (THRE)
+//    - B6       Transmitter empty (TEMT)
+//    - B7       Error in RCVR FIFO (ERFF)
+    /*Pre-defined modem status bit mask, and event enums*/
+    public static final int MODEM_STATUS_CTS_MSK =0x01 << 4;
+    public static final int MODEM_STATUS_DSR_MSK =0x01 << 5;
+    public static final int MODEM_STATUS_RI_MSK =0x01 << 6;
+    public static final int MODEM_STATUS_RLSD_MSK =0x01 << 7;
+    
+    public static final int MODEM_STATUS_DR_MSK =0x01 << 8;
+    public static final int MODEM_STATUS_OE_MSK =0x01 << 9;
+    public static final int MODEM_STATUS_PE_MSK =0x01 << 10;
+    public static final int MODEM_STATUS_FE_MSK =0x01 << 11;
+    public static final int MODEM_STATUS_BI_MSK =0x01 << 12;
+    public static final int MODEM_STATUS_THRE_MSK =0x01 << 13;
+    public static final int MODEM_STATUS_TEMT_MSK =0x01 << 14;
+    public static final int MODEM_STATUS_ERFF_MSK =0x01 << 15;
+    
+    public enum FTDI_CommErroEnum{
+    	DATA_READY, OVERRUN_ERR, PARITY_ERR, FRAME_ERR, BREAK_INT, TRANS_HOLD_REG, TRANS_EMPTY, ERROR_RCVR_FIFO
+    }
+    
+    public enum FTDI_PinChangeEnum{
+    	CTS_CHANGED,DSR_CHANGED,RI_CHANGED, CD_CHANGED
+    }
 }
