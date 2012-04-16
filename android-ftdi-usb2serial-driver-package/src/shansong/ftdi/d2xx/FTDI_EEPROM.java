@@ -46,14 +46,6 @@ public class FTDI_EEPROM {
 		mUsbDeviceConnection = newUsbDeviceConnection;
 	}
 	
-	/**
-	 * Clr usb device connection. This method shall be used by FTDI_Device when close the device.
-	 */
-	protected void clrUsbDeviceConnection()
-	{
-		mUsbDeviceConnection = null;
-	}
-	
 	//readEEPROM, writeEEPROM, eraseEEPROM
 	//TODO: it seems that FTDI chip read/write is always 2-byte wise. Let's verify this later.
 	/**

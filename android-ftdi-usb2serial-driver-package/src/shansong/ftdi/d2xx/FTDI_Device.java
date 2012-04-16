@@ -4,7 +4,6 @@
  */
 package shansong.ftdi.d2xx;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
@@ -40,7 +39,7 @@ public class FTDI_Device{
 	private UsbDevice mUsbDevice;
 	
 	/** The FTDI_Device class keeps a record of the usbDeviceConnection. */
-	private UsbDeviceConnection mUsbDeviceConnection;
+	private UsbDeviceConnection mUsbDeviceConnection=null;
 	
 	/** The ftdi interfaces. FTDI device(chip) may have 1, 2 or 4 interfaces */
 	private FTDI_Interface[] mFTDI_Interfaces;
@@ -63,20 +62,25 @@ public class FTDI_Device{
 	 * Instantiates a new FTDI_Device.
 	 *
 	 * @param dev the dev
+	 * @throws Exception 
 	 */
-	public FTDI_Device(Context context, UsbDevice dev)
+	public FTDI_Device(Context context, UsbDevice dev) throws Exception
 	{
 		//Write down the caller Activity or Service's context
 		mContext = context;
+		if(initDevice(dev)<0){
+			//throw exception
+			throw new Exception("failed to recognize device as FTDI device.");
+		}
 	}
 	
 	/**
 	 * Inits the FTDI_Device class according to the device information given by dev.
 	 * TODO: revise the return value here
 	 * @param dev the dev
-	 * @return the int
+	 * @return 0 if successful. -1 if failed.
 	 */
-	public int initDevice(UsbDevice dev)
+	private int initDevice(UsbDevice dev)
 	{
 		//////////////////////////////////////////////////
 		//Step1: check VID is the FTDI VID. Decide the device type from VID. And design how many interfaces the device should have
@@ -253,9 +257,16 @@ public class FTDI_Device{
 	//==================================================================
 	
 	//openDevice, closeDevice, resetDevice
+	/**
+	 * Open device. This function establishes a UsbDeviceConnection and let every interface to access this connection through.
+	 *
+	 * @return 1 if device already opened. 0 if opening operation successful. -1 if failed.
+	 */
 	public int openDevice()
 	{
-		//TODO: decide if we need a check if device is initialized or not.
+		//TODO: decide if we need a check if device is initialized or not. 
+		// and Decide what will happen if trying to call openDevice more than once
+		if(mUsbDeviceConnection != null) return 1;//if the device is already opened, no need to open again.
 		
 		UsbManager mManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
 		//check if we have the permission to this device
@@ -307,7 +318,7 @@ public class FTDI_Device{
 			mFTDI_Interfaces[i].setUsbDeviceConnection(null);
 		}
 		//And mFTDI_EEPROM's mUsbDeviceConnection needs to be cleared.
-		mFTDI_EEPROM.clrUsbDeviceConnection();
+		mFTDI_EEPROM.setUsbDeviceConnection(null);
 		//TODO: decide if there's more cleaning up jobs to do when closing the device.
 	}
 	

@@ -270,7 +270,7 @@ public class FTDI_Interface {
 	 *
 	 * @param baudrate the baudrate
 	 * @param value_index: values that gives to usb control transfer. First int is "value", second is "index"
-	 * @return the int
+	 * 
 	 * @return: the actual baud rate we get. The actual baud rate cannot always equals to the desired baud rate
 	 * due to clock pre-scale stuff inside the FTDI chips.
 	 */
@@ -401,10 +401,10 @@ public class FTDI_Interface {
 	 * Sets the baud rate.
 	 *
 	 * @param baudrate the baudrate
-	 * @return 0: Everything is OK.
-	 * @return -1: the usb controlTransfer function has failed.
-	 * @return -2: Cannot implement the desired baud rate.
-	 * @return -3: The error between implemented baud rate and desired baud rate >5 percent.
+	 * @return postive num: Everything is OK. num is the actual baud rate.
+	 *  		-1: the usb controlTransfer function has failed.
+	 *  		-2: Cannot implement the desired baud rate.
+	 *  		-3: The error between implemented baud rate and desired baud rate >5 percent.
 	 */
 	public int setBaudRate(int baudrate)
 	{
@@ -452,7 +452,7 @@ public class FTDI_Interface {
 	    {
 		    //need to keep a record of what baudrate is setup.
 	    	mBaudRate = actual_baudrate;
-		    return 0;
+		    return actual_baudrate;
 	    }
 	}
 	
@@ -475,8 +475,8 @@ public class FTDI_Interface {
 	 * @param parity_type the parity_type
 	 * @param break_type the break_type
 	 * @return 0: everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: one input parameter is not reasonable.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: one input parameter is not reasonable.
 	 */
 	public int setLineProperty(int data_bits_type, int stop_bits_type, int parity_type, int break_type)
 	{
@@ -545,8 +545,8 @@ public class FTDI_Interface {
 	 *
 	 * @param flow_ctrl_type the flow_ctrl_type
 	 * @return 0: everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: one input parameter is not reasonable.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: one input parameter is not reasonable.
 	 */
 	public int setFlowControl(int flow_ctrl_type)
 	{
@@ -577,7 +577,7 @@ public class FTDI_Interface {
 	 * Read pins status from GPIO pins.
 	 *
 	 * @return 0 or positive value: The lower byte is the pin status. Can only be 0~255.
-	 * @return -1: negative value: The error value returned by usb control msg operation.
+	 *  -1: negative value: The error value returned by usb control msg operation.
 	 */
 	public int readPins()//Well, I do believe the method shall return the actual value directly.
 	{
@@ -629,7 +629,7 @@ public class FTDI_Interface {
 	 * - B7       Error in RCVR FIFO
 	 *
 	 * @return non-negative value: lower 2 bytes represents the modem status.
-	 * @return -1: USB controlTransfer operation failed.
+	 *  -1: USB controlTransfer operation failed.
 	 */
 	public int getModemStatus()
 	{
@@ -653,8 +653,8 @@ public class FTDI_Interface {
 	 *
 	 * @param dtr: DTR setting. Can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW.
 	 * @return 0: Everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: input value cannot be recognized.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: input value cannot be recognized.
 	 */
 	public int setDTR(int dtr)
 	{
@@ -683,8 +683,8 @@ public class FTDI_Interface {
 	 *
 	 * @param rts: the RTS setting. Can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW.
 	 * @return 0: Everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: input value cannot be recognized.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: input value cannot be recognized.
 	 */
 	public int setRTS(int rts)
 	{
@@ -714,8 +714,8 @@ public class FTDI_Interface {
 	 * @param dtr: the DTR setting. Can only be SIO_SET_DTR_HIGH or SIO_SET_DTR_LOW.
 	 * @param rts: the RTS setting. Can only be SIO_SET_RTS_HIGH or SIO_SET_RTS_LOW.
 	 * @return 0: Everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: input value cannot be recognized.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: input value cannot be recognized.
 	 */
 	public int setDTR_RTS(int dtr, int rts)
 	{
@@ -756,8 +756,8 @@ public class FTDI_Interface {
 	 * 					MPSSE_BITMODE_MPSSE, MPSSE_BITMODE_SYNCBB, MPSSE_BITMODE_MCU,MPSSE_BITMODE_OPTO
 	 * 					MPSSE_BITMODE_CBUS, or MPSSE_BITMODE_SYNCFF
 	 * @return 0: Everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: input value cannot be recognized.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: input value cannot be recognized.
 	 */
 	public int SetBitMaskBitMode(byte bitmask, byte bitmode)
 	{
@@ -821,8 +821,8 @@ public class FTDI_Interface {
 	 *
 	 * @param latency: the desired latency in ms. Must be 1~255
 	 * @return 0: Everything is OK.
-	 * @return -1: USB controlTransfer method failed.
-	 * @return -2: input value cannot be recognized.
+	 *  -1: USB controlTransfer method failed.
+	 *  -2: input value cannot be recognized.
 	 */
 	public int setLatencyTimer(int latency)
 	{
@@ -846,7 +846,7 @@ public class FTDI_Interface {
 	 * Gets the latency timer.
 	 *
 	 * @return positive number: The latency timer value. Can only be 1~255. By design, this method WILL NOT return 0.
-	 * @return -1: USB controlTransfer method failed.
+	 *  -1: USB controlTransfer method failed.
 	 */
 	public int getLatencyTimer()//this shall return the actual value, rather than the result of usb operation method.
 	{
@@ -872,7 +872,7 @@ public class FTDI_Interface {
 	 * @param eventChar: the byte that is used as the event char.
 	 * @param enable: indicate the event char is enabled or not.
 	 * @return 0: everything is fine.
-	 * @return -1: USB controlTransfer method failed.
+	 *  -1: USB controlTransfer method failed.
 	 */
 	public int setEventChar(byte eventChar, boolean enable)
 	{
@@ -896,7 +896,7 @@ public class FTDI_Interface {
 	 * @param errorChar: the byte that is used as the error char.
 	 * @param enable: indicate the error char is enabled or not.
 	 * @return 0: everything is fine.
-	 * @return -1: USB controlTransfer method failed.
+	 *  -1: USB controlTransfer method failed.
 	 */
 	public int setErrorChar(byte errorChar, boolean enable)
 	{
