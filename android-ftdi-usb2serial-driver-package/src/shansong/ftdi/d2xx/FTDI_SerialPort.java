@@ -1,5 +1,12 @@
 package shansong.ftdi.d2xx;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+import shansong.ftdi.d2xx.FTDI_SerialPortReadWriteTask.OnDataReceivedListener;
+import shansong.ftdi.d2xx.FTDI_SerialPortReadWriteTask.OnErrorReceivedListener;
+import shansong.ftdi.d2xx.FTDI_SerialPortReadWriteTask.OnPinChangedListener;
+
 
 public class FTDI_SerialPort {
 		
@@ -13,6 +20,10 @@ public class FTDI_SerialPort {
 	private int mFlowControl;
 	private int mBreakState;//the break that we'd like to send out.
 	
+	private int mReadBufferSize,mWriteBufferSize,mReadTimeOut,mWriteTimeOut,mBulkReadSize,mBulkWriteSize;
+	
+	private boolean mIsOpened;
+	
 	private FTDI_SerialPortReadWriteTask mSerialPortTask;
 	
 	public FTDI_SerialPort(FTDI_Device dev, int whichInterface)
@@ -22,30 +33,55 @@ public class FTDI_SerialPort {
 		//need to do the initialization by calling FTDI_Device.initDevice
 		
 		//need to set default port configuration.
+		mBaudRate 	= 9600;
+		mDataBits 	= FTDI_Constants.DATA_BITS_8;
+		mParity 	= FTDI_Constants.PARITY_NONE;
+		mStopBits 	= FTDI_Constants.STOP_BITS_1;
+		mFlowControl= FTDI_Constants.SIO_DISABLE_FLOW_CTRL;
+		mBreakState = FTDI_Constants.BREAK_OFF;
 		
+		mReadBufferSize		= 4096;
+		mWriteBufferSize 	= 4096;
+		mBulkReadSize 		= 512;
+		mBulkWriteSize 		= 512;
+		mReadTimeOut 		= 2000;
+		mWriteTimeOut		= 2000;
+		
+		mIsOpened = false;//equals true when mFTDI_Device is opened and FTDI_Interface is claimed.
 	}
 	
 	public void open()
-	{
+	{	//Open the FTDI_Device.
 		if(mFTDI_Device.openDevice() < 0)
 		{
 			//throw exception
 		}
+		//set up baud rate, data bits, etc, according to current config		
+		if( mFTDI_Interface.setBaudRate(mBaudRate) < 0 ||
+				mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, mBreakState) < 0 ||
+				mFTDI_Interface.setFlowControl(mFlowControl)<0)
+		{
+			//throw exception
+		}
 		
+		//TODO:need to claim the usb interface//I believe the claim interface shall happen in this function.
 		
-		//need to claim the usb interface
-		//set up baud rate, data bits, etc, according to current config
-		//need to reset the device? No. or flush the the usb buffer for a port? no. because all of this will influence other 
+		//need to reset the device? No. or flush the the usb buffer for a port? no. 
+		//because all of this will influence other interfaces that are possibly operating.
+		
 		//set up a read/write task and let it run
-		
-		//mSerialPortTask = new FTDI_SerialPortReadWriteTask();
-		//I believe the claim interface shall happen in this function.
+		mSerialPortTask = new FTDI_SerialPortReadWriteTask(mFTDI_Interface,mReadBufferSize,mReadTimeOut,mBulkReadSize,
+															mWriteBufferSize,mWriteTimeOut,mBulkWriteSize);	
+		mSerialPortTask.execute();
+		mIsOpened = true;
 	}
 	
 	public void close()
 	{
 		//need to release the claimed usb interface
+		
 		//need to end the read/write async task
+		mSerialPortTask.cancel(true);
 	}
 
 	public int getBaudRate()
@@ -55,12 +91,17 @@ public class FTDI_SerialPort {
 	
 	public int setBaudRate(int baudrate)
 	{
-		int actualBaudRate = mFTDI_Interface.setBaudRate(baudrate);
-		if(actualBaudRate<0){
-			//TODO: throw an exception?
+		if(mIsOpened){
+			int actualBaudRate = mFTDI_Interface.setBaudRate(baudrate);
+			if(actualBaudRate<0){
+				//TODO: throw an exception?
+			}
+			mBaudRate = baudrate;
+			return actualBaudRate;
 		}
-		mBaudRate = baudrate;
-		return actualBaudRate;
+		else{
+			return mBaudRate = baudrate;
+		}
 	}
 	
 	public int getDataBits()
@@ -70,12 +111,18 @@ public class FTDI_SerialPort {
 	
 	public int setDataBits(int new_data_bits)
 	{
-		int result = mFTDI_Interface.setLineProperty(new_data_bits, mStopBits, mParity, mBreakState);
-		if(result < 0){
-			//TODO: throw proper exceptions
+		if(mIsOpened){
+			int result = mFTDI_Interface.setLineProperty(new_data_bits, mStopBits, mParity, mBreakState);
+			if(result < 0){
+				//TODO: throw proper exceptions
+			}
+			mDataBits = new_data_bits;
+			return result;
 		}
-		mDataBits = new_data_bits;
-		return result;
+		else{
+			mDataBits = new_data_bits;
+			return 0;
+		}
 	}
 	
 	public int getParity()
@@ -84,11 +131,18 @@ public class FTDI_SerialPort {
 	}
 	public int setParity(int new_parity)
 	{
-		int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, new_parity, mBreakState);
-		if(result < 0){
-			//TODO: throw proper exceptions
+		if(mIsOpened){
+			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, new_parity, mBreakState);
+			if(result < 0){
+				//TODO: throw proper exceptions
+			}
+			mParity = new_parity;
+			return result;
 		}
-		return result;
+		else{
+			mParity = new_parity;
+			return 0;
+		}
 	}
 	
 	public int getStopBits()
@@ -98,11 +152,18 @@ public class FTDI_SerialPort {
 	
 	public int setStopBits(int new_stop_bits)
 	{
-		int result = mFTDI_Interface.setLineProperty(mDataBits, new_stop_bits, mParity, mBreakState);
-		if(result < 0){
-			//TODO: throw proper exceptions
+		if(mIsOpened){
+			int result = mFTDI_Interface.setLineProperty(mDataBits, new_stop_bits, mParity, mBreakState);
+			if(result < 0){
+				//TODO: throw proper exceptions
+			}
+			mStopBits = new_stop_bits;
+			return result;
 		}
-		return result;
+		else{
+			mStopBits = new_stop_bits;
+			return 0;
+		}
 	}
 
 	public int getBreakState()
@@ -112,11 +173,18 @@ public class FTDI_SerialPort {
 	
 	public int setBreakState(int new_break_state)
 	{
-		int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, new_break_state);
-		if(result < 0){
-			//TODO: throw proper exceptions
+		if(mIsOpened){
+			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, new_break_state);
+			if(result < 0){
+				//TODO: throw proper exceptions
+			}
+			mBreakState = new_break_state;
+			return result;
 		}
-		return result;
+		else{
+			mBreakState = new_break_state;
+			return 0;
+		}
 	}
 	
 	public int getFlowControl()
@@ -126,22 +194,42 @@ public class FTDI_SerialPort {
 	
 	public int setFlowControl(int new_flow_ctrl_type)
 	{
-		int result = mFTDI_Interface.setFlowControl(new_flow_ctrl_type);
-		if(result < 0){
-			//throw proper exception here.
+		if(mIsOpened){
+			int result = mFTDI_Interface.setFlowControl(new_flow_ctrl_type);
+			if(result < 0){
+				//TODO:throw proper exception here.
+			}
+			mFlowControl = new_flow_ctrl_type;
+			return result;
 		}
-		return result;
+		else{
+			mFlowControl = new_flow_ctrl_type;
+			return 0;
+		}
 	}
 		
-	public int read(byte[] buf, int startIndex, int length)
+	public int read(byte[] buf, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
 	{
-		return 0;
+		return mSerialPortTask.readData(buf, startIndex, length);
 	}
 	
-	public int write(byte[] buf, int startIndex, int length)
+	public int write(byte[] buf, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
 	{
-		return 0;
+		return mSerialPortTask.writeData(buf, startIndex, length);
 	}
 	
+	public void setOnDataReceivedListener(OnDataReceivedListener l)
+	{
+		mSerialPortTask.setOnDataReceivedListener(l);
+	}
 	
+	public void setOnErrorReceivedListener(OnErrorReceivedListener l)
+	{
+		mSerialPortTask.setOnErrorReceivedListener(l);
+	}
+	
+	public void setOnPinChangedListener(OnPinChangedListener l)
+	{
+		mSerialPortTask.setOnPinChangedListener(l);
+	}
 }

@@ -181,7 +181,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      * @param writeTimeOut the: write time out in ms.
      */
     public FTDI_SerialPortReadWriteTask(FTDI_Interface claimedFTDI_Interface, int readBufferSize, int readTimeOut,
-    		int bulkReadSize, int bulkWriteSize, int writeBufferSize, int writeTimeOut)
+    		int bulkReadSize, int writeBufferSize, int writeTimeOut,  int bulkWriteSize)
     {    	
     	mRxFifo = new ByteCircularFifoBuffer(readBufferSize);
     	mTxFifo = new ByteCircularFifoBuffer(writeBufferSize);
