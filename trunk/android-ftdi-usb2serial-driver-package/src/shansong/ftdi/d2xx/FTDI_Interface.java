@@ -222,19 +222,20 @@ public class FTDI_Interface {
 	//	3.x Serial port control and operation methods
 	//==================================================================
 	//TODO: Need to find a proper function definition to place claimInterface and releaseInterface.
-	public int openInterface()
+	public boolean claimInterface(boolean force)
 	{
 		//Things I believe we need to do here: 
 		//	1. give a reset to the device (already handled by OpenDevice function)
 		//	2. set bitmode to known state, should know its default setting after reset.
 		//	3. set baudrate to known state, should know its default setting after reset
 		//Question is: how do these sync with all other member methods here.
-		return 0;
+		return mUsbDeviceConnection.claimInterface(mUsbInterface, force);
+		
 	}
 	
-	public int closeInterface()
+	public boolean releaseInterface()
 	{
-		return 0;
+		return mUsbDeviceConnection.releaseInterface(mUsbInterface);
 	}
 	/**
 	 * Read data.
