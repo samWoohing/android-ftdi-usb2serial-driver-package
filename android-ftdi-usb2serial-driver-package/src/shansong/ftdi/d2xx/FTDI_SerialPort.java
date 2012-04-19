@@ -1,6 +1,5 @@
 package shansong.ftdi.d2xx;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import shansong.ftdi.d2xx.FTDI_SerialPortReadWriteTask.OnDataReceivedListener;
@@ -21,6 +20,10 @@ public class FTDI_SerialPort {
 	private int mBreakState;//the break that we'd like to send out.
 	
 	private int mReadBufferSize,mWriteBufferSize,mReadTimeOut,mWriteTimeOut,mBulkReadSize,mBulkWriteSize;
+	
+	private OnDataReceivedListener mOnDataReceivedListener;
+	private OnErrorReceivedListener mOnErrorReceivedListener;
+	private OnPinChangedListener mOnPinChangedListener;
 	
 	private boolean mIsOpened;
 	
@@ -54,7 +57,8 @@ public class FTDI_SerialPort {
 	{	//Open the FTDI_Device.
 		if(mFTDI_Device.openDevice() < 0)
 		{
-			//throw exception
+			//TODO: think if we should open the device outside this class.
+			//because one FTDI_Device class can manage more than one FTDI_Interface.
 		}
 		//set up baud rate, data bits, etc, according to current config		
 		if( mFTDI_Interface.setBaudRate(mBaudRate) < 0 ||
@@ -65,13 +69,19 @@ public class FTDI_SerialPort {
 		}
 		
 		//TODO:need to claim the usb interface//I believe the claim interface shall happen in this function.
-		
+		if(!mFTDI_Interface.claimInterface(false))
+		{
+			//throw exception
+		}
 		//need to reset the device? No. or flush the the usb buffer for a port? no. 
 		//because all of this will influence other interfaces that are possibly operating.
 		
 		//set up a read/write task and let it run
 		mSerialPortTask = new FTDI_SerialPortReadWriteTask(mFTDI_Interface,mReadBufferSize,mReadTimeOut,mBulkReadSize,
 															mWriteBufferSize,mWriteTimeOut,mBulkWriteSize);	
+		mSerialPortTask.setOnDataReceivedListener(mOnDataReceivedListener);
+		mSerialPortTask.setOnErrorReceivedListener(mOnErrorReceivedListener);
+		mSerialPortTask.setOnPinChangedListener(mOnPinChangedListener);
 		mSerialPortTask.execute();
 		mIsOpened = true;
 	}
@@ -79,9 +89,12 @@ public class FTDI_SerialPort {
 	public void close()
 	{
 		//need to release the claimed usb interface
-		
+		if(!mFTDI_Interface.releaseInterface()){
+			//TODO: throw exception;
+		}
 		//need to end the read/write async task
-		mSerialPortTask.cancel(true);
+		mSerialPortTask.cancel(true);//TODO: shall we change back to a stop() function?
+		mIsOpened = false;
 	}
 
 	public int getBaudRate()
@@ -129,6 +142,7 @@ public class FTDI_SerialPort {
 	{
 		return mParity;
 	}
+	
 	public int setParity(int new_parity)
 	{
 		if(mIsOpened){
@@ -208,28 +222,40 @@ public class FTDI_SerialPort {
 		}
 	}
 		
-	public int read(byte[] buf, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
+	public int read(byte[] buf, int startIndex, int length) throws TimeoutException
 	{
+		if(!mIsOpened){
+			//TODO: throw exception.
+		}
 		return mSerialPortTask.readData(buf, startIndex, length);
 	}
 	
-	public int write(byte[] buf, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
+	public int write(byte[] buf, int startIndex, int length) throws TimeoutException
 	{
+		if(!mIsOpened){
+			//TODO: throw exception.
+		}
 		return mSerialPortTask.writeData(buf, startIndex, length);
 	}
 	
 	public void setOnDataReceivedListener(OnDataReceivedListener l)
 	{
-		mSerialPortTask.setOnDataReceivedListener(l);
+		if(mIsOpened)
+			mSerialPortTask.setOnDataReceivedListener(l);
+		mOnDataReceivedListener = l;
 	}
 	
 	public void setOnErrorReceivedListener(OnErrorReceivedListener l)
 	{
-		mSerialPortTask.setOnErrorReceivedListener(l);
+		if(mIsOpened)
+			mSerialPortTask.setOnErrorReceivedListener(l);
+		mOnErrorReceivedListener = l;
 	}
 	
 	public void setOnPinChangedListener(OnPinChangedListener l)
 	{
-		mSerialPortTask.setOnPinChangedListener(l);
+		if(mIsOpened)
+			mSerialPortTask.setOnPinChangedListener(l);
+		mOnPinChangedListener = l;
 	}
 }

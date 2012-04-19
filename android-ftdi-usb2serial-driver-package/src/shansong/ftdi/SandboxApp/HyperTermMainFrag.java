@@ -1,6 +1,5 @@
 package shansong.ftdi.SandboxApp;
 
-import java.nio.ByteBuffer;
 
 import android.app.Fragment;
 import android.content.Intent;

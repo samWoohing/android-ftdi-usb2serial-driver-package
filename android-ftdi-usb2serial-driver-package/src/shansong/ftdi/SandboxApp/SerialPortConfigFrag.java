@@ -165,7 +165,8 @@ public class SerialPortConfigFrag extends Fragment {
     		UsbDevice dev = mFTDIDevHashMap.get(((Spinner)getView().findViewById(R.id.spinner_usb_dev)).getSelectedItem());
     		//TODO: update the interface spinner. Need to have another function in FTDI_Device to decide a 
     		//		Hashmap or string array of interfaces for a given usb device.
-    		//		
+    		//get how many interfaces should have and refresh the interface spinner accordingly.    		
+    		refreshInterfaceSpinner(dev);
     		//test purpose
     		Toast.makeText(getActivity(), "Item selected!", Toast.LENGTH_SHORT).show();
     	}
@@ -194,19 +195,41 @@ public class SerialPortConfigFrag extends Fragment {
         }
     };	
     
-    private HashMap<String, UsbDevice> mFTDIDevHashMap;
     
+    /** The hashmap of FTDI devices. */
+    private HashMap<String, UsbDevice> mFTDIDevHashMap;
+    /**
+     * Refresh the FTDI device list and update content of usb dev spinner.
+     */
     private void refreshUsbDevSpinner()
     {
     	//enumerate all FTDI devices
     	mFTDIDevHashMap = FTDI_Device.findAllFTDIDevices(getActivity());
+    	if(mFTDIDevHashMap.size()==0){
+    		Toast.makeText(getActivity(),"No FTDI device found!",Toast.LENGTH_SHORT).show();
+    		return;
+    	}
     	//get the key values and use them as spinner's list items by creating an adapter.
     	String[] items = new String[mFTDIDevHashMap.size()];
     	mFTDIDevHashMap.keySet().toArray(items);
     	SpinnerAdapter adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item, items);
     	//"adapter" contains all device names.
     	((Spinner)getView().findViewById(R.id.spinner_usb_dev)).setAdapter(adapter);
-    	
     	//TODO: this fragment need to keep a record of mFTDIList, add a member hashmap is enough.
+    }
+    
+    private HashMap<String, Integer> mInterfaceHashMap;
+    
+    private void refreshInterfaceSpinner(UsbDevice dev)
+    {
+    	mInterfaceHashMap = FTDI_Device.listAllInterfaces(dev);
+    	if(mInterfaceHashMap.size()==0){
+    		Toast.makeText(getActivity(),"Couldn't recognize the selected device as FTDI device!",Toast.LENGTH_SHORT).show();
+    		return;
+    	}
+    	String[] items = new String[mInterfaceHashMap.size()];
+    	mInterfaceHashMap.keySet().toArray(items);
+    	SpinnerAdapter adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item, items);
+    	((Spinner)getView().findViewById(R.id.spinner_interface)).setAdapter(adapter);
     }
 }

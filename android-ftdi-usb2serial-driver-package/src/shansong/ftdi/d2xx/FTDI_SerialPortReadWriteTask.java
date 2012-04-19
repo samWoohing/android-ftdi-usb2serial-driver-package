@@ -1,5 +1,7 @@
 package shansong.ftdi.d2xx;
 
+import java.nio.BufferUnderflowException;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -226,7 +228,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    			//do nothing
 	    		}
 	    		public void onFinish() {
-	    			  ReadDataAsyncTask.this.cancel(true);
 	    			  isTimeOut=true;
 	    		}
 	    	};
@@ -234,6 +235,8 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	
  		/* (non-Javadoc)
 		  * @see android.os.AsyncTask#doInBackground(Params[])
+		  * @return 0 or positive: the num of actual bytes read before time out. 
+		  * -1 if no bytes is read until time out
 		  */
     	@Override
 		protected Integer doInBackground(Void... params) {
@@ -245,36 +248,38 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     			int numOccupied = mRxFifo.occupiedLength();
     			
     			if(numOccupied>0)//to save CPU resource, only run when data exists in fifo.
-    			{
+    			{	//always read as much as we can
     				int numToReadOnce = (numOccupied <= numLeftToRead)?numOccupied:numLeftToRead;
     				numAlreadyRead += mRxFifo.readData(buffer, currentStartIndex, numToReadOnce);
     				//TODO: Need to catch exceptions?? 
-    				//yes!! need to throw out how many actual bytes are read
+    				//no. This branch shall not throw any exception.
     				currentStartIndex+=numToReadOnce;
     				numLeftToRead-=numToReadOnce;
     			}
  	    		
-    		}while(numLeftToRead>0 && !isCancelled());
+    		}while(numLeftToRead>0 && !isTimeOut);
     		
-    		if(isTimeOut){
-    			//TODO: throw out Timeout exception.
+    		if(isTimeOut && numAlreadyRead == 0){
+    			return -1;
     		}
     		return numAlreadyRead;//TODO: review if this return value makes sense.
     	}
 	}
     
     /**
-     * Read data.
+     * Read data. Perform an asynchronous non-blocking read.
      *
      * @param buffer the buffer
      * @param startIndex the start index
      * @param length the length
-     * @return the int
-     * @throws TimeoutException 
-     * @throws ExecutionException 
-     * @throws InterruptedException 
+     * @return Positive number: the actual bytes read.
+     * @throws BufferUnderflowException the buffer underflow exception
+     * @throws IndexOutOfBoundsException the index out of bounds exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws TimeoutException the timeout exception
      */
-    public int readData(byte[] buffer, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
+    public int readData(byte[] buffer, int startIndex, int length) 
+    		throws BufferUnderflowException, IndexOutOfBoundsException, IllegalArgumentException, TimeoutException
     {
     	//TODO: detailed implementation
     	//Another solution is to use the get(...) method in an AsyncTask.
@@ -283,15 +288,29 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	//if the read buffer already have the required number of bytes,
     	//just do a direct read
     	int result = 0;
-    	if(mRxFifo.occupiedLength() >= length)
-    	{
+    	if(mRxFifo.occupiedLength() >= length){
     		result = mRxFifo.readData(buffer, startIndex, length);
     	}
-    	else
-    	{
+    	else{
+    		//find illegal argument before we perform any async read.
+    		if(startIndex<0 || length<0){
+    			throw new IndexOutOfBoundsException();
+    		}
+    		if(startIndex+length > buffer.length){
+    			throw new IllegalArgumentException();
+    		}
     		ReadDataAsyncTask readTask = new ReadDataAsyncTask(buffer, startIndex, length, mReadTimeOut);
     		readTask.execute();
-    		result = readTask.get();//this may throw the exception directly.
+    		try {
+				result = readTask.get();
+			} catch (InterruptedException e) {
+				// TODO: write log
+			} catch (ExecutionException e) {
+				// TODO: write log
+			}catch (CancellationException e){
+				// TODO: write log
+			}
+    		if(result == -1) throw new TimeoutException();
     	}
        	return result;
     }
@@ -303,12 +322,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     private class WriteDataAsyncTask extends AsyncTask<Void, Integer, Integer> {
     	/** The start index. */
 	    private int length, startIndex;
-    	
 	    /** The buffer. */
 	    private byte[] buffer;
-	    
 	    private CountDownTimer mTimer;
-	    
 	    boolean isTimeOut;
 	    
 	    /**
@@ -328,7 +344,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    			//do nothing
 	    		}
 	    		public void onFinish() {
-	    			  WriteDataAsyncTask.this.cancel(true);
 	    			  isTimeOut=true;
 	    		}
 	    	};
@@ -336,26 +351,27 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	
     	/* (non-Javadoc)
 	     * @see android.os.AsyncTask#doInBackground(Params[])
+	     * @return 0 or positive: the num of actual bytes written before time out. -1 if no bytes is written until time ou
 	     */
 	    @Override
 		protected Integer doInBackground(Void... params) {
     		int numAlreadyWritten = 0;
     		int numLeftToWrite = length;
     		int currentStartIndex = startIndex;
+    		mTimer.start();
     		do{
     			int numFree = mTxFifo.freeLength();
-    			mTimer.start();
     			if(numFree>0)
     			{
     				int numToWriteOnce = (numFree <= numLeftToWrite)? numFree:numLeftToWrite;
     				numAlreadyWritten += mTxFifo.writeData(buffer, currentStartIndex, numToWriteOnce);
-    				//TODO: add exception handling.
+    				
     				currentStartIndex += numToWriteOnce;
     				numLeftToWrite -= numToWriteOnce;
     			}
-    		}while(numLeftToWrite > 0 && !isCancelled());//when user cancel the operation, break the loop
-    		if(isTimeOut){
-    			//TODO: throw out Timeout exception.
+    		}while(numLeftToWrite > 0 && !isTimeOut);//timeout reached, break the loop
+    		if(isTimeOut && numAlreadyWritten==0){
+    			return -1;
     		}
     		return numAlreadyWritten;
     	}
@@ -371,20 +387,36 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      * @throws ExecutionException 
      * @throws InterruptedException 
      */
-    public int writeData(byte[] buffer, int startIndex, int length) throws InterruptedException, ExecutionException, TimeoutException
+    public int writeData(byte[] buffer, int startIndex, int length) 
+    		throws BufferUnderflowException, IndexOutOfBoundsException, IllegalArgumentException, TimeoutException
     {
     	int result = 0;
-    	if(mTxFifo.freeLength() >= length)
-    	{
+    	if(mTxFifo.freeLength() >= length){
     		result = mTxFifo.writeData(buffer, startIndex, length);
     	}
-    	else
-    	{
-    		//TODO: call the async task.
+    	else{
+    		//find illegal argument before we perform any async read.
+    		if(startIndex<0 || length<0){
+    			throw new IndexOutOfBoundsException();
+    		}
+    		if(startIndex+length > buffer.length){
+    			throw new IllegalArgumentException();
+    		}
+    		//call the async task.
     		WriteDataAsyncTask mWriteDataAsyncTask = new WriteDataAsyncTask(buffer, startIndex, length, mWriteTimeOut);
     		mWriteDataAsyncTask.execute();
-    		result = mWriteDataAsyncTask.get();//this may throw the exception directly.
+    		try {
+				result = mWriteDataAsyncTask.get();
+			} catch (InterruptedException e) {
+				// TODO: write log				
+			} catch (ExecutionException e){
+				// TODO: write log
+				
+			} catch (CancellationException e){
+				// TODO: write log
+			}
     		//TODO: still need to catch the timeout exception, and cancel the execution
+    		if(result == -1) throw new TimeoutException();
     	}
     	return result;
     }
