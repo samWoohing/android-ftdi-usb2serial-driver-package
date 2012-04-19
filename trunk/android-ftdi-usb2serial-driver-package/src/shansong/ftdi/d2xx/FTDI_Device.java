@@ -86,45 +86,20 @@ public class FTDI_Device{
 		//Step1: check VID is the FTDI VID. Decide the device type from VID. And design how many interfaces the device should have
 		//////////////////////////////////////////////////
 		//VID check
-		if(dev.getVendorId() != FTDI_Constants.VID_FTDI)
-		{
+		if(dev.getVendorId() != FTDI_Constants.VID_FTDI){
 			Log.e(TAG, "Failed to recognize the Vendor ID: " + Integer.toString(dev.getVendorId()) + " on UsbDevice"+dev.toString());
 			return -1;
 		}
 		
 		//PID, see if this is a valid FTDI device, and decide the chip type
-		int expectedNumOfInterfaces = 0;
-		
-		switch(dev.getProductId())
-		{
-		case FTDI_Constants.PID_FT232B_FT245B_FT232R_FT245R:
-			expectedNumOfInterfaces = 1;
-			break;
-			
-		case FTDI_Constants.PID_FT232H:
-			expectedNumOfInterfaces = 1;
-			break;
-			
-		case FTDI_Constants.PID_FT2232C_FT2232D_FT2232L_FT2232H:
-			expectedNumOfInterfaces = 2;
-			break;
-			
-		case FTDI_Constants.PID_FT4232H:
-			expectedNumOfInterfaces = 4;
-			break;
-			
-		default:
-			Log.e(TAG, "Failed to recognize the Product ID:"+Integer.toString(dev.getProductId())+" on UsbDevice"+dev.toString());
-			return -1;
-		}
-		
+		int expectedNumOfInterfaces = getExpectedNumOfInterfaces(dev);
+		if(expectedNumOfInterfaces < 0) return -1;
+				
 		//////////////////////////////////////////////////
 		//Step2: Initialize the FTDI device Interfaces, recognize the interfaces and write information into mFTDI_Interfaces[]
 		//////////////////////////////////////////////////
-		
 		//check if the device really have that many interfaces:
-		if(dev.getInterfaceCount() != expectedNumOfInterfaces)
-		{
+		if(dev.getInterfaceCount() != expectedNumOfInterfaces){
 			Log.e(TAG, "Expected "+Integer.toString(expectedNumOfInterfaces)+" Interfaces, but only find "
 					+Integer.toString(dev.getInterfaceCount())+" interfaces on UsbDevice: "+dev.toString());
 			return -1;
@@ -134,12 +109,10 @@ public class FTDI_Device{
 		mFTDI_Interfaces = new FTDI_Interface[expectedNumOfInterfaces];
 		UsbInterface tempUsbInterface = null;
 		FTDI_Interface tempFTDI_Interface = null;
-		for(int i=0; i<expectedNumOfInterfaces; i++)
-		{
+		for(int i=0; i<expectedNumOfInterfaces; i++){
 			tempUsbInterface = dev.getInterface(i);
 			tempFTDI_Interface = new FTDI_Interface(this);
-			if(tempFTDI_Interface.initInterface(tempUsbInterface) < 0)
-			{
+			if(tempFTDI_Interface.initInterface(tempUsbInterface) < 0){
 				//Initialization of this FTDI_Interface failed. For some reason, 
 				//this UsbInterface cannot be recognized as a FTDI_Interface.
 				Log.e(TAG,"Cannot recogonize the UsbInterface: "+tempUsbInterface.toString()+" as FTDI_Interface.");
@@ -151,8 +124,7 @@ public class FTDI_Device{
 			switch(tempFTDI_Interface.getWhichInterfaceThisIs())
 			{
 			case FTDI_Constants.INTERFACE_A:
-				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_A)
-				{
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_A){
 					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
 							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_A));
 					return -1;
@@ -161,8 +133,7 @@ public class FTDI_Device{
 				break;
 				
 			case FTDI_Constants.INTERFACE_B:
-				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_B)
-				{
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_B){
 					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
 							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_B));
 					return -1;
@@ -171,8 +142,7 @@ public class FTDI_Device{
 				break;
 				
 			case FTDI_Constants.INTERFACE_C:
-				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_C)
-				{
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_C){
 					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
 							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_C));
 					return -1;
@@ -181,8 +151,7 @@ public class FTDI_Device{
 				break;
 				
 			case FTDI_Constants.INTERFACE_D:
-				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_D)
-				{
+				if(mFTDI_Interfaces.length < FTDI_Constants.INTERFACE_D){
 					Log.e(TAG,"mFTDI_Interfaces has insufficient length. Current length is: "+Integer.toString(mFTDI_Interfaces.length)+ 
 							", but desired length is:"+Integer.toString(FTDI_Constants.INTERFACE_D));
 					return -1;
@@ -338,7 +307,6 @@ public class FTDI_Device{
 		
 		//get all usb devce in a hashmap
 		//go through the hashmap and 
-		//TODO: detailed implementation.
 		UsbManager mManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
 		
 		HashMap<String, UsbDevice> deviceList = mManager.getDeviceList();
@@ -354,6 +322,64 @@ public class FTDI_Device{
 			}
 		}
 		return FTDIDeviceList;
+	}
+	
+	/**
+	 * Gets the expected num of interfaces for a given UsbDevice by checking its PID.
+	 *
+	 * @param dev the UsbDevice
+	 * @return the expected num of interfaces on the device, can be 1 2,or 4. 
+	 * return -1 if device cann't be recognized.
+	 */
+	public static int getExpectedNumOfInterfaces(UsbDevice dev)
+	{
+		switch(dev.getProductId())
+		{
+		case FTDI_Constants.PID_FT232B_FT245B_FT232R_FT245R:
+			return 1;
+			
+		case FTDI_Constants.PID_FT232H:
+			return 1;
+			
+		case FTDI_Constants.PID_FT2232C_FT2232D_FT2232L_FT2232H:
+			return 2;
+			
+		case FTDI_Constants.PID_FT4232H:
+			return 4;
+		default:
+			Log.e(TAG, "Failed to recognize the Product ID:"+Integer.toString(dev.getProductId())+" on UsbDevice"+dev.toString());
+			return -1;
+		}
+	}
+	
+	/**
+	 * List all interfaces in a Hashmap with string names as key..
+	 *
+	 * @param dev : the FTDI USB devices
+	 * @return the hash map that includes the interface string name and number.
+	 */
+	public static HashMap<String, Integer> listAllInterfaces(UsbDevice dev)
+	{
+		HashMap<String, Integer> interfaceList=new HashMap<String, Integer>();
+		switch(getExpectedNumOfInterfaces(dev)){
+		case 1:
+			interfaceList.put("Interface A", FTDI_Constants.INTERFACE_A);
+			break;
+		case 2:
+			interfaceList.put("Interface A", FTDI_Constants.INTERFACE_A);
+			interfaceList.put("Interface B", FTDI_Constants.INTERFACE_B);
+			break;
+		case 4:
+			interfaceList.put("Interface A", FTDI_Constants.INTERFACE_A);
+			interfaceList.put("Interface B", FTDI_Constants.INTERFACE_B);
+			interfaceList.put("Interface C", FTDI_Constants.INTERFACE_C);
+			interfaceList.put("Interface D", FTDI_Constants.INTERFACE_D);
+			break;
+		default:
+			break;
+		}
+		
+		return interfaceList;
 	}
 	
 	//TODO: resetDevice, usbPurgeRXBuffer, usbPurgeTXBuffer, Hmm... maybe this shall be defined as private functions just for internal use only?
@@ -388,7 +414,8 @@ public class FTDI_Device{
 	protected static final int STD_USB_BCDDEVICE_OFFSET=12;//offset of bcdDevice in the entire descriptor.
 	protected static final int STD_USB_ISERIALNUMBER_OFFSET=16;//offset of bcdDevice in the entire descriptor.
 	/**
-	 * Gets the entire device descriptor. We need bcdDevice and iSerialNum to decide the chip type, but android does not give this function interface.
+	 * Gets the entire device descriptor. We need bcdDevice and iSerialNum to decide the chip type, 
+	 * but android does not give this function interface.
 	 * So let's do it by ourselves, by sending standard USB controlTransfer command.
 	 *
 	 * @return the buffer that contains the DeviceDescriptor.
@@ -426,23 +453,26 @@ public class FTDI_Device{
 			Log.e(TAG,"Cannot open the device:"+mUsbDevice.toString());
 			return null;
 		}
-
+		
 		//Device descriptor total size is 18 byte. So prepare a 18 byte array
-		byte[] buf = new byte[STD_USB_DT_DEVICE_LEN];
-		int r;
-		
-		if ((r = tempConn.controlTransfer(UsbConstants.USB_DIR_IN, STD_USB_REQUEST_GET_DESCRIPTOR, 
-				(STD_USB_DT_DEVICE << 8), 0, buf, STD_USB_DT_DEVICE_LEN, mReadTimeout)) 
-				!= STD_USB_DT_DEVICE_LEN)
-		{
-			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
-			tempConn.close();
-			return null;
-		}
-		
-		//always remember to close the temporary connection
-		tempConn.close();
-		return buf;
+		//This function provided by Android is much more convenient than
+		//sending the standard USB control message.
+		return tempConn.getRawDescriptors();
+//		byte[] buf = new byte[STD_USB_DT_DEVICE_LEN];
+//		int r;
+//		
+//		if ((r = tempConn.controlTransfer(UsbConstants.USB_DIR_IN, STD_USB_REQUEST_GET_DESCRIPTOR, 
+//				(STD_USB_DT_DEVICE << 8), 0, buf, STD_USB_DT_DEVICE_LEN, mReadTimeout)) 
+//				!= STD_USB_DT_DEVICE_LEN)
+//		{
+//			Log.e(TAG,"USB controlTransfer operation failed. controlTransfer return value is:"+Integer.toString(r));
+//			tempConn.close();
+//			return null;
+//		}
+//		
+//		//always remember to close the temporary connection
+//		tempConn.close();
+//		return buf;
 	}
 	
 	/**

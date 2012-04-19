@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package shansong.ftdi.d2xx;
 
 import java.nio.BufferOverflowException;
@@ -15,9 +18,6 @@ import java.nio.BufferUnderflowException;
  */
 public class ByteCircularFifoBuffer {
 	
-	//TODO: need to define my own exceptions to cover the exceptional cases.
-	
-	/** The last. */
 	//"first" is the index for first element. 
 	//"last" is the index for last element+1. or say, it points to the first empty slot.
 	int first, last; 
@@ -28,7 +28,7 @@ public class ByteCircularFifoBuffer {
 	/**
 	 * Instantiates a new byte circular fifo buffer.
 	 *
-	 * @param size the size
+	 * @param size: the size of the buffer in bytes.
 	 */
 	public ByteCircularFifoBuffer(int size)
 	{
@@ -40,57 +40,72 @@ public class ByteCircularFifoBuffer {
 	}
 	
 	/**
-	 * Read data.
+	 * Read data of given length from the ByteCircularFifoBuffer, put it into buf from startIndex.
 	 *
 	 * @param buf the buf
 	 * @param startIndex the start index
 	 * @param length the length
-	 * @return the int
+	 * @return integer of how many bytes are actually read.
+	 * @throws BufferUnderflowException the buffer underflow exception
+	 * @throws IndexOutOfBoundsException the index out of bounds exception
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public int readData(byte[] buf, int startIndex, int length)
+	public int readData(byte[] buf, int startIndex, int length) 
+			throws BufferUnderflowException, IndexOutOfBoundsException, IllegalArgumentException
 	{
+		if(occupiedLength()<length){
+			//throw the exception of buffer underflow
+			throw new BufferUnderflowException();
+		}
+		if(startIndex<0 || length<0){
+			throw new IndexOutOfBoundsException();
+		}
+		if(startIndex+length > buf.length){
+			throw new IllegalArgumentException();
+		}
 		int numRead=0;
-		while(numRead<length)
-		{
+		while(numRead<length){
 			if(first == last) break;//this means the fifo is empty
 			buf[startIndex]=mFifoBuffer[first];
 			startIndex++;
 			numRead++;
 			first=(first++) % mFifoBuffer.length;//always update "first" after doing the actual copy.
-			
-		}
-		if(numRead<length)
-		{
-			//throw the exception of buffer underflow
-			throw new BufferUnderflowException();
-		}
-		
+		}		
 		return numRead;
 	}
 	
 	/**
-	 * Write data.
+	 * Write data. retrieve "length" of bytes from "buf" "startIndex",
+	 * and put it into ByteCircularFifoBuf.
 	 *
 	 * @param buf the buf
 	 * @param startIndex the start index
 	 * @param length the length
-	 * @return the int
+	 * @return the actual num of bytes written.
+	 * @throws BufferOverflowException the buffer overflow exception
+	 * @throws IndexOutOfBoundsException the index out of bounds exception
+	 * @throws IllegalArgumentException the illegal argument exception
 	 */
-	public int writeData(byte[] buf, int startIndex, int length)
+	public int writeData(byte[] buf, int startIndex, int length) 
+			throws BufferOverflowException, IndexOutOfBoundsException, IllegalArgumentException
 	{
+		if(freeLength()<length){
+			//throw the exception of buffer overflow
+			throw new BufferOverflowException();
+		}
+		if(startIndex<0 || length<0){
+			throw new IndexOutOfBoundsException();
+		}
+		if(startIndex+length > buf.length){
+			throw new IllegalArgumentException();
+		}
 		int numWrite=0;
-		while(numWrite<length)
-		{
+		while(numWrite<length){
 			if((last+1)% mFifoBuffer.length == first) break;//this means the fifo is already full
 			mFifoBuffer[last]=buf[startIndex];
 			startIndex++;
 			numWrite++;
 			last=(last++) % mFifoBuffer.length;
-		}
-		if(numWrite<length)
-		{
-			//throw the exception of buffer overflow
-			throw new BufferOverflowException();
 		}
 		return numWrite;
 	}
