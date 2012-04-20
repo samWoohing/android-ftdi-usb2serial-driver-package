@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
+import shansong.ftdi.d2xx.FTDI_Constants;
 import shansong.ftdi.d2xx.FTDI_Device;
 
 // TODO: Auto-generated Javadoc
@@ -39,6 +41,8 @@ public class SerialPortConfigFrag extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        buildHashMapsForPortConfig();//build the hashmap for selecting port configuration.
+        //these hashmaps are static
     }
     
     /**
@@ -53,7 +57,7 @@ public class SerialPortConfigFrag extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.serial_port_config, container, false);
-
+        
         //TODO: set the onItemClickListener for some spinner here. I believe sp_usb_dev and sp_interface need this.
         //well, maybe sp_interface does not need one.
         //Set the OnItemSelectedListener for usb device list spinner.
@@ -231,5 +235,72 @@ public class SerialPortConfigFrag extends Fragment {
     	mInterfaceHashMap.keySet().toArray(items);
     	SpinnerAdapter adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item, items);
     	((Spinner)getView().findViewById(R.id.spinner_interface)).setAdapter(adapter);
+    }
+    
+    private HashMap<String, Integer> mBaudRateHashMap;
+    private HashMap<String, Integer> mDataBitsHashMap;
+    private HashMap<String, Integer> mStopBitsHashMap;
+    private HashMap<String, Integer> mParityHashMap;
+    private HashMap<String, Integer> mFlowCtrlHashMap;
+    /**
+     * Builds the hash maps for port config.
+     */
+    private void buildHashMapsForPortConfig()
+    {
+    	Resources res = getResources();
+    	String[] baud_rate_list = res.getStringArray(R.array.baud_rate_list);
+    	String[] data_bits_list = res.getStringArray(R.array.data_bits_list);
+    	String[] stop_bits_list = res.getStringArray(R.array.stop_bits_list);
+    	String[] parity_list = res.getStringArray(R.array.parity_list);
+    	String[] flow_ctrl_list = res.getStringArray(R.array.flow_ctrl_list);
+    	//baud rate hashmap
+    	for(String str: baud_rate_list){
+    		mBaudRateHashMap.put(str, Integer.parseInt(str));
+    	}
+    	//data bits hashmap
+    	for(String str: data_bits_list){
+    		if(str == "7"){
+    			mDataBitsHashMap.put(str, FTDI_Constants.DATA_BITS_7);
+    		}else if(str == "8"){
+    			mDataBitsHashMap.put(str, FTDI_Constants.DATA_BITS_8);
+    		}
+    	}
+    	
+    	//stop bits hashmap
+    	for(String str: stop_bits_list){
+    		if(str == "1"){
+    			mStopBitsHashMap.put(str, FTDI_Constants.STOP_BITS_1);
+    		}else if(str == "1.5"){
+    			mStopBitsHashMap.put(str, FTDI_Constants.STOP_BITS_15);
+    		}else if(str == "2"){
+    			mStopBitsHashMap.put(str, FTDI_Constants.STOP_BITS_2);
+    		}
+    	}
+    	//parity hash map
+    	for(String str: parity_list){
+    		if(str == "None"){
+    			mParityHashMap.put(str, FTDI_Constants.PARITY_NONE);
+    		}else if(str == "Odd"){
+    			mParityHashMap.put(str, FTDI_Constants.PARITY_ODD);
+    		}else if(str == "Even"){
+    			mParityHashMap.put(str, FTDI_Constants.PARITY_EVEN);
+    		}else if(str == "Mark"){
+    			mParityHashMap.put(str, FTDI_Constants.PARITY_MARK);
+    		}else if(str == "Space"){
+    			mParityHashMap.put(str, FTDI_Constants.PARITY_SPACE);
+    		}
+    	}
+    	//flow control hash map
+    	for(String str: flow_ctrl_list){
+    		if(str == "None"){
+    			mFlowCtrlHashMap.put(str,FTDI_Constants.SIO_DISABLE_FLOW_CTRL);
+    		}else if(str == "RTS/CTS"){
+    			mFlowCtrlHashMap.put(str,FTDI_Constants.SIO_RTS_CTS_HS);
+    		}else if(str == "DTR/DSR"){
+    			mFlowCtrlHashMap.put(str,FTDI_Constants.SIO_DTR_DSR_HS);
+    		}else if(str == "Xon/Xoff"){
+    			mFlowCtrlHashMap.put(str,FTDI_Constants.SIO_XON_XOFF_HS);
+    		}
+    	}
     }
 }
