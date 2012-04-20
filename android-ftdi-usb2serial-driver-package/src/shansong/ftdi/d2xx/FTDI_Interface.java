@@ -421,7 +421,7 @@ public class FTDI_Interface {
 	    	baudrate = baudrate*4;
 	    }
 	    
-	    actual_baudrate = convertBaudRate(baudrate, value_index);
+	    actual_baudrate = convertBaudRate(baudrate, value_index);//this function will change the items in value_index.
 	    value = value_index[0];
 	    index = value_index[1];
 	    
@@ -467,6 +467,71 @@ public class FTDI_Interface {
 		return mBaudRate;
 	}
 	
+	static protected boolean validateDataBits(int data_bits_type)
+	{
+		switch(data_bits_type){//FTDI document D2xx programming guide says it only supports 7 or 8.
+		case FTDI_Constants.DATA_BITS_7:
+		case FTDI_Constants.DATA_BITS_8:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the data bits setting: "+ Integer.toString(data_bits_type));
+			return false;
+		}
+	}
+	
+	static protected boolean validateStopBits(int stop_bits_type)
+	{
+		switch(stop_bits_type){
+		case FTDI_Constants.STOP_BITS_1:
+		case FTDI_Constants.STOP_BITS_15:
+		case FTDI_Constants.STOP_BITS_2:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the stop bits setting: "+ Integer.toString(stop_bits_type));
+			return false;
+		}
+	}
+	
+	static protected boolean validateParity(int parity_type)
+	{
+		switch(parity_type){
+		case FTDI_Constants.PARITY_EVEN:
+		case FTDI_Constants.PARITY_MARK:
+		case FTDI_Constants.PARITY_NONE:
+		case FTDI_Constants.PARITY_ODD:
+		case FTDI_Constants.PARITY_SPACE:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the parity setting: "+ Integer.toString(parity_type));
+			return false;
+		}
+	}
+	
+	static protected boolean validateBreak(int break_type)
+	{
+		switch(break_type)
+		{
+		case FTDI_Constants.BREAK_OFF:
+		case FTDI_Constants.BREAK_ON:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the break setting: "+ Integer.toString(break_type));
+			return false;
+		}
+	}
+	static protected boolean validateFlowCtrl(int flow_ctrl_type)
+	{
+		switch(flow_ctrl_type){
+		case FTDI_Constants.SIO_DISABLE_FLOW_CTRL:
+		case FTDI_Constants.SIO_RTS_CTS_HS:
+		case FTDI_Constants.SIO_DTR_DSR_HS:
+		case FTDI_Constants.SIO_XON_XOFF_HS:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the flow control type: "+ Integer.toString(flow_ctrl_type));
+			return false;
+		}
+	}
 	/**
 	 * Sets the line property, including num of databits, num of stop bits, parity, and break.
 	 * The job is done by sending usb control message to FTDI device.
@@ -482,51 +547,13 @@ public class FTDI_Interface {
 	public int setLineProperty(int data_bits_type, int stop_bits_type, int parity_type, int break_type)
 	{
 		//check the number of data bits is valid.
-		switch(data_bits_type)//FTDI document D2xx programming guide says it only supports 7 or 8.
-		{
-		case FTDI_Constants.DATA_BITS_7:
-		case FTDI_Constants.DATA_BITS_8:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the data bits setting: "+ Integer.toString(data_bits_type));
-			return -2;
-		}
+		if(!validateDataBits(data_bits_type)) return -2;
 		//check if the stop bits type is valid
-		switch(stop_bits_type)
-		{
-		case FTDI_Constants.STOP_BITS_1:
-		case FTDI_Constants.STOP_BITS_15:
-		case FTDI_Constants.STOP_BITS_2:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the stop bits setting: "+ Integer.toString(stop_bits_type));
-			return -2;
-		}
-		
+		if(!validateStopBits(stop_bits_type)) return -2;
 		//check if the parity type is valid
-		switch(parity_type)
-		{
-		case FTDI_Constants.PARITY_EVEN:
-		case FTDI_Constants.PARITY_MARK:
-		case FTDI_Constants.PARITY_NONE:
-		case FTDI_Constants.PARITY_ODD:
-		case FTDI_Constants.PARITY_SPACE:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the parity setting: "+ Integer.toString(parity_type));
-			return -2;
-		}
-		
+		if(!validateParity(parity_type)) return -2;
 		//check if the break type is valid
-		switch(break_type)
-		{
-		case FTDI_Constants.BREAK_OFF:
-		case FTDI_Constants.BREAK_ON:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the break setting: "+ Integer.toString(break_type));
-			return -2;
-		}
+		if(!validateBreak(break_type))return -2;
 		
 		//if we run to here, then every setting is valid. Just throw it through usb control message.
 		int combinedSetupValue = data_bits_type|(parity_type << 8)|(stop_bits_type << 11)|(break_type << 14);
@@ -552,17 +579,7 @@ public class FTDI_Interface {
 	public int setFlowControl(int flow_ctrl_type)
 	{
 		//Only allow the pre-defined flow control type.
-		switch(flow_ctrl_type)
-		{
-		case FTDI_Constants.SIO_DISABLE_FLOW_CTRL:
-		case FTDI_Constants.SIO_RTS_CTS_HS:
-		case FTDI_Constants.SIO_DTR_DSR_HS:
-		case FTDI_Constants.SIO_XON_XOFF_HS:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the flow control type: "+ Integer.toString(flow_ctrl_type));
-			return -2;
-		}
+		if(!validateFlowCtrl(flow_ctrl_type))return -2;
 		int r;
 		if ((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_FLOW_CTRL_REQUEST, 
 										0, (flow_ctrl_type|mInterface), null, 0, mWriteTimeout)) != 0)

@@ -107,7 +107,8 @@ public class FTDI_SerialPort {
 		if(mIsOpened){
 			int actualBaudRate = mFTDI_Interface.setBaudRate(baudrate);
 			if(actualBaudRate<0){
-				//TODO: throw an exception?
+				//TODO: throw an exception, 
+				//need to separate USB failure, invalid arguments, and >5% error result
 			}
 			mBaudRate = baudrate;
 			return actualBaudRate;
@@ -126,13 +127,14 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(new_data_bits, mStopBits, mParity, mBreakState);
-			if(result < 0){
-				//TODO: throw proper exceptions
-			}
+			if(result == -2) throw new IllegalArgumentException();
+			//TODO:throw proper exception here for USB operation failure.
+			
 			mDataBits = new_data_bits;
 			return result;
 		}
 		else{
+			if(!FTDI_Interface.validateDataBits(new_data_bits)) throw new IllegalArgumentException();
 			mDataBits = new_data_bits;
 			return 0;
 		}
@@ -147,13 +149,14 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, new_parity, mBreakState);
-			if(result < 0){
-				//TODO: throw proper exceptions
-			}
+			if(result == -2) throw new IllegalArgumentException();
+			//TODO:throw proper exception here for USB operation failure.
+
 			mParity = new_parity;
 			return result;
 		}
 		else{
+			if(!FTDI_Interface.validateParity(new_parity)) throw new IllegalArgumentException();
 			mParity = new_parity;
 			return 0;
 		}
@@ -168,13 +171,14 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, new_stop_bits, mParity, mBreakState);
-			if(result < 0){
-				//TODO: throw proper exceptions
-			}
+			if(result == -2) throw new IllegalArgumentException();
+			//TODO:throw proper exception here for USB operation failure.
+			
 			mStopBits = new_stop_bits;
 			return result;
 		}
 		else{
+			if(!FTDI_Interface.validateStopBits(new_stop_bits))throw new IllegalArgumentException();
 			mStopBits = new_stop_bits;
 			return 0;
 		}
@@ -189,13 +193,13 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, new_break_state);
-			if(result < 0){
-				//TODO: throw proper exceptions
-			}
+			if(result == -2) throw new IllegalArgumentException();
+			//TODO:throw proper exception here for USB operation failure.
 			mBreakState = new_break_state;
 			return result;
 		}
 		else{
+			if(!FTDI_Interface.validateBreak(new_break_state))throw new IllegalArgumentException();
 			mBreakState = new_break_state;
 			return 0;
 		}
@@ -210,13 +214,13 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setFlowControl(new_flow_ctrl_type);
-			if(result < 0){
-				//TODO:throw proper exception here.
-			}
+			if(result == -2) throw new IllegalArgumentException();
+			//TODO:throw proper exception here for USB operation failure.
 			mFlowControl = new_flow_ctrl_type;
 			return result;
 		}
 		else{
+			if(!FTDI_Interface.validateFlowCtrl(new_flow_ctrl_type))throw new IllegalArgumentException();
 			mFlowControl = new_flow_ctrl_type;
 			return 0;
 		}

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
+import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.widget.Toast;
 import shansong.ftdi.d2xx.*;
@@ -190,5 +191,10 @@ public class SandboxAppActivity extends Activity {
     protected boolean isSerialPortConnected()
     {
     	return mIsSerialPortConnected;
+    }
+    
+    protected void setSerialPortConfigSelections(UsbDevice dev, int ftdi_interface, int baud_rate, int data_bits, int stop_bits, int parity, int flow_ctrl)
+    {
+    	//set the selections to local variables.
     }
 }
