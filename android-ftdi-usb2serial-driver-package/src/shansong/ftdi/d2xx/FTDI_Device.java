@@ -229,7 +229,7 @@ public class FTDI_Device{
 	/**
 	 * Open device. This function establishes a UsbDeviceConnection and let every interface to access this connection through.
 	 *
-	 * @return 1 if device already opened. 0 if opening operation successful. -1 if failed.
+	 * @return 1 if device already opened. 0 if opening operation successful. -1 if Usb operation failed. -2 if Usb has no permission to access.
 	 */
 	public int openDevice()
 	{
@@ -243,7 +243,7 @@ public class FTDI_Device{
 		{
 			//write the permission problem to Android log, and return -1
 			Log.e(TAG,"Permission denied when opening the device:"+mUsbDevice.toString());
-			return -1;
+			return -2;
 		}
 		
 		mUsbDeviceConnection = mManager.openDevice(mUsbDevice);
