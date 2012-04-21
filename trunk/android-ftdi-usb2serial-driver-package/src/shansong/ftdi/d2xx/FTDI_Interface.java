@@ -398,6 +398,7 @@ public class FTDI_Interface {
 	    // Return the nearest baud rate
 	    return best_baud;
 	}
+	
 	/**
 	 * Sets the baud rate.
 	 *
@@ -765,6 +766,30 @@ public class FTDI_Interface {
 		else
 			return 0;
 	}
+	
+	/**
+	 * Validate if the given bit mode is listed in FTDI_Constants.
+	 *
+	 * @param bitmode the bitmode
+	 * @return true, if the bitmode is valide. false if not valide.
+	 */
+	protected static boolean validateBitMode(int bitmode)
+	{
+		switch(bitmode){
+		case FTDI_Constants.MPSSE_BITMODE_RESET:
+		case FTDI_Constants.MPSSE_BITMODE_BITBANG:
+		case FTDI_Constants.MPSSE_BITMODE_MPSSE:
+		case FTDI_Constants.MPSSE_BITMODE_SYNCBB:
+		case FTDI_Constants.MPSSE_BITMODE_MCU:
+		case FTDI_Constants.MPSSE_BITMODE_OPTO:
+		case FTDI_Constants.MPSSE_BITMODE_CBUS:
+		case FTDI_Constants.MPSSE_BITMODE_SYNCFF:
+			return true;
+		default:
+			Log.e(TAG,"Cannot recognize the bit mode: "+ Integer.toString(bitmode));
+			return false;
+		}
+	}
 	//setBitMode
 	/**
 	 * Sets the bit mask bit mode.
@@ -779,22 +804,8 @@ public class FTDI_Interface {
 	 */
 	public int SetBitMaskBitMode(byte bitmask, byte bitmode)
 	{
-		switch(bitmode)
-		{
-		case FTDI_Constants.MPSSE_BITMODE_RESET:
-		case FTDI_Constants.MPSSE_BITMODE_BITBANG:
-		case FTDI_Constants.MPSSE_BITMODE_MPSSE:
-		case FTDI_Constants.MPSSE_BITMODE_SYNCBB:
-		case FTDI_Constants.MPSSE_BITMODE_MCU:
-		case FTDI_Constants.MPSSE_BITMODE_OPTO:
-		case FTDI_Constants.MPSSE_BITMODE_CBUS:
-		case FTDI_Constants.MPSSE_BITMODE_SYNCFF:
-			break;
-		default:
-			Log.e(TAG,"Cannot recognize the bit mode: "+ Integer.toString(bitmode));
-			return -2;
-		}
-		
+		//check if the bitmode is valide. bitmask no need to check.
+		if(!validateBitMode(bitmode))return -2;
 		int combinedSetupValue = (bitmode << 8) | bitmask;
 		int r;
 		if((r = mUsbDeviceConnection.controlTransfer(FTDI_Constants.FTDI_DEVICE_OUT_REQTYPE, FTDI_Constants.SIO_SET_BITMODE_REQUEST, 
@@ -828,7 +839,18 @@ public class FTDI_Interface {
 	 */
 	public boolean isBitBangEnabled()
 	{
-		if(mBitMode == FTDI_Constants.MPSSE_BITMODE_RESET)
+		return validateBitBangEnabled(mBitMode);
+	}
+	
+	/**
+	 * Validate bit bang enabled.
+	 *
+	 * @param bitmode the bitmode
+	 * @return true, if the bitmode can enable bitbang mode.
+	 */
+	protected static boolean validateBitBangEnabled(int bitmode)
+	{
+		if(bitmode == FTDI_Constants.MPSSE_BITMODE_RESET)
 			return false;
 		else
 			return true;

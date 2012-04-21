@@ -253,6 +253,13 @@ public class SerialPortConfigFrag extends Fragment {
     	String[] stop_bits_list = res.getStringArray(R.array.stop_bits_list);
     	String[] parity_list = res.getStringArray(R.array.parity_list);
     	String[] flow_ctrl_list = res.getStringArray(R.array.flow_ctrl_list);
+    	//intialize hashmaps first:
+    	mBaudRateHashMap = new HashMap<String, Integer>();
+    	mDataBitsHashMap = new HashMap<String, Integer>();
+    	mStopBitsHashMap = new HashMap<String, Integer>();
+    	mParityHashMap = new HashMap<String, Integer>();
+    	mFlowCtrlHashMap = new HashMap<String, Integer>();
+    	
     	//baud rate hashmap
     	for(String str: baud_rate_list){
     		mBaudRateHashMap.put(str, Integer.parseInt(str));

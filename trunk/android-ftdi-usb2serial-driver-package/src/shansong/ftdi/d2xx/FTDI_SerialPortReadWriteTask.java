@@ -27,14 +27,14 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	/** The m rx fifo. */
     private ByteCircularFifoBuffer mRxFifo, mTxFifo;
     
-    /** The pre-defined size of USB bulk read and write */
+    /** The pre-defined size of USB bulk read and write. */
     private int mBulkReadSize, mBulkWriteSize;
     
     /** The m write time out. */
     private int mReadTimeOut,mWriteTimeOut;
     
     /** The flag used to exit the main loop. */
-    //private boolean mContinueToRun;
+    private boolean mContinueToRun;
     
     /** The ftdi interface that is used as serial port. */
     FTDI_Interface mFTDI_Interface;
@@ -50,15 +50,12 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      *
      * @see OnDataReceivedEvent
      */
-    public interface OnDataReceivedListener {
-        
+    public interface OnDataReceivedListener {      
         /**
          * On data received.
-         *
          * @param sender the sender
          */
         void onDataReceived(Object sender);
-        
         //to call the Listener within this class: mOnDataReceivedListener.onDataReceived(this);
     }
     
@@ -99,11 +96,9 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      *
      * @see OnErrorReceivedEvent
      */
-    public interface OnErrorReceivedListener {
-        
+    public interface OnErrorReceivedListener {    
         /**
          * On data received.
-         *
          * @param sender the sender
          * @param error the error
          */
@@ -116,7 +111,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     
     /**
      * Sets the on error received listener.
-     *
      * @param l the new on data received listener
      */
     public void setOnErrorReceivedListener(OnErrorReceivedListener l)
@@ -146,16 +140,14 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	 *
 	 * @see OnPinChangedEvent
 	 */
-	public interface OnPinChangedListener {
-        
+	public interface OnPinChangedListener {    
         /**
          * On data received.
-         *
          * @param sender the sender
          * @param pinChange the pin change
+         * @param isPinActive the is pin active
          */
         void onPinChanged(Object sender, FTDI_PinChangeEnum pinChange, boolean isPinActive);
-        
         //to call the Listener within this class: mOnErrorReceivedListener.onDataReceived(this);
     }
 	
@@ -164,7 +156,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     
     /**
      * Sets the on pin changed listener.
-     *
      * @param l the new on data received listener
      */
     public void setOnPinChangedListener(OnPinChangedListener l)
@@ -172,15 +163,58 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	mOnPinChangedListener = l;
     }
     
+    /**
+     * The Enum BackgroundTaskErrorType.
+     */
+    public enum BackgroundTaskErrorType{
+	    /** The US b_ rea d_ error. */
+	    USB_READ_ERROR, 
+	    /** The US b_ writ e_ error. */
+	    USB_WRITE_ERROR, 
+	    /** The US b_ mode m_ statu s_ error. */
+	    USB_MODEM_STATUS_ERROR
+    }
+    /**
+     * The listener interface for receiving onBackgroundTaskError events.
+     * The class that is interested in processing a onBackgroundTaskError
+     * event implements this interface, and the object created
+     * with that class is registered with a component using the
+     * component's <code>addOnBackgroundTaskErrorListener<code> method. When
+     * the onBackgroundTaskError event occurs, that object's appropriate
+     * method is invoked.
+     *
+     * @see OnBackgroundTaskErrorEvent
+     */
+    public interface OnBackgroundTaskErrorListener{  	
+	    /**
+	     * On background task error.
+	     * @param sender the sender
+	     */
+	    void OnBackgroundTaskError(Object sender, BackgroundTaskErrorType err);
+    }
+    
+    /** The m on background task error listener. */
+    private OnBackgroundTaskErrorListener mOnBackgroundTaskErrorListener;
     
     /**
-     * Instantiates a new fTD i_ serial port read task.
+     * Sets the on background task error listener.
+     * @param l the new on background task error listener
+     */
+    public void setOnBackgroundTaskErrorListener(OnBackgroundTaskErrorListener l)
+    {
+    	mOnBackgroundTaskErrorListener = l;
+    }
+    
+    /**
+     * Instantiates a new FTDI serial port read/write task.
      *
      * @param claimedFTDI_Interface the claimed ftd i_ interface
      * @param readBufferSize the read buffer size
      * @param readTimeOut the read time out
+     * @param bulkReadSize the bulk read size
      * @param writeBufferSize the write buffer size
      * @param writeTimeOut the: write time out in ms.
+     * @param bulkWriteSize the bulk write size
      */
     public FTDI_SerialPortReadWriteTask(FTDI_Interface claimedFTDI_Interface, int readBufferSize, int readTimeOut,
     		int bulkReadSize, int writeBufferSize, int writeTimeOut,  int bulkWriteSize)
@@ -207,15 +241,19 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    /** The buffer. */
 	    private byte[] buffer;
 	    
-	    private CountDownTimer mTimer;
+	    /** The m timer. */
+    	private CountDownTimer mTimer;
 	    
-	    boolean isTimeOut;
-	    /**
+	    /** The is time out. */
+    	boolean isTimeOut;
+	    
+    	/**
     	 * Instantiates a new ReadDataAsyncTask.
     	 *
     	 * @param buf the buf
     	 * @param stIdx the st idx
     	 * @param len the len
+    	 * @param readTimeOut the read time out
     	 */
     	public ReadDataAsyncTask(byte[] buf, int stIdx, int len, int readTimeOut)
 	    {
@@ -324,8 +362,12 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	    private int length, startIndex;
 	    /** The buffer. */
 	    private byte[] buffer;
-	    private CountDownTimer mTimer;
-	    boolean isTimeOut;
+	    
+    	/** The m timer. */
+    	private CountDownTimer mTimer;
+	    
+    	/** The is time out. */
+    	boolean isTimeOut;
 	    
 	    /**
     	 * Instantiates a new write data async task.
@@ -333,6 +375,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	 * @param buf the buf
     	 * @param stIdx the st idx
     	 * @param len the len
+    	 * @param writeTimeOut the write time out
     	 */
     	public WriteDataAsyncTask(byte[] buf, int stIdx, int len, int writeTimeOut){
 	    	buffer = buf;
@@ -376,6 +419,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     		return numAlreadyWritten;
     	}
     }
+    
     /**
      * Write data.
      *
@@ -383,9 +427,10 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      * @param startIndex the start index
      * @param length the length
      * @return the int
-     * @throws TimeoutException 
-     * @throws ExecutionException 
-     * @throws InterruptedException 
+     * @throws BufferUnderflowException the buffer underflow exception
+     * @throws IndexOutOfBoundsException the index out of bounds exception
+     * @throws IllegalArgumentException the illegal argument exception
+     * @throws TimeoutException the timeout exception
      */
     public int writeData(byte[] buffer, int startIndex, int length) 
     		throws BufferUnderflowException, IndexOutOfBoundsException, IllegalArgumentException, TimeoutException
@@ -426,9 +471,8 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
      */
     protected Integer doInBackground(Void...Params)
 	{
-		//TODO: detailed implementation.
     	//here we shall have a main loop of reading and writing FTDI USB endpoints.
-    	//attention: the exception handling of this task is tricky. 
+    	//attention: no exception can be thrown from async task. Use return values or call backs for execution error
 		//We should handle as much as possible for the task to continue without breaking.
     	
     	//1. prepare the usb bulk read/write buffer, and other variables needed in the loop
@@ -436,9 +480,10 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	byte[] bulkWriteBuf = new byte[mBulkWriteSize];
     	int numTxBytes,numRxFree, modemStatus;
     	int oldModemStatus;
-    	if((oldModemStatus = mFTDI_Interface.getModemStatus())<0)
-    	{
+    	if((oldModemStatus = mFTDI_Interface.getModemStatus())<0){
     		//this is error branch, should throw a exception and end the execution of this task.
+    		if(this.mOnBackgroundTaskErrorListener!=null) 
+    			mOnBackgroundTaskErrorListener.OnBackgroundTaskError(this, BackgroundTaskErrorType.USB_MODEM_STATUS_ERROR);
     	}
     	
     	//2. check if the interface is claimed?? seems that we don't have a method to check this
@@ -446,47 +491,46 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     	//3. the main loop
     	do{
     		//3.1 if there's anything remained in transmit buffer, do the transmit
-    		if((numTxBytes = mTxFifo.occupiedLength()) > 0)//if there's anything to send
-    		{
+    		if((numTxBytes = mTxFifo.occupiedLength()) > 0){//if there's anything to send
+    		
     			int numToWrite = (numTxBytes <= mBulkWriteSize)? numTxBytes:mBulkWriteSize;
     			mTxFifo.readData(bulkWriteBuf, 0, numToWrite);
     			int numActuallyWritten = mFTDI_Interface.writeData(bulkWriteBuf, numToWrite);
     			//TODO: handle the possible usb writing error represented by numActuallyWritten 
     			//the desired behavior is to handle the exception/mistakes and call the callbacks later.
     			//so that this thread can keep running rather than exit with exception.
-    			if(numActuallyWritten < numToWrite)
-    			{
-    				//this is error branch, should through a exception and end the execution of this task.
+    			if(numActuallyWritten < numToWrite){
+    				//TODO: think what if the numActuallyWritten >0 but <numToWrite, is this a normal case?
+    				//need to check if this will happen during normal writing operation.
+    				if(this.mOnBackgroundTaskErrorListener!=null) 
+    	    			mOnBackgroundTaskErrorListener.OnBackgroundTaskError(this, BackgroundTaskErrorType.USB_WRITE_ERROR);
     			}
     			//after this, all bytes in bulkWriteBuf are written out to FTDI chip, nothing useful left.
     		}
     		//3.2 do a receive USB read, note that we get the modem status at the same time
-    		if((numRxFree = mRxFifo.freeLength())>0)
-    		{
+    		if((numRxFree = mRxFifo.freeLength())>0){
     			int numToRead = (numRxFree <= mBulkReadSize)? numRxFree:mBulkReadSize;
     			int numActuallyRead = mFTDI_Interface.readData(bulkReadBuf, numToRead);
     			modemStatus = ((bulkReadBuf[1] << 8) | (bulkReadBuf[0] & 0xFF));
-    			if(numActuallyRead >2)//Data received
-    			{
+    			if(numActuallyRead >2){//Data received
     				mRxFifo.writeData(bulkReadBuf, 2, numActuallyRead-2);//the remaining are actual bytes read from rx.
         			if(mOnDataReceivedListener != null)//call the event listener
     	    			mOnDataReceivedListener.onDataReceived(this);
     			}
-    			else if(numActuallyRead < 2)
-    			{
+    			else if(numActuallyRead < 2){
     				//this is error branch, should through a exception and end the execution of this task.
+    				if(this.mOnBackgroundTaskErrorListener!=null) 
+    	    			mOnBackgroundTaskErrorListener.OnBackgroundTaskError(this, BackgroundTaskErrorType.USB_READ_ERROR);
     			}
     		}
-    		else//if RX fifo is full and we cannot perform a read, at least read the modem status.
-    		{
+    		else{//if RX fifo is full and we cannot perform a read, at least read the modem status.
     			modemStatus = mFTDI_Interface.getModemStatus();
     		}
     		
     		//3.4 call the event listeners according to modem status and other status
-    		if(modemStatus >= 0)
-    		{    			
-    		    if(this.mOnPinChangedListener != null)
-    		    {
+    		if(modemStatus >= 0){
+    		    			
+    		    if(this.mOnPinChangedListener != null){
     		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_CTS_MSK) != 
     		    			(oldModemStatus & FTDI_Constants.MODEM_STATUS_CTS_MSK))
     		    		mOnPinChangedListener.onPinChanged(this, FTDI_Constants.FTDI_PinChangeEnum.CTS_CHANGED, 
@@ -508,8 +552,7 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     		    				((modemStatus & FTDI_Constants.MODEM_STATUS_RLSD_MSK) != 0)?true:false );
     		    }
     		    
-    		    if(this.mOnErrorReceivedListener != null)
-    		    {
+    		    if(this.mOnErrorReceivedListener != null){
     		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_DR_MSK) != 0)
     		    		mOnErrorReceivedListener.onErrorReceived(this, FTDI_Constants.FTDI_CommErroEnum.DATA_READY);
     		    	if((modemStatus & FTDI_Constants.MODEM_STATUS_OE_MSK) != 0)
@@ -530,18 +573,33 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
     		    //update the oldModemStatus for next loop.
     		    oldModemStatus = modemStatus;
     		}
-    		else//(modemStatus<0)
-    		{
-    			//TODO: handle the exception in modem status reading
-    			//this is error branch, should through a exception and end the execution of this task.
-    			continue;
+    		else{//(modemStatus<0)
+    			if(this.mOnBackgroundTaskErrorListener!=null) 
+        			mOnBackgroundTaskErrorListener.OnBackgroundTaskError(this, BackgroundTaskErrorType.USB_MODEM_STATUS_ERROR);
     		}
     		
-    	}while(this.isCancelled());
+    	}while(this.mContinueToRun);
     	
 		return 0;
 	}
 	
+    /**
+     * Start the async task execution.
+     */
+    protected void start()
+    {
+    	mContinueToRun = true;
+    	this.execute();
+    }
+    
+    /**
+     * Stop the async task execution by setting mContinueToRun to false.
+     */
+    protected void stop()
+    {
+    	mContinueToRun = false;
+    }
+    
 	/* (non-Javadoc)
      * @see android.os.AsyncTask#onProgressUpdate(Progress[])
      */
@@ -564,4 +622,6 @@ public class FTDI_SerialPortReadWriteTask extends AsyncTask<Void, Integer, Integ
 	{
 		
 	}
+    
+    
 }

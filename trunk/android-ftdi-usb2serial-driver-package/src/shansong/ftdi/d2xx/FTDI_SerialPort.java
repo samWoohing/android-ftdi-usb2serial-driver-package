@@ -1,5 +1,7 @@
 package shansong.ftdi.d2xx;
 
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import shansong.ftdi.d2xx.FTDI_SerialPortReadWriteTask.OnDataReceivedListener;
@@ -18,6 +20,8 @@ public class FTDI_SerialPort {
 	private int mStopBits;
 	private int mFlowControl;
 	private int mBreakState;//the break that we'd like to send out.
+	private static byte mBitMode = FTDI_Constants.MPSSE_BITMODE_RESET;//the default bitmode shall be used for serial port.
+	private static byte mBitMask = 0;//TODO: i think seial port shouldn't provide GPIO. may review this later.
 	
 	private int mReadBufferSize,mWriteBufferSize,mReadTimeOut,mWriteTimeOut,mBulkReadSize,mBulkWriteSize;
 	
@@ -53,47 +57,56 @@ public class FTDI_SerialPort {
 		mIsOpened = false;//equals true when mFTDI_Device is opened and FTDI_Interface is claimed.
 	}
 	
-	public void open()
-	{	//Open the FTDI_Device.
-		if(mFTDI_Device.openDevice() < 0)
-		{
-			//TODO: think if we should open the device outside this class.
-			//because one FTDI_Device class can manage more than one FTDI_Interface.
-		}
-		//set up baud rate, data bits, etc, according to current config		
-		if( mFTDI_Interface.setBaudRate(mBaudRate) < 0 ||
-				mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, mBreakState) < 0 ||
-				mFTDI_Interface.setFlowControl(mFlowControl)<0)
-		{
-			//throw exception
-		}
+	public void open() throws IOException, IllegalArgumentException
+	{
+		//TODO: think if we should open the device outside this class.
+		//because one FTDI_Device class can manage more than one FTDI_Interface.
+		int result;
+		result = mFTDI_Device.openDevice();
+		if(result == -1) throw new IOException("openDevice: Usb operation failed");
+		if(result == -2) throw new IOException("openDevice: Device access permission denied.");
+				
+		result = mFTDI_Interface.setBaudRate(mBaudRate);
+		if(result == -1) throw new IOException("setBaudRate: Usb operation failed");
+		if(result == -2) throw new IllegalArgumentException("setBaudRate: Cannot implement the given baudrate");
+		if(result == -3) throw new IllegalArgumentException("setBaudRate: Implement baudrate has >5% error");
 		
-		//TODO:need to claim the usb interface//I believe the claim interface shall happen in this function.
-		if(!mFTDI_Interface.claimInterface(false))
-		{
-			//throw exception
-		}
-		//need to reset the device? No. or flush the the usb buffer for a port? no. 
-		//because all of this will influence other interfaces that are possibly operating.
+		result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, mBreakState);
+		if(result == -1) throw new IOException("setLineProperty: Usb operation failed");
+		if(result == -2) throw new IllegalArgumentException("setLineProperty: Invalid input parameter");
 		
+		result = mFTDI_Interface.SetBitMaskBitMode(mBitMask, mBitMode);
+		if(result == -1) throw new IOException("SetBitMaskBitMode: Usb operation failed");
+		if(result == -2) throw new IllegalArgumentException("SetBitMaskBitMode: Invalid input parameter");
+		
+		if(!mFTDI_Interface.claimInterface(false)) throw new IOException("claimInterface: failed to claim interface.");
+
 		//set up a read/write task and let it run
 		mSerialPortTask = new FTDI_SerialPortReadWriteTask(mFTDI_Interface,mReadBufferSize,mReadTimeOut,mBulkReadSize,
 															mWriteBufferSize,mWriteTimeOut,mBulkWriteSize);	
 		mSerialPortTask.setOnDataReceivedListener(mOnDataReceivedListener);
 		mSerialPortTask.setOnErrorReceivedListener(mOnErrorReceivedListener);
 		mSerialPortTask.setOnPinChangedListener(mOnPinChangedListener);
-		mSerialPortTask.execute();
+		mSerialPortTask.start();
 		mIsOpened = true;
 	}
 	
-	public void close()
+	public void close() throws IOException
 	{
 		//need to release the claimed usb interface
-		if(!mFTDI_Interface.releaseInterface()){
-			//TODO: throw exception;
-		}
+		if(!mFTDI_Interface.releaseInterface())throw new IOException("releaseInterface: failed to release interface.");
 		//need to end the read/write async task
-		mSerialPortTask.cancel(true);//TODO: shall we change back to a stop() function?
+		mSerialPortTask.stop();
+		int result=0;
+		try {
+			result = mSerialPortTask.get();
+		} catch (InterruptedException e) {
+			// TODO decide what to do with excution exceptions
+		} catch (ExecutionException e) {
+			// TODO decide what to do with excution exceptions
+			e.printStackTrace();
+		}
+		
 		mIsOpened = false;
 	}
 
@@ -102,10 +115,13 @@ public class FTDI_SerialPort {
 		return mBaudRate;
 	}
 	
-	public int setBaudRate(int baudrate)
+	public int setBaudRate(int baudrate) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int actualBaudRate = mFTDI_Interface.setBaudRate(baudrate);
+			if(actualBaudRate == -2) throw new IllegalArgumentException("calculated actual baud rate is negative.");
+			if(actualBaudRate == -3) throw new IllegalArgumentException("calculated actual baud rate has greater than 5% error");
+			if(actualBaudRate == -1) throw new IOException();
 			if(actualBaudRate<0){
 				//TODO: throw an exception, 
 				//need to separate USB failure, invalid arguments, and >5% error result
@@ -123,12 +139,12 @@ public class FTDI_SerialPort {
 		return mDataBits;
 	}
 	
-	public int setDataBits(int new_data_bits)
+	public int setDataBits(int new_data_bits) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(new_data_bits, mStopBits, mParity, mBreakState);
 			if(result == -2) throw new IllegalArgumentException();
-			//TODO:throw proper exception here for USB operation failure.
+			if(result == -1) throw new IOException();
 			
 			mDataBits = new_data_bits;
 			return result;
@@ -145,12 +161,12 @@ public class FTDI_SerialPort {
 		return mParity;
 	}
 	
-	public int setParity(int new_parity)
+	public int setParity(int new_parity) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, new_parity, mBreakState);
 			if(result == -2) throw new IllegalArgumentException();
-			//TODO:throw proper exception here for USB operation failure.
+			if(result == -1) throw new IOException();
 
 			mParity = new_parity;
 			return result;
@@ -167,13 +183,12 @@ public class FTDI_SerialPort {
 		return mStopBits;
 	}
 	
-	public int setStopBits(int new_stop_bits)
+	public int setStopBits(int new_stop_bits) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, new_stop_bits, mParity, mBreakState);
 			if(result == -2) throw new IllegalArgumentException();
-			//TODO:throw proper exception here for USB operation failure.
-			
+			if(result == -1) throw new IOException();
 			mStopBits = new_stop_bits;
 			return result;
 		}
@@ -189,12 +204,12 @@ public class FTDI_SerialPort {
 		return mBreakState;
 	}
 	
-	public int setBreakState(int new_break_state)
+	public int setBreakState(int new_break_state) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, new_break_state);
 			if(result == -2) throw new IllegalArgumentException();
-			//TODO:throw proper exception here for USB operation failure.
+			if(result == -1) throw new IOException();
 			mBreakState = new_break_state;
 			return result;
 		}
@@ -210,12 +225,12 @@ public class FTDI_SerialPort {
 		return mFlowControl;
 	}
 	
-	public int setFlowControl(int new_flow_ctrl_type)
+	public int setFlowControl(int new_flow_ctrl_type) throws IOException, IllegalArgumentException
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setFlowControl(new_flow_ctrl_type);
 			if(result == -2) throw new IllegalArgumentException();
-			//TODO:throw proper exception here for USB operation failure.
+			if(result == -1) throw new IOException();
 			mFlowControl = new_flow_ctrl_type;
 			return result;
 		}
@@ -226,19 +241,17 @@ public class FTDI_SerialPort {
 		}
 	}
 		
-	public int read(byte[] buf, int startIndex, int length) throws TimeoutException
-	{
-		if(!mIsOpened){
-			//TODO: throw exception.
-		}
+	public int read(byte[] buf, int startIndex, int length) throws TimeoutException, IllegalAccessException
+	{	//TODO: more exception shall be thrown from here
+		if(!mIsOpened)
+			throw new IllegalAccessException("Port is not opened. Cannot perform port read.");
 		return mSerialPortTask.readData(buf, startIndex, length);
 	}
 	
-	public int write(byte[] buf, int startIndex, int length) throws TimeoutException
+	public int write(byte[] buf, int startIndex, int length) throws TimeoutException, IllegalAccessException
 	{
-		if(!mIsOpened){
-			//TODO: throw exception.
-		}
+		if(!mIsOpened)
+			throw new IllegalAccessException("Port is not opened. Cannot perform port write.");
 		return mSerialPortTask.writeData(buf, startIndex, length);
 	}
 	
