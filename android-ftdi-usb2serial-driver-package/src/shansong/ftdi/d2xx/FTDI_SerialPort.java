@@ -35,6 +35,8 @@ public class FTDI_SerialPort {
 	
 	public FTDI_SerialPort(FTDI_Device dev, int whichInterface)
 	{
+		//TODO: if dev is null, need to throw out something.
+		
 		mFTDI_Device = dev;
 		mFTDI_Interface = mFTDI_Device.getInterfaces(whichInterface);
 		//need to do the initialization by calling FTDI_Device.initDevice
@@ -110,6 +112,11 @@ public class FTDI_SerialPort {
 		mIsOpened = false;
 	}
 
+	public boolean isOpened()
+	{
+		return mIsOpened;
+	}
+	
 	public int getBaudRate()
 	{
 		return mBaudRate;
@@ -119,9 +126,9 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int actualBaudRate = mFTDI_Interface.setBaudRate(baudrate);
-			if(actualBaudRate == -2) throw new IllegalArgumentException("calculated actual baud rate is negative.");
-			if(actualBaudRate == -3) throw new IllegalArgumentException("calculated actual baud rate has greater than 5% error");
-			if(actualBaudRate == -1) throw new IOException();
+			if(actualBaudRate == -2) throw new IllegalArgumentException("setBaudRate: calculated actual baud rate is negative.");
+			if(actualBaudRate == -3) throw new IllegalArgumentException("setBaudRate: calculated actual baud rate has greater than 5% error");
+			if(actualBaudRate == -1) throw new IOException("setBaudRate: Usb operation failed.");
 			if(actualBaudRate<0){
 				//TODO: throw an exception, 
 				//need to separate USB failure, invalid arguments, and >5% error result
@@ -143,14 +150,14 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(new_data_bits, mStopBits, mParity, mBreakState);
-			if(result == -2) throw new IllegalArgumentException();
-			if(result == -1) throw new IOException();
+			if(result == -2) throw new IllegalArgumentException("setDataBits: invalid input parameter.");
+			if(result == -1) throw new IOException("setDataBits: Usb operation failed.");
 			
 			mDataBits = new_data_bits;
 			return result;
 		}
 		else{
-			if(!FTDI_Interface.validateDataBits(new_data_bits)) throw new IllegalArgumentException();
+			if(!FTDI_Interface.validateDataBits(new_data_bits)) throw new IllegalArgumentException("setDataBits: invalid input parameter.");
 			mDataBits = new_data_bits;
 			return 0;
 		}
@@ -165,14 +172,14 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, new_parity, mBreakState);
-			if(result == -2) throw new IllegalArgumentException();
-			if(result == -1) throw new IOException();
+			if(result == -2) throw new IllegalArgumentException("setParity: invalid input parameter");
+			if(result == -1) throw new IOException("setParity: Usb operation failed.");
 
 			mParity = new_parity;
 			return result;
 		}
 		else{
-			if(!FTDI_Interface.validateParity(new_parity)) throw new IllegalArgumentException();
+			if(!FTDI_Interface.validateParity(new_parity)) throw new IllegalArgumentException("setParity: invalid input parameter");
 			mParity = new_parity;
 			return 0;
 		}
@@ -187,13 +194,13 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, new_stop_bits, mParity, mBreakState);
-			if(result == -2) throw new IllegalArgumentException();
-			if(result == -1) throw new IOException();
+			if(result == -2) throw new IllegalArgumentException("setStopBits: invalid input parameter");
+			if(result == -1) throw new IOException("setStopBits: Usb operation failed.");
 			mStopBits = new_stop_bits;
 			return result;
 		}
 		else{
-			if(!FTDI_Interface.validateStopBits(new_stop_bits))throw new IllegalArgumentException();
+			if(!FTDI_Interface.validateStopBits(new_stop_bits))throw new IllegalArgumentException("setStopBits: invalid input parameter");
 			mStopBits = new_stop_bits;
 			return 0;
 		}
@@ -208,13 +215,13 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setLineProperty(mDataBits, mStopBits, mParity, new_break_state);
-			if(result == -2) throw new IllegalArgumentException();
-			if(result == -1) throw new IOException();
+			if(result == -2) throw new IllegalArgumentException("setBreakState: invalid input parameter");
+			if(result == -1) throw new IOException("setBreakState: Usb operation failed.");
 			mBreakState = new_break_state;
 			return result;
 		}
 		else{
-			if(!FTDI_Interface.validateBreak(new_break_state))throw new IllegalArgumentException();
+			if(!FTDI_Interface.validateBreak(new_break_state))throw new IllegalArgumentException("setBreakState: invalid input parameter");
 			mBreakState = new_break_state;
 			return 0;
 		}
@@ -229,13 +236,13 @@ public class FTDI_SerialPort {
 	{
 		if(mIsOpened){
 			int result = mFTDI_Interface.setFlowControl(new_flow_ctrl_type);
-			if(result == -2) throw new IllegalArgumentException();
-			if(result == -1) throw new IOException();
+			if(result == -2) throw new IllegalArgumentException("setFlowControl: invalid input parameter");
+			if(result == -1) throw new IOException("setFlowControl: Usb operation failed.");
 			mFlowControl = new_flow_ctrl_type;
 			return result;
 		}
 		else{
-			if(!FTDI_Interface.validateFlowCtrl(new_flow_ctrl_type))throw new IllegalArgumentException();
+			if(!FTDI_Interface.validateFlowCtrl(new_flow_ctrl_type))throw new IllegalArgumentException("setFlowControl: invalid input parameter");
 			mFlowControl = new_flow_ctrl_type;
 			return 0;
 		}

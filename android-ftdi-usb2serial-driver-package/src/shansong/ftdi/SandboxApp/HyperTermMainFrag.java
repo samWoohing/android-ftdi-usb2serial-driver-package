@@ -60,7 +60,7 @@ public class HyperTermMainFrag extends Fragment {
         	//TODO: detailed implementation. Currently just dummy code.
         	Toast.makeText(getActivity(), "Connect button clicked!", Toast.LENGTH_SHORT).show();
         	SandboxAppActivity mApp = (SandboxAppActivity)getActivity();
-        	mApp.mIsSerialPortConnected = mApp.mIsSerialPortConnected ? false:true;
+        	mApp.mIsSerialPortConnected = mApp.mIsSerialPortConnected ? false:true;//flip the logic
         }
     };
     
