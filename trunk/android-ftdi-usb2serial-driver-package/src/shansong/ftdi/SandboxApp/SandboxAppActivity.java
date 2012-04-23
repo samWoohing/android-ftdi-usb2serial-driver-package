@@ -1,5 +1,7 @@
 package shansong.ftdi.SandboxApp;
 
+import java.io.IOException;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -15,11 +17,11 @@ import shansong.ftdi.d2xx.*;
  * The Class SandboxAppActivity.
  */
 public class SandboxAppActivity extends Activity {
-    
-	private FTDI_Device mFTDI_Device;
 	
 	//TODO: set this to private in future.
 	public boolean mIsSerialPortConnected;
+	
+	private FTDI_SerialPort mSerialPort;
     /**
      * Called when the activity is first created.
      *
@@ -83,17 +85,13 @@ public class SandboxAppActivity extends Activity {
     public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
         
         /** The m activity. */
-        private final Activity mActivity;
-        
+        private final Activity mActivity;     
         /** The m tag. */
-        private final String mTag;
-        
+        private final String mTag;        
         /** The m class. */
-        private final Class<T> mClass;
-        
+        private final Class<T> mClass;        
         /** The m args. */
-        private final Bundle mArgs;
-        
+        private final Bundle mArgs;        
         /** The m fragment. */
         private Fragment mFragment;
 
@@ -143,14 +141,12 @@ public class SandboxAppActivity extends Activity {
          */
         public void onTabSelected(Tab tab, FragmentTransaction ft) 
         {
-            if (mFragment == null) 
-            {
+            if (mFragment == null){	//this is actually where a new fragment is instantiated.
                 mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
                 ft.add(android.R.id.content, mFragment, mTag);
                 //Toast.makeText(mActivity, "Fragment add: "+mTag, Toast.LENGTH_SHORT).show();
             } 
-            else 
-            {
+            else{
                 //ft.attach(mFragment);
             	//I modified this class, to show and hide, not attach and detach.
             	ft.show(mFragment);
@@ -163,8 +159,7 @@ public class SandboxAppActivity extends Activity {
          */
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
         {
-            if (mFragment != null) 
-            {
+            if (mFragment != null){
                 //ft.detach(mFragment);
             	//I modified this class, to show and hide, not attach and detach.
             	ft.hide(mFragment);
@@ -190,11 +185,49 @@ public class SandboxAppActivity extends Activity {
      */
     protected boolean isSerialPortConnected()
     {
-    	return mIsSerialPortConnected;
+    	if(mSerialPort == null) return false;
+    	else return mSerialPort.isOpened();
     }
     
+    /**
+     * Sets the serial port config selections.
+     *
+     * @param dev the dev
+     * @param ftdi_interface the ftdi_interface
+     * @param baud_rate the baud_rate
+     * @param data_bits the data_bits
+     * @param stop_bits the stop_bits
+     * @param parity the parity
+     * @param flow_ctrl the flow_ctrl
+     */
     protected void setSerialPortConfigSelections(UsbDevice dev, int ftdi_interface, int baud_rate, int data_bits, int stop_bits, int parity, int flow_ctrl)
     {
     	//set the selections to local variables.
+    	FTDI_Device ftdi_dev;
+    	try {
+    		ftdi_dev = new FTDI_Device(this, dev);
+    		mSerialPort = new FTDI_SerialPort(ftdi_dev, ftdi_interface);
+		} catch (Exception e) {
+			// TODO: should give a dialog box?
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+			mSerialPort = null;
+		}
+    	
+    	try {
+			mSerialPort.setBaudRate(baud_rate);
+			mSerialPort.setDataBits(data_bits);
+	    	mSerialPort.setStopBits(stop_bits);
+	    	mSerialPort.setParity(parity);
+	    	mSerialPort.setFlowControl(flow_ctrl);
+		} catch (IllegalArgumentException e) {
+			// TODO display a dialog and show exception content
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+			mSerialPort = null;
+		} catch (IOException e) {
+			// TODO display a dialog and show exception content
+			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+			mSerialPort = null;
+		}
+    	
     }
 }

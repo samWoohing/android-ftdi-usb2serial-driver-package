@@ -77,17 +77,12 @@ public class SerialPortConfigFrag extends Fragment {
     	//update the enable/disable of each spinner
     	//Only when no serial port is connected, the items in this view 
         //is enabled and user can operate them.
-    	if(hidden)
-    	{
-    		//TODO: if this is a hiding transition, we should let SandboxAppActivity know what options the user has chosen.
-        	//TBD...
-    		
+    	if(hidden){
+    		//if this is a hiding transition, we should let SandboxAppActivity know what options the user has chosen.
+    		updatePortCfgToMainApp();
     	}
-    	else
-    	{	//if this is a showing transition. Just update spinner status and show them.
+    	else{	//if this is a showing transition. Just update spinner status and show them.
     		updateSpinnerStatus();
-    		
-    		//TODO: update the USB device selection list here.
     	}
     }
     
@@ -254,6 +249,8 @@ public class SerialPortConfigFrag extends Fragment {
     	String[] parity_list = res.getStringArray(R.array.parity_list);
     	String[] flow_ctrl_list = res.getStringArray(R.array.flow_ctrl_list);
     	//intialize hashmaps first:
+    	mFTDIDevHashMap = new HashMap<String, UsbDevice>();
+    	mInterfaceHashMap = new HashMap<String, Integer>();
     	mBaudRateHashMap = new HashMap<String, Integer>();
     	mDataBitsHashMap = new HashMap<String, Integer>();
     	mStopBitsHashMap = new HashMap<String, Integer>();
@@ -309,5 +306,28 @@ public class SerialPortConfigFrag extends Fragment {
     			mFlowCtrlHashMap.put(str,FTDI_Constants.SIO_XON_XOFF_HS);
     		}
     	}
+    }
+    
+    private void updatePortCfgToMainApp()
+    {
+    	SandboxAppActivity mApp = (SandboxAppActivity) getActivity();
+		UsbDevice dev = mFTDIDevHashMap.get(((Spinner)getView().findViewById(R.id.spinner_usb_dev)).getSelectedItem());
+		Integer ftdi_interface = mInterfaceHashMap.get(((Spinner)getView().findViewById(R.id.spinner_interface)).getSelectedItem());
+		Integer baudRate = mBaudRateHashMap.get(((Spinner)getView().findViewById(R.id.spinner_baud_rate)).getSelectedItem());
+		Integer dataBits = mDataBitsHashMap.get(((Spinner)getView().findViewById(R.id.spinner_data_bits)).getSelectedItem());
+		Integer stopBits = mStopBitsHashMap.get(((Spinner)getView().findViewById(R.id.spinner_stop_bits)).getSelectedItem());
+		Integer parity = mParityHashMap.get(((Spinner)getView().findViewById(R.id.spinner_parity)).getSelectedItem());
+		Integer flowCtrol = mFlowCtrlHashMap.get(((Spinner)getView().findViewById(R.id.spinner_flow_ctrl)).getSelectedItem());
+		
+		if(dev == null){
+			Toast.makeText(this.getActivity(), "Selected USB device cannot found. Try refresh device list.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if(ftdi_interface == null){
+			Toast.makeText(this.getActivity(), "Selected interface cannot found. Try refresh device list.", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		mApp.setSerialPortConfigSelections(dev, ftdi_interface, baudRate, dataBits, stopBits, parity, flowCtrol);
     }
 }
