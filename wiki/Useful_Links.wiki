@@ -64,6 +64,10 @@ Since API 11 on, Android also has a better choice called "ActionBar". I would pr
 
 http://developer.android.com/guide/topics/ui/actionbar.html
 
+This page contains information of how to create a custom widget in Android. We may need to use it to custom Anroid's textView:
+
+http://developer.android.com/guide/topics/ui/custom-components.html
+
 = USB related =
 
 This "USB in a nutshell" is very useful. Following page explains what is bcdDevice, etc, and all the details of a USB descriptor:
