@@ -1,0 +1,9 @@
+﻿  CRYPTO1_32.c
+C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(990,5): warning MSB8012: TargetPath(D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.dll) does not match the Linker's OutputFile property value (D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.mexw32). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+C:\Program Files\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(991,5): warning MSB8012: TargetExt(.dll) does not match the Linker's OutputFile property value (.mexw32). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     Creating library D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.lib and object D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.exp
+CRYPTO1_32.exp : warning LNK4070: /OUT:CRYPTO1_32.dll directive in .EXP differs from output filename 'D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.mexw32'; ignoring directive
+  Generating code
+  Finished generating code
+CRYPTO1_32.exp : warning LNK4070: /OUT:CRYPTO1_32.dll directive in .EXP differs from output filename 'D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.mexw32'; ignoring directive
+  CRYPTO1_32.vcxproj -> D:\MyDevelop\MySoftware\RFID\LibSimMF\Release\CRYPTO1_32.dll

@@ -1,0 +1,2 @@
+LIBRARY NF20_REV
+EXPORTS mexFunction

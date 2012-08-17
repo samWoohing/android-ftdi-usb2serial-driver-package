@@ -1,0 +1,2 @@
+LIBRARY LFSRRB_4
+EXPORTS mexFunction

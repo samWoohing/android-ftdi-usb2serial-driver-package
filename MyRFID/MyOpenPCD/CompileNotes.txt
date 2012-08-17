@@ -1,0 +1,42 @@
+A. Compiling environment:
+NOTE: MINGW cannot be used to compile the OpenPCD firmware! The MINGW <sys/types.h> file doesn't have u_int16_t or u_int8_t defined. This two types are used in OpenPCD firmware a lot. So Cygwin is suggested.
+
+NOTE: arm-none-eabi toolchain from CodeSourcery can only compile main_dumbreader so far. Any trial to compile main_librfid or main_mifare will throw out isattyr.c:(.text+0x18): undefined reference to `_isatty' error. We should always use GNUARM toolchain for compiling man_librfid etc.
+
+In summary, Cygwin + GNUARM is the perfect tool to do this job.
+
+1. Cygwin newest version installation. Make sure we have gnu make, autoconf automake, SVN and perl. (they should all be provided with MINGW complete installation)
+2. GNUARM.com arm-elf toolchain installation. Add the /bin path into system path so that Cygwin can find it.
+CodeSourcery arm-none-eabi toolchain installation. Add the /bin path into system path so that Cygwin can find it. (GNUARM is preferred)
+3. Download librfid and OpenPCD firmware and put into corrisponding folders. folder librfid_hw and librfid_host has the same content, just for different purpose.
+
+
+B. Compiling librfid_hw:
+1. run ./autogen.sh first. this will generate configure script.
+2. run ./configure --with-firmware=../OpenPCD/firmware --target=arm-elf --host=arm-elf (or --target=arm-none-eabi --host=arm-none-eabi if using arm-none-eabi toolchain)
+3. make
+4. "make install" is optional. if doing this, the librfid will be installed to local folders. you may need to change the path in following actions to direct OpenPCD compilation to it. I don't have any plan to do this because we have 2 versions of librfid. better to install none of them to avoid confusion.
+5. this compiled version will be used into OpenPCD firmware compilation.
+
+C. compiling OpenPCD firmware:
+1. go to OpenPCD/firmware/makefile, do following changes:
+	line 37 change to: LIBRFID_DIR=../../librfid_hw/
+	line 339~347, change toolchain from arm-elf to arm-none-eabi. (do this if you are using arm-none-eabi toolchain)
+
+
+2. go to OpenPCD/firmware/makefile.dfu, do following changes:
+	line 296~304, change toolchain from arm-elf to arm-none-eabi. (do this if you are using arm-none-eabi toolchain)
+
+3. make the firmware by specifying board type and target: make BOARD=PCD TARGET=main_dumbreader
+	if we need to make a PICC firmware, then BOARD=PICC.
+	TARGET is all the main_xx files under \OpenPCD\firmware\src\pcd
+	To clean the build we must also specify make BOARD=PCD TARGET=main_dumbreader clean. Say the same option as when you are buiding it.
+
+4. make the DFU firmware by: make -f Makefile.dfu BOARD=PCD
+	the .dep folder generated during these two build brings in error some time. better to delete .dep folder before they other build.
+
+
+To compile librfid_host, we may need to apply a patch
+
+
+TODO: find out why the downloaded dumbreader_samba has bigger size than the one I've compiled.

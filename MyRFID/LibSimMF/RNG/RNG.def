@@ -1,0 +1,2 @@
+LIBRARY RNG
+EXPORTS mexFunction
