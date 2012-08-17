@@ -1,0 +1,2 @@
+LIBRARY CRYPTO1_32
+EXPORTS mexFunction
