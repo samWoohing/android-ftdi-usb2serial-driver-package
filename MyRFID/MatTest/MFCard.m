@@ -19,6 +19,7 @@
 %   state1: LFSR state after ks1 is generated. 64bit unsigned int.
 %   state2: LFSR state after ks2 is generated. 64bit unsigned int.
 %   state3: final LFSR state after ks3 is generated. 64bit unsigned int.
+%	ks_pb:	8 parity bits calculated with nr^ks1 and suc2(nt)^ks2
 %
 function [ks1, ks2, ks3, state1, state2, state3, ks_pb] = MFCard(key, uid, nt, nr_ks1, suc_ks2)
 
