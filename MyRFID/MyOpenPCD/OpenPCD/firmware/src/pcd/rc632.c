@@ -427,7 +427,7 @@ void rc632_reset(void)
 static int rc632_usb_in(struct req_ctx *rctx)
 {
 	struct openpcd_hdr *poh = (struct openpcd_hdr *) rctx->data;
-	u_int16_t len = rctx->tot_len-sizeof(*poh); /*all remaining are data, except the openpcd header.*/
+	u_int16_t len = rctx->tot_len-sizeof(*poh); /*all remaining is data bytes, except the openpcd header.*/
 
 	/* initialize transmit length to header length */
 	rctx->tot_len = sizeof(*poh);

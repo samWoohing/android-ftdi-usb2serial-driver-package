@@ -366,7 +366,7 @@ static void udp_irq(void)
 			DEBUGIO("RCTX too small, truncating !!!\n");
 			pkt_size = rctx->size - rctx->tot_len;
 		}
-
+		/*read the remaining from fifo to context buffer*/
 		for (i = 0; i < pkt_size; i++)
 			rctx->data[rctx->tot_len++] = pUDP->UDP_FDR[1];
 

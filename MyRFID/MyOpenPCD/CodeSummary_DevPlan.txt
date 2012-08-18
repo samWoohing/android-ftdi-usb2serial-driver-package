@@ -131,10 +131,12 @@ Endpoint 3 is also send out to host (interrupt). This is not used for RC632 rela
 For a usb request of RC632 commond, the USB context data has following format:
 struct req_ctx {
 	volatile u_int32_t state; (all possible states are defined in req_ctx.h)
-	u_int16_t size;
-	u_int16_t tot_len;
+	u_int16_t size; (two values: #define RCTX_SIZE_LARGE	2048 #define RCTX_SIZE_SMALL	64)
+	u_int16_t tot_len; (this is the total length of data[] array)
 	u_int8_t *data;
 };
+
+The data sent from host to OpenPCD has to have the following format:
 
 struct openpcd_hdr {
 	u_int8_t cmd;		/* command. high nibble: class,
@@ -151,3 +153,5 @@ struct openpcd_hdr {
 
 BCC
 = Block Check Character, it is calculated as exclusive-or over the 4 previous bytes
+
+Current openpcd firmware dumbreader RC632 operating rountine lack of paths to get out of RCTX_STATE_MAIN_PROCESSING state. This should be a bug and can be fixed in usb_handler.c.
