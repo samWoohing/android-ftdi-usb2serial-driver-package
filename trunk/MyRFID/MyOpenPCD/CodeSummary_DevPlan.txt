@@ -6,6 +6,8 @@
 ============================================
 	Code reading summary
 ============================================
+
+============================================
 1. Where is the USB command processed?
 The main_dumbreader.c code calls 3 functions:
 	usb_out_process();
@@ -28,6 +30,7 @@ to enable the usb interrupt request.
 
 The entire USB command processing happens in usb_in(rctx).
 
+============================================
 2. How usb_in(rctx) process all the usb commands, especially RC632 commands?
 A global static variable is defined in usb_handler.c:
 
@@ -46,7 +49,7 @@ The detailed usb protocal command for RC632 is defined in \firmware\include\open
 
 another version is defined in \firmware\src\pcd.h but not used anywhere.
 
-
+============================================
 3. How the firmware receive usb data?
 The low-level usb communication handler and the high level usb command handler all use the global static defined in req_ctx.c:
 
@@ -82,6 +85,7 @@ and then the data is read out from the fifo UDP fifo register and store into the
 			
 Note that UDP_FDR can be ultimately found defined in /firmware/include/AT91SAM7.h.
 
+============================================
 4. How the firmware transmit usb data?
 The standard USB protocal related data transmit is done Similar to the transmit process. 
 When usb needs to transmit standard protocal related data, a AT91C_UDP_EPINT0 interrupt is generated.
@@ -113,3 +117,37 @@ void usb_out_process(void)
 	udp_refill_ep(3);
 	udp_refill_ep(2);
 }
+
+============================================
+5. The usb endpoint arrangement of current OpenPCD firmware
+
+udp_irq function in pcd_enumerate.c is registered as interrupt processing function of usb device controller.
+All usb-related interrupts are processed in this function.
+
+Endpoint 1 is used to receive request from host.
+Endpoint 2 is used to send out the response (bulk).
+Endpoint 3 is also send out to host (interrupt). This is not used for RC632 related communication
+
+For a usb request of RC632 commond, the USB context data has following format:
+struct req_ctx {
+	volatile u_int32_t state; (all possible states are defined in req_ctx.h)
+	u_int16_t size;
+	u_int16_t tot_len;
+	u_int8_t *data;
+};
+
+struct openpcd_hdr {
+	u_int8_t cmd;		/* command. high nibble: class,
+				 *	     low nibble: cmd */ (all possible command are defined in openpcd.h
+	u_int8_t flags;
+	u_int8_t reg;		/* register */
+	u_int8_t val;		/* value (in case of write *) */
+	u_int8_t data[0];
+} __attribute__ ((packed));
+
+"flags" only uses following 2 values:
+#define OPENPCD_FLAG_RESPOND	0x01	/* Response requested */
+#define OPENPCD_FLAG_ERROR	0x80	/* An error occurred */
+
+BCC
+= Block Check Character, it is calculated as exclusive-or over the 4 previous bytes
