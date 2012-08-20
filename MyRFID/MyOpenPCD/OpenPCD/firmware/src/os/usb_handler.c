@@ -70,7 +70,7 @@ static int usb_in(struct req_ctx *rctx)
 		req_ctx_set_state(rctx, RCTX_STATE_UDP_EP2_PENDING);
 		udp_refill_ep(2);
 	}
-
+	/*TODO: Need a rountine to free the context, if no respond is required and no error happens */
 /*	DEBUGPCR("");*/
 	return (ret & USB_RET_ERR) ? 1 : 0;
 }
