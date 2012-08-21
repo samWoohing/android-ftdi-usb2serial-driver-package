@@ -40,3 +40,8 @@ To compile librfid_host, we may need to apply a patch
 
 
 TODO: find out why the downloaded dumbreader_samba has bigger size than the one I've compiled.
+
+$ make BOARD=PCD TARGET=main_dumbreader
+$ make -f Makefile.dfu BOARD=PCD
+$ cat dfu.bin main_dumbreader.bin > main_dumbreader_with_dfu.bin
+

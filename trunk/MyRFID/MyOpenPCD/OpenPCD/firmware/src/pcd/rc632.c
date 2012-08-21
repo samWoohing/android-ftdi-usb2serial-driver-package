@@ -437,11 +437,11 @@ static int rc632_usb_in(struct req_ctx *rctx)
 		opcd_rc632_reg_read(NULL, poh->reg, &poh->val);
 		DEBUGP("READ REG(0x%02x)=0x%02x ", poh->reg, poh->val);
 		/* register read always has to provoke a response */
-		poh->flags &= OPENPCD_FLAG_RESPOND;
+		poh->flags |= OPENPCD_FLAG_RESPOND;//change to fix this bug by Shan
 		break;
 	case OPENPCD_CMD_READ_FIFO:
 		/* FIFO read always has to provoke a response */
-		poh->flags &= OPENPCD_FLAG_RESPOND;
+		poh->flags |= OPENPCD_FLAG_RESPOND;//change to fix this bug by Shan
 		{
 		u_int16_t req_len = poh->val, remain_len = req_len, pih_len;
 #if 0
