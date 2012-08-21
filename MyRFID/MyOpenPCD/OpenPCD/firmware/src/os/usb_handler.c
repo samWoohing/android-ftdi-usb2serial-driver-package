@@ -71,6 +71,7 @@ static int usb_in(struct req_ctx *rctx)
 		udp_refill_ep(2);
 	}
 	/*TODO: Need a rountine to free the context, if no respond is required and no error happens */
+	/*Aug21, Shan confirmed that the problem exists, by using matlab code. So let's fix it*/
 /*	DEBUGPCR("");*/
 	return (ret & USB_RET_ERR) ? 1 : 0;
 }

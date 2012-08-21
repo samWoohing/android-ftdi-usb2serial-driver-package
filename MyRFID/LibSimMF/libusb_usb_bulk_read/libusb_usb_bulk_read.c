@@ -92,7 +92,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	else
 	{
 		data = (char*)mxMalloc(readsize);
-
+		mexPrintf("bulk read size: %d\r\n", readsize);
 		result = usb_bulk_read(hdl,usbendpoint,data,readsize,timeout);
 
 		if(result < 0)
@@ -101,8 +101,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 			//return a byte anyway
 			plhs[0] = mxCreateNumericArray(2, dims1, mxUINT8_CLASS, mxREAL);
 			*(unsigned char*)mxGetData(plhs[0]) = 0;
-			//end return the errorous result
-			
 		}
 		else
 		{
