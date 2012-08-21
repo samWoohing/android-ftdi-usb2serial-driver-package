@@ -1,0 +1,2 @@
+LIBRARY libusb_usb_close
+EXPORTS mexFunction
