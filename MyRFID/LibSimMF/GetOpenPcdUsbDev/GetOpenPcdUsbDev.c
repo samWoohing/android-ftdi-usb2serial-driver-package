@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	{
 		mexErrMsgTxt("dev_ptr = GetOpenPcdUsbDev(vendorID, ProductID): need 2 inputs, no more no less.");
 	}
-	if (nlhs != 1)
+	if (nlhs > 1)
 	{
 		mexErrMsgTxt("dev_ptr = GetOpenPcdUsbDev(vendorID, ProductID): only 1 output, no more no less.");
 	}
@@ -76,8 +76,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	pid = (*(unsigned short*)(mxGetData(prhs[1])));
 
 	dev = find_dev(vid, pid);
+
 	if(dev == NULL)
 		mexPrintf("Device with VID 0x%x and PID 0x%x cannot be found.\r\n",vid,pid);
+	else
+		mexPrintf("Device with VID 0x%x and PID 0x%x found: 0x%x\r\n",vid,pid,dev);
 
 	plhs[0] = mxCreateNumericArray(2, dims1, mxUINT64_CLASS, mxREAL);
 	ptr = (U64*)mxGetData(plhs[0]);

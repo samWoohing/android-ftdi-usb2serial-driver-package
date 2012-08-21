@@ -31,6 +31,44 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GET_KEYS", "GET_KEYS\GET_KEYS.vcxproj", "{1352380E-234A-4319-B817-7337831463DF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GetOpenPcdUsbDev", "GetOpenPcdUsbDev\GetOpenPcdUsbDev.vcxproj", "{20AF6406-8C6A-4CDD-9C1F-79B7B73925AE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_close", "libusb_usb_close\libusb_usb_close.vcxproj", "{1D43E375-37D7-4F98-9D46-A0025DBFDD95}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_open", "libusb_usb_open\libusb_usb_open.vcxproj", "{D54EDA09-2A56-4C48-B026-77361E5ADE7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_claim_interface", "libusb_usb_claim_interface\libusb_usb_claim_interface.vcxproj", "{ED770780-A83D-4FAD-92C9-1DC13C4C0335}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_release_interface", "libusb_usb_release_interface\libusb_usb_release_interface.vcxproj", "{FB086137-B5E0-45D6-A0C6-9745C50C7F5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_set_configuration", "libusb_usb_set_configuration\libusb_usb_set_configuration.vcxproj", "{3A21B21A-F58A-4577-A36D-20B5B0A3B6FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_bulk_read", "libusb_usb_bulk_read\libusb_usb_bulk_read.vcxproj", "{C03DA3FC-C46E-4BB2-B145-F77BE1BDCA42}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libusb_usb_bulk_write", "libusb_usb_bulk_write\libusb_usb_bulk_write.vcxproj", "{F4648025-FFF4-4193-9653-7DD21A82E0A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64951DA7-6D15-42A8-9463-CFBBE25D6CF6} = {64951DA7-6D15-42A8-9463-CFBBE25D6CF6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +120,34 @@ Global
 		{20AF6406-8C6A-4CDD-9C1F-79B7B73925AE}.Debug|Win32.Build.0 = Debug|Win32
 		{20AF6406-8C6A-4CDD-9C1F-79B7B73925AE}.Release|Win32.ActiveCfg = Release|Win32
 		{20AF6406-8C6A-4CDD-9C1F-79B7B73925AE}.Release|Win32.Build.0 = Release|Win32
+		{1D43E375-37D7-4F98-9D46-A0025DBFDD95}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D43E375-37D7-4F98-9D46-A0025DBFDD95}.Debug|Win32.Build.0 = Debug|Win32
+		{1D43E375-37D7-4F98-9D46-A0025DBFDD95}.Release|Win32.ActiveCfg = Release|Win32
+		{1D43E375-37D7-4F98-9D46-A0025DBFDD95}.Release|Win32.Build.0 = Release|Win32
+		{D54EDA09-2A56-4C48-B026-77361E5ADE7B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D54EDA09-2A56-4C48-B026-77361E5ADE7B}.Debug|Win32.Build.0 = Debug|Win32
+		{D54EDA09-2A56-4C48-B026-77361E5ADE7B}.Release|Win32.ActiveCfg = Release|Win32
+		{D54EDA09-2A56-4C48-B026-77361E5ADE7B}.Release|Win32.Build.0 = Release|Win32
+		{ED770780-A83D-4FAD-92C9-1DC13C4C0335}.Debug|Win32.ActiveCfg = Debug|Win32
+		{ED770780-A83D-4FAD-92C9-1DC13C4C0335}.Debug|Win32.Build.0 = Debug|Win32
+		{ED770780-A83D-4FAD-92C9-1DC13C4C0335}.Release|Win32.ActiveCfg = Release|Win32
+		{ED770780-A83D-4FAD-92C9-1DC13C4C0335}.Release|Win32.Build.0 = Release|Win32
+		{FB086137-B5E0-45D6-A0C6-9745C50C7F5F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FB086137-B5E0-45D6-A0C6-9745C50C7F5F}.Debug|Win32.Build.0 = Debug|Win32
+		{FB086137-B5E0-45D6-A0C6-9745C50C7F5F}.Release|Win32.ActiveCfg = Release|Win32
+		{FB086137-B5E0-45D6-A0C6-9745C50C7F5F}.Release|Win32.Build.0 = Release|Win32
+		{3A21B21A-F58A-4577-A36D-20B5B0A3B6FF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A21B21A-F58A-4577-A36D-20B5B0A3B6FF}.Debug|Win32.Build.0 = Debug|Win32
+		{3A21B21A-F58A-4577-A36D-20B5B0A3B6FF}.Release|Win32.ActiveCfg = Release|Win32
+		{3A21B21A-F58A-4577-A36D-20B5B0A3B6FF}.Release|Win32.Build.0 = Release|Win32
+		{C03DA3FC-C46E-4BB2-B145-F77BE1BDCA42}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C03DA3FC-C46E-4BB2-B145-F77BE1BDCA42}.Debug|Win32.Build.0 = Debug|Win32
+		{C03DA3FC-C46E-4BB2-B145-F77BE1BDCA42}.Release|Win32.ActiveCfg = Release|Win32
+		{C03DA3FC-C46E-4BB2-B145-F77BE1BDCA42}.Release|Win32.Build.0 = Release|Win32
+		{F4648025-FFF4-4193-9653-7DD21A82E0A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F4648025-FFF4-4193-9653-7DD21A82E0A9}.Debug|Win32.Build.0 = Debug|Win32
+		{F4648025-FFF4-4193-9653-7DD21A82E0A9}.Release|Win32.ActiveCfg = Release|Win32
+		{F4648025-FFF4-4193-9653-7DD21A82E0A9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
