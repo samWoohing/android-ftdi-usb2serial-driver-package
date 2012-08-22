@@ -72,6 +72,9 @@ static int usb_in(struct req_ctx *rctx)
 	}
 	/*TODO: Need a rountine to free the context, if no respond is required and no error happens */
 	/*Aug21, Shan confirmed that the problem exists, by using matlab code. So let's fix it*/
+	if(!(ret & USB_RET_ERR) && !(ret & USB_RET_RESPOND)){
+		req_ctx_put(rctx);//if no error and no respond needed, free the context. added by Shan
+	}
 /*	DEBUGPCR("");*/
 	return (ret & USB_RET_ERR) ? 1 : 0;
 }
