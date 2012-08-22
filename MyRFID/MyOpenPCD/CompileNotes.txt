@@ -45,3 +45,13 @@ $ make BOARD=PCD TARGET=main_dumbreader
 $ make -f Makefile.dfu BOARD=PCD
 $ cat dfu.bin main_dumbreader.bin > main_dumbreader_with_dfu.bin
 
+1. unplug the USB Device
+2. press the button marked as "BOOTLOADER" and keep it pressed
+3. power on the USB Device by plugging it into USB
+4. the red LED will turn itself on
+5. you may now release the "BOOTLOADER" button
+6. If you have a serial cable attached, it should print a message about sam7dfu. This is optional.
+7. Call dfu-programmer like described below
+8. unplug and replug (without pressing any button)
+
+# ./dfu-programmer openpcd dfu_dnload /path/to/openpcd/firmware/main_dumbreader.bin

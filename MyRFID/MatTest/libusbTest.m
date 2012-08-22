@@ -20,7 +20,7 @@ result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)
 %[bytes, result] = libusb_usb_bulk_read(pcd_dev_hdl, endpoint2, readsz, timeout)
 
-[regvalue, flag] = OpenPCD_ReadReg(pcd_dev_hdl, 17)
+[regvalue, flag] = OpenPCD_ReadReg(pcd_dev_hdl, 34)
 
 result = libusb_usb_release_interface(pcd_dev_hdl, interface0)
 result = libusb_usb_close(pcd_dev_hdl)
