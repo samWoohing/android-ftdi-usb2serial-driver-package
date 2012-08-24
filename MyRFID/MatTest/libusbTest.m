@@ -20,7 +20,19 @@ result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)
 %[bytes, result] = libusb_usb_bulk_read(pcd_dev_hdl, endpoint2, readsz, timeout)
 
-[regvalue, flag] = OpenPCD_ReadReg(pcd_dev_hdl, 34)
+%[regvalue, flag, result] = OpenPCD_ReadReg(pcd_dev_hdl, 34)
+
+%try to do a anti-collision stage on a Mifare card
+
+%need to refer to function rc632_iso14443a_transceive_sf (short frame
+%transmitting function)
+%Following sequence can now successfully get responds of REQA from card.!
+%RC632_REG_BIT_FRAMING=15
+result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
+result = OpenPCD_WriteReg(pcd_dev_hdl, 15, 7)%set 7bit short frame, TODO: reset it to normal later, add a short frame tranceive function
+result = OpenPCD_WriteFIFO(pcd_dev_hdl,int8(38))
+result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
+[bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 2)
 
 result = libusb_usb_release_interface(pcd_dev_hdl, interface0)
 result = libusb_usb_close(pcd_dev_hdl)
