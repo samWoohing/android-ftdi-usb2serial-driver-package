@@ -28,18 +28,21 @@ result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 %transmitting function)
 %Following sequence can now successfully get responds of REQA from card.!
 %RC632_REG_BIT_FRAMING=15
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 93)%Enable the TX pins! don't forget!
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
 result = OpenPCD_WriteReg(pcd_dev_hdl, 15, 7)%set 7bit short frame,
+result = OpenPCD_WriteReg(pcd_dev_hdl, 34, 3)%disable crc and enable parity
 
 %req type A (0x26)
-result = OpenPCD_WriteFIFO(pcd_dev_hdl,int8(38)) 
+result = OpenPCD_WriteFIFO(pcd_dev_hdl,38) 
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 [bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 2)
 
 %go back to 8 bit standard frame
-result = OpenPCD_WriteReg(pcd_dev_hdl, 15, 0); %unnecessary, because the RC632 automatically reset the lower 3 bits
+%result = OpenPCD_WriteReg(pcd_dev_hdl, 15, 0); %unnecessary, because the RC632 automatically reset the lower 3 bits
+%result = OpenPCD_WriteReg(pcd_dev_hdl, 34, int8(3))%disable crc and enable parity
 %select command: 0x93 20
-result = OpenPCD_WriteFIFO(pcd_dev_hdl, int8([hex2dex('0x93'),hex2dec('0x20')]))
+result = OpenPCD_WriteFIFO(pcd_dev_hdl, [hex2dec('93'),hex2dec('20')])
 	%the card shall return its UID,BCC
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 [bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 5)
@@ -50,21 +53,26 @@ result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 %line 1039, the regular MIFARE or 14443A frame need TX, RX CRC both
 %enabled. And Odd parity enabled too.
 %CRC_A is used, initial value 0x6363.
-result = OpenPCD_WriteReg(pcd_dev_hdl, 34, int8(15))
+result = OpenPCD_WriteReg(pcd_dev_hdl, 34, 7)%enable TX CRC and parity, RX CRC disabled
 
 %crc initial value, LSB and MSB
-result = OpenPCD_WriteReg(pcd_dev_hdl, 35, int8(hex2dex('0x63')));
-result = OpenPCD_WriteReg(pcd_dev_hdl, 36, int8(hex2dex('0x63')));
+result = OpenPCD_WriteReg(pcd_dev_hdl, 35,hex2dec('63'));
+result = OpenPCD_WriteReg(pcd_dev_hdl, 36, hex2dec('63'));
 
 %then do a select(UID): 0x93, 70, UID, BCC 
-result = OpenPCD_WriteFIFO(pcde_dev_hdl, [int8([hex2dex('0x93'),hex2dec('0x70')]),bytes])
+result = OpenPCD_WriteFIFO(pcd_dev_hdl, [uint8([hex2dec('93'),hex2dec('70')]),bytes])
 	%the card shall return its type
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 [bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 3)
 
 %then do a auth(block N)
+result = OpenPCD_WriteFIFO(pcd_dev_hdl,uint8([hex2dec('60'),hex2dec('01')]))
+%no need to append CRC here. They are auto-calculated!
 
-	%the card shall return 48bit Nt challenge
+	%the card shall return 32bit Nt challenge
+result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
+[bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 6)
 
+%TODO: try to generate the same Nt every time.
 result = libusb_usb_release_interface(pcd_dev_hdl, interface0)
 result = libusb_usb_close(pcd_dev_hdl)

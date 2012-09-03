@@ -106,8 +106,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 		{
 			mexPrintf("Device 0x%x, endpoint %d bulk read done. num of bytes read: %d.\r\n",hdl, usbendpoint, result);
 
-			dims_read[0]=result;
-			dims_read[1]=1;
+			dims_read[0]=1;
+			dims_read[1]=result;
 			plhs[0] = mxCreateNumericArray(2,dims_read,mxUINT8_CLASS,mxREAL);
 			//do the memory copy
 			ptr = (char*)mxGetData(plhs[0]);
