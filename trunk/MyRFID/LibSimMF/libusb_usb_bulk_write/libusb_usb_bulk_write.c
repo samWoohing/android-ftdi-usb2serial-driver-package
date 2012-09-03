@@ -22,7 +22,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	mwSize ndim1, ndim2, ndim3, ndim4;
 	usb_dev_handle *hdl;
 	int usbendpoint, writesize, timeout, result, i, *ptr_result;
-	char *data;
+	unsigned char *data;
 
 	//check the number of input and output
 	if (nrhs != 4)
@@ -55,9 +55,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	{
 		mexErrMsgTxt("Function second input should be 32 bit int: result = libusb_usb_bulk_write(usb_dev_hdl, endpoint, data, timeout)");
 	}
-	if(mxGetClassID(prhs[2]) !=  mxINT8_CLASS)
+	if(mxGetClassID(prhs[2]) !=  mxUINT8_CLASS)
 	{
-		mexErrMsgTxt("Function third input should be byte array: result = libusb_usb_bulk_write(usb_dev_hdl, endpoint, data, timeout)");
+		mexErrMsgTxt("Function third input should be unsigned byte array: result = libusb_usb_bulk_write(usb_dev_hdl, endpoint, data, timeout)");
 	}
 	if(mxGetClassID(prhs[3]) !=  mxINT32_CLASS)
 	{
@@ -71,7 +71,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 
 	hdl = (usb_dev_handle*)(*(U64*)(mxGetData(prhs[0])));
 	usbendpoint = *(int*)(mxGetData(prhs[1]));
-	data = (char*)(mxGetData(prhs[2]));
+	data = (unsigned char*)(mxGetData(prhs[2]));
 	timeout = *(int*)(mxGetData(prhs[3]));	
 
 	plhs[0] = mxCreateNumericArray(2, dims1, mxINT32_CLASS, mxREAL);
@@ -85,7 +85,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 	{
 		writesize = dims3[0]*dims3[1];
 		mexPrintf("usb bulk write size: %d\r\n",writesize);
-		result = usb_bulk_write(hdl,usbendpoint,data,writesize,timeout);
+		result = usb_bulk_write(hdl,usbendpoint,(char*)data,writesize,timeout);
 
 		if(result < 0)
 			mexPrintf("Error when bulk writing device 0x%x, endpoint: %d return value: %d.\r\n Error string: %s\r\n",hdl, usbendpoint, result, usb_strerror());
