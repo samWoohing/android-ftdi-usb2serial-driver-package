@@ -438,6 +438,7 @@ static int rc632_usb_in(struct req_ctx *rctx)
 	switch (poh->cmd) {
 	case OPENPCD_CMD_MIFARE_CRACK://Added by Shan, 
 		poh->flags |= OPENPCD_FLAG_RESPOND;//always need to respond
+		rctx->tot_len = sizeof(*poh)+21;//totally 25 bytes of return values
 		//TODO: check parameters
 		params = (struct mifare_crack_params *)poh->data;
 		//TODO: call the processing function here
