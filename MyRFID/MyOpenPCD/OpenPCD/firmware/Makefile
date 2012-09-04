@@ -96,7 +96,7 @@ SRCARM += src/os/pcd_enumerate.c src/os/fifo.c src/os/dbgu.c \
 
 ifeq ($(BOARD), PCD)
 # PCD support code
-SRCARM += src/pcd/rc632.c src/pcd/rc632_highlevel.c
+SRCARM += src/pcd/rc632.c src/pcd/rc632_highlevel.c src/pcd/mifare_crack.c
 # finally, the actual main application 
 SRCARM += src/pcd/$(TARGET).c 
 endif

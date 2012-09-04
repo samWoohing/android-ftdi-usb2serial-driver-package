@@ -37,6 +37,7 @@
 #include <os/usb_handler.h>
 #include <os/req_ctx.h>
 #include "rc632.h"
+#include "mifare_crack.h"
 
 #include <librfid/rfid_asic.h>
 
@@ -428,11 +429,23 @@ static int rc632_usb_in(struct req_ctx *rctx)
 {
 	struct openpcd_hdr *poh = (struct openpcd_hdr *) rctx->data;
 	u_int16_t len = rctx->tot_len-sizeof(*poh); /*all remaining is data bytes, except the openpcd header.*/
+	
+	struct mifare_crack_params *params;
 
 	/* initialize transmit length to header length */
 	rctx->tot_len = sizeof(*poh);
 
 	switch (poh->cmd) {
+	case OPENPCD_CMD_MIFARE_CRACK://Added by Shan, 
+		poh->flags |= OPENPCD_FLAG_RESPOND;//always need to respond
+		//TODO: check parameters
+		params = (struct mifare_crack_params *)poh->data;
+		//TODO: call the processing function here
+		mifare_fixed_Nt_attack(params);
+		
+		DEBUGP("MIFARE CRACK");
+		goto not_impl;
+		break;
 	case OPENPCD_CMD_READ_REG:
 		opcd_rc632_reg_read(NULL, poh->reg, &poh->val);
 		DEBUGP("READ REG(0x%02x)=0x%02x ", poh->reg, poh->val);

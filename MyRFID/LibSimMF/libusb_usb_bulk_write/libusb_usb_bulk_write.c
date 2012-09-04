@@ -89,8 +89,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs,const mxArray *prhs[])
 
 		if(result < 0)
 			mexPrintf("Error when bulk writing device 0x%x, endpoint: %d return value: %d.\r\n Error string: %s\r\n",hdl, usbendpoint, result, usb_strerror());
-		else
-			mexPrintf("Device 0x%x, endpoint %d bulk write done. num of bytes written: %d.\r\n",hdl, usbendpoint, result);
+		//else
+			//mexPrintf("Device 0x%x, endpoint %d bulk write done. num of bytes written: %d.\r\n",hdl, usbendpoint, result);
 
 		//return error code
 		plhs[0] = mxCreateNumericArray(2, dims1, mxUINT8_CLASS, mxREAL);

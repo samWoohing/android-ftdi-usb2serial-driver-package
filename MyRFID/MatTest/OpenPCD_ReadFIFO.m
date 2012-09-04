@@ -12,7 +12,7 @@
 function [bytes, result] = OpenPCD_ReadFIFO(hdl, len)
 EP1W=int32(hex2dec('1'));%write endpoint
 EP2R=int32(hex2dec('82')); %note that read endpoint always begins with 8
-timeout = int32(127);
+timeout = int32(1024);
 
 byteW = [uint8([23, 0, 0, len]), zeros(1,len, 'uint8')];%refer to OpenPCD.h for command codes.
 
