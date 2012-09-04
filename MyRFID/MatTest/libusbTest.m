@@ -16,6 +16,9 @@ pcd_dev_hdl = libusb_usb_open(pcd_dev)
 result = libusb_usb_set_configuration(pcd_dev_hdl, config1);
 result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 
+
+[bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
+
 %bytedata = int8([22, 0, 17, 1]);
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)
 %[bytes, result] = libusb_usb_bulk_read(pcd_dev_hdl, endpoint2, readsz, timeout)
@@ -53,7 +56,7 @@ result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 %line 1039, the regular MIFARE or 14443A frame need TX, RX CRC both
 %enabled. And Odd parity enabled too.
 %CRC_A is used, initial value 0x6363.
-result = OpenPCD_WriteReg(pcd_dev_hdl, 34, 7)%enable TX CRC and parity, RX CRC disabled
+result = OpenPCD_WriteReg(pcd_dev_hdl, 34, 7)%enable TX CRC and odd parity, RX CRC disabled
 
 %crc initial value, LSB and MSB
 result = OpenPCD_WriteReg(pcd_dev_hdl, 35,hex2dec('63'));
@@ -71,7 +74,7 @@ result = OpenPCD_WriteFIFO(pcd_dev_hdl,uint8([hex2dec('60'),hex2dec('01')]))
 
 	%the card shall return 32bit Nt challenge
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
-[bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 6)
+[bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 4)
 
 %disable the TX pins before exit
 result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 88)

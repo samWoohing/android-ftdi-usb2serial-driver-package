@@ -442,9 +442,7 @@ static int rc632_usb_in(struct req_ctx *rctx)
 		params = (struct mifare_crack_params *)poh->data;
 		//TODO: call the processing function here
 		mifare_fixed_Nt_attack(params);
-		
 		DEBUGP("MIFARE CRACK");
-		goto not_impl;
 		break;
 	case OPENPCD_CMD_READ_REG:
 		opcd_rc632_reg_read(NULL, poh->reg, &poh->val);
