@@ -28,7 +28,7 @@ result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 %transmitting function)
 %Following sequence can now successfully get responds of REQA from card.!
 %RC632_REG_BIT_FRAMING=15
-result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 93)%Enable the TX pins! don't forget!
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
 result = OpenPCD_WriteReg(pcd_dev_hdl, 15, 7)%set 7bit short frame,
 result = OpenPCD_WriteReg(pcd_dev_hdl, 34, 3)%disable crc and enable parity
@@ -72,6 +72,9 @@ result = OpenPCD_WriteFIFO(pcd_dev_hdl,uint8([hex2dec('60'),hex2dec('01')]))
 	%the card shall return 32bit Nt challenge
 result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 30) %tranceive command
 [bytes, result] = OpenPCD_ReadFIFO(pcd_dev_hdl, 6)
+
+%disable the TX pins before exit
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 88)
 
 %TODO: try to generate the same Nt every time.
 result = libusb_usb_release_interface(pcd_dev_hdl, interface0)
