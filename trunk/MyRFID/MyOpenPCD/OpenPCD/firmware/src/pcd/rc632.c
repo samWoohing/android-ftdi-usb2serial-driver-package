@@ -365,7 +365,7 @@ static void rc632_irq(void)
 		DEBUGP("RxComplete ");
 	if (cause & RC632_INT_TX)
 		DEBUGP("TxComplete ");
-	
+	//TODO: added by shan, need to find a timer+RX solution for tracking the tranceiving, need to add some code here
 
 	irq_rctx = req_ctx_find_get(0, RCTX_STATE_FREE,
 				    RCTX_STATE_RC632IRQ_BUSY);
@@ -438,10 +438,14 @@ static int rc632_usb_in(struct req_ctx *rctx)
 	switch (poh->cmd) {
 	case OPENPCD_CMD_MIFARE_CRACK://Added by Shan, 
 		poh->flags |= OPENPCD_FLAG_RESPOND;//always need to respond
-		rctx->tot_len = sizeof(*poh)+21;//totally 25 bytes of return values
 		//TODO: check parameters
+		if(len < sizeof(struct mifare_crack_params)){
+			//how to return this error condition? currently let's use the existing routine
+			goto not_impl;
+		}
+		rctx->tot_len = sizeof(*poh)+sizeof(struct mifare_crack_params);//totally 25 bytes of return values
 		params = (struct mifare_crack_params *)poh->data;
-		//TODO: call the processing function here
+		//call the processing function here
 		mifare_fixed_Nt_attack(params);
 		DEBUGP("MIFARE CRACK");
 		break;
