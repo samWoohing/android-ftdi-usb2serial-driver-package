@@ -340,6 +340,7 @@ static void rc632_irq(void)
 	/* ACK all interrupts */
 	//rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, cause);
 	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
+	//by Shan: the true purpose of above is to write 0 to SetIrq bit, to clear all other bits in RC632_REG_INTERRUPT_RQ
 	DEBUGP("rc632_irq: ");
 
 	if (cause & RC632_INT_LOALERT) {
@@ -358,34 +359,40 @@ static void rc632_irq(void)
 	}
 	/* All interrupts below can be reported directly to the host */
 	if (cause & RC632_INT_TIMER)
+		clearFlagRxTimeout();
 		DEBUGP("Timer ");
 	if (cause & RC632_INT_IDLE)
 		DEBUGP("Idle ");
 	if (cause & RC632_INT_RX)
+		clearFlagRxTimeout();
 		DEBUGP("RxComplete ");
 	if (cause & RC632_INT_TX)
 		DEBUGP("TxComplete ");
 	//TODO: added by shan, need to find a timer+RX solution for tracking the tranceiving, need to add some code here
 
-	irq_rctx = req_ctx_find_get(0, RCTX_STATE_FREE,
-				    RCTX_STATE_RC632IRQ_BUSY);
-	if (!irq_rctx) {
-		DEBUGPCRF("NO RCTX!");
-		/* disable rc632 interrupt until RCTX is free */
-		AT91F_AIC_DisableIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632);
-		return;
-	}
+	//by Shan: following code allocate a context for the interrupt and notify the usb host
+	//Consider if we may delete or disable this since we don't use this at all.
 
-	irq_opcdh = (struct openpcd_hdr *) irq_rctx->data;
+//	irq_rctx = req_ctx_find_get(0, RCTX_STATE_FREE,
+//				    RCTX_STATE_RC632IRQ_BUSY);
+//	if (!irq_rctx) {
+//		DEBUGPCRF("NO RCTX!");
+		/* disable rc632 interrupt until RCTX is free */
+//		AT91F_AIC_DisableIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632);
+//		return;
+//	}
+
+//	irq_opcdh = (struct openpcd_hdr *) irq_rctx->data;
 
 	/* initialize static part of openpcd_hdr for USB IRQ reporting */
-	irq_opcdh->cmd = OPENPCD_CMD_IRQ;
-	irq_opcdh->flags = 0x00;
-	irq_opcdh->reg = 0x07;
-	irq_opcdh->val = cause;
+//	irq_opcdh->cmd = OPENPCD_CMD_IRQ;
+//	irq_opcdh->flags = 0x00;
+//	irq_opcdh->reg = 0x07;
+//	irq_opcdh->val = cause;
 	
-	req_ctx_set_state(irq_rctx, RCTX_STATE_UDP_EP3_PENDING);
-	DEBUGPCR("");
+//	req_ctx_set_state(irq_rctx, RCTX_STATE_UDP_EP3_PENDING);
+//	DEBUGPCR("");
+
 }
 
 void rc632_unthrottle(void)
