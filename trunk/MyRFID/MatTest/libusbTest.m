@@ -17,7 +17,7 @@ result = libusb_usb_set_configuration(pcd_dev_hdl, config1);
 result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 
 
-[bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
+%[bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
 
 %bytedata = int8([22, 0, 17, 1]);
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)

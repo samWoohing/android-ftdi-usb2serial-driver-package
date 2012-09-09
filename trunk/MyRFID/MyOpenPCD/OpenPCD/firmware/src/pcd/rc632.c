@@ -333,14 +333,16 @@ static void rc632_irq(void)
 	struct req_ctx *irq_rctx;
 	struct openpcd_hdr *irq_opcdh;
 	u_int8_t cause;
-
+	
 	/* CL RC632 has interrupted us */
 	opcd_rc632_reg_read(NULL, RC632_REG_INTERRUPT_RQ, &cause);
 
 	/* ACK all interrupts */
 	//rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, cause);
-	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
+	//Shan commented this: 
+	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
 	//by Shan: the true purpose of above is to write 0 to SetIrq bit, to clear all other bits in RC632_REG_INTERRUPT_RQ
+	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, 0x3F);
 	DEBUGP("rc632_irq: ");
 
 	if (cause & RC632_INT_LOALERT) {
@@ -601,8 +603,8 @@ void rc632_init(void)
 	opcd_rc632_reg_write(NULL, RC632_REG_IRQ_PIN_CONFIG,
 			     RC632_IRQCFG_CMOS|RC632_IRQCFG_INV);
 	/* enable interrupts */
-	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_TIMER);
-	
+	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_TIMER);//Shan: not using the highest bit, problem?
+	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET||RC632_INT_RX||RC632_INT_TIMER);
 	/* configure AUX to test signal four */
 	opcd_rc632_reg_write(NULL, RC632_REG_TEST_ANA_SELECT, 0x04);
 

@@ -20,59 +20,91 @@
 #include "rc632.h"
 #include "mifare_crack.h"
 
-u_int8_t REQA=0x26;
-u_int8_t SELECT[2]={0x93,0x20};
-u_int8_t SELECT_UID[7]={0x93,0x70,0,0,0,0,0};
-u_int8_t AUTH_BLK_N[2]={0x60, 0x00};
-u_int8_t BUFFER[16];
-u_int8_t RxComplete=0;
 u_int8_t FlagRxTimeout=0;
-
 void setFlagRxTimeout()
 {
-	FlagIdleTimeout = 1;
+	FlagRxTimeout = 1;
 }
 
 void clearFlagRxTimeout()
 {
-	FlagIdleTimeout = 0;
+	FlagRxTimeout = 0;
 }
 
 void waitFlagRxTimeout()
 {
-	do{}while(FlagRxTimeout);
+	while(FlagRxTimeout!=0){
+	//wait
+	}
 }
 
+void initRC632Irq()
+{	//enable timer interrupt and Rx interrupt
+	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET||RC632_INT_RX||RC632_INT_TIMER);
+}
 void initRC632Timer()
 {
-//TODO: implement
+	//prescaler, 2^7=128, 
+	opcd_rc632_reg_write(NULL, RC632_REG_TIMER_CLOCK, 0x07);
+	//timer starts at TX end, stops at RX end (wait the tranceive to finish
+	opcd_rc632_reg_write(NULL, RC632_REG_TIMER_CONTROL, RC632_TMR_START_TX_END||RC632_TMR_STOP_RX_END);
 }
 
-void setRC632Timer(u_int8_t count)
+void setRC632Timer(u_int8_t bytecount)
 {
-//TODO: implement
+//default Rxwait is 6 bit-clock cycles, wait time shall >= 6bit (10bit)-clock + expected bits
+//Refer to ISO14443-3 Table2 (page7), the time interval between a transmission and reception
+//is about 10 bit cycles.
+opcd_rc632_reg_write(NULL, RC632_REG_TIMER_RELOAD, 10+22+bytecount*8);
 }
 
-//maybe we don't need a return value at all...
-int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
+u_int8_t old_REG_TX_CONTROL, old_REG_CHANNEL_REDUNDANCY, old_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_MSB,old_REG_INTERRUPT_EN, old_REG_TIMER_CLOCK, old_REG_TIMER_CONTROL;
+void backupRC632Reg()
 {
-	int temp;
-	u_int8_t old_REG_TX_CONTROL, old_REG_CHANNEL_REDUNDANCY, old_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_MSB,old_REG_INTERRUPT_EN;
-	//store registor old values
 	opcd_rc632_reg_read(NULL, RC632_REG_TX_CONTROL, &old_REG_TX_CONTROL);
 	opcd_rc632_reg_read(NULL, RC632_REG_CHANNEL_REDUNDANCY, &old_REG_CHANNEL_REDUNDANCY);
 	opcd_rc632_reg_read(NULL, RC632_REG_CRC_PRESET_LSB, &old_REG_CRC_PRESET_LSB);
 	opcd_rc632_reg_read(NULL, RC632_REG_CRC_PRESET_MSB, &old_REG_CRC_PRESET_MSB);
 	opcd_rc632_reg_read(NULL, RC632_REG_INTERRUPT_EN, &old_REG_INTERRUPT_EN);
-	//TODO: enable the RC632 timer interrupt and idle interrupt
+	opcd_rc632_reg_read(NULL, RC632_REG_TIMER_CLOCK, &old_REG_TIMER_CLOCK);
+	opcd_rc632_reg_read(NULL, RC632_REG_TIMER_CONTROL, &old_REG_TIMER_CONTROL);
+	//TODO: consider shall we backup the timer related registers?
+}
+void restoreRC632Reg()
+{
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, old_REG_TX_CONTROL);
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, old_REG_CHANNEL_REDUNDANCY);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_LSB);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_MSB, old_REG_CRC_PRESET_MSB);
+	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, old_REG_INTERRUPT_EN || RC632_INT_SET);
+	opcd_rc632_reg_write(NULL, RC632_REG_TIMER_CLOCK, old_REG_TIMER_CLOCK);
+	opcd_rc632_reg_write(NULL, RC632_REG_TIMER_CONTROL, old_REG_TIMER_CONTROL);
+}
+
+u_int8_t REQA=0x26;
+u_int8_t SELECT[2]={0x93,0x20};
+u_int8_t SELECT_UID[7]={0x93,0x70,0,0,0,0,0};
+u_int8_t AUTH_BLK_N[2]={0x60, 0x00};
+u_int8_t BUFFER[16];
+//maybe we don't need a return value at all...
+int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
+{
+	int temp;
+
+	//store registor old values
+	backupRC632Reg();
+	//initialize the timer configuration
+	initRC632Timer();
+	//enable the RC632 timer interrupt and idle interrupt
+	initRC632Irq();
+	
 	
 	//prepare data for later use
 	AUTH_BLK_N[1]=params->BLOCK;
 	
 	//send idle command
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_IDLE);
-	
-	//disable TX1 and TX2
+	//disable TX1 and TX2. See if we need to wait here...
 	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x58);
 	
 	//////////////////////////////
@@ -87,6 +119,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//do the REQA tranceive
 	opcd_rc632_fifo_write(NULL, sizeof(REQA), &REQA, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	setRC632Timer(2);
 	setFlagRxTimeout();//wait for the command to finish
 	waitFlagRxTimeout();
 	temp = opcd_rc632_fifo_read(NULL, 2, BUFFER);//read fifo, should get 0x20,00. Do we need to wait here?
@@ -96,12 +129,13 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 		params->BLOCK=temp;//use BLOCK to store the error message
 		goto exit;
 	}
-	
+
 	//////////////////////////////
 	//do anti collision
 	//tranceive, send 0x93 20
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT), SELECT, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	setRC632Timer(5);
 	setFlagRxTimeout();//wait for the command to finish
 	waitFlagRxTimeout();
 	temp = opcd_rc632_fifo_read(NULL, 5, SELECT_UID+2);//read fifo, should get UID BCC	
@@ -122,6 +156,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//do a tranceive: select(UID): 0x93, 70, UID, BCC 
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT_UID), SELECT_UID, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	setRC632Timer(3);
 	setFlagRxTimeout();//wait for the command to finish
 	waitFlagRxTimeout();
 	temp = opcd_rc632_fifo_read(NULL, 3, BUFFER);//read fifo, should get SAK, with 2-byte CRC-A
@@ -137,6 +172,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//do a tranceive: 0x60 NN CRC_A
 	opcd_rc632_fifo_write(NULL, sizeof(AUTH_BLK_N), AUTH_BLK_N, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	setRC632Timer(4);
 	setFlagRxTimeout();//wait for the command to finish
 	waitFlagRxTimeout();
 	temp = opcd_rc632_fifo_read(NULL, 4, params->Nt_actual);//read fifo, should get 32-bit Nt
@@ -154,6 +190,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//do a tranceive: Nr_Ar_Parity, 9-bytes with parity bits embedded in bit stream
 	opcd_rc632_fifo_write(NULL, 9, params->Nr_Ar_Parity, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	setRC632Timer(1);
 	setFlagRxTimeout();//wait for the command to finish
 	waitFlagRxTimeout();
 	temp = opcd_rc632_fifo_read(NULL, 1, &(params->NACK_encrypted));//read fifo, should get NACK or nothing
@@ -178,11 +215,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	
 exit:	
 	// restore the old register values?
-	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, old_REG_TX_CONTROL);
-	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, old_REG_CHANNEL_REDUNDANCY);
-	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_LSB, old_REG_CRC_PRESET_LSB);
-	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_MSB, old_REG_CRC_PRESET_MSB);
-	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, old_REG_INTERRUPT_EN);
+	restoreRC632Reg();
 	return params->result;
 }
 
