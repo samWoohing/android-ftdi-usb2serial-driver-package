@@ -362,10 +362,11 @@ static void rc632_irq(void)
 	/* All interrupts below can be reported directly to the host */
 	if (cause & RC632_INT_TIMER){
 		//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
-		clearFlagRxTimeout();
+		//clearFlagRxTimeout();
 		//DEBUGP("Timer ");
 	}
 	if (cause & RC632_INT_IDLE){
+		clearFlagRxTimeout();//try if using idle irq can make a better result
 		//DEBUGP("Idle ");
 	}
 	if (cause & RC632_INT_RX){
@@ -602,10 +603,10 @@ void rc632_init(void)
 	//AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632,
 	//		      OPENPCD_IRQ_PRIO_RC632,
 	//		      AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, &rc632_irq);//equal to AT91C_AIC_SRCTYPE_EXT_LOW_LEVEL
-	//Shan: make it negative edge trigged			  
+	//Shan: make it low level trigged			  
 	AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632,
 			      OPENPCD_IRQ_PRIO_RC632,
-			      AT91C_AIC_SRCTYPE_EXT_NEGATIVE_EDGE, &rc632_irq);
+			      AT91C_AIC_SRCTYPE_EXT_LOW_LEVEL, &rc632_irq);
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632);
 	
 	AT91F_PIO_CfgOutput(AT91C_BASE_PIOA, OPENPCD_PIO_RC632_RESET);
