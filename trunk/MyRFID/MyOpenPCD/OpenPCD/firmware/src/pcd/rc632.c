@@ -327,13 +327,13 @@ int opcd_rc632_clear_bits(struct rfid_asic_handle *hdl,
 }
 
 /* RC632 interrupt handling */
-
 static void rc632_irq(void)
-{
+{//Shan: verified, this function is called when there's a interrupt. But why clearFlagRxTimeout seems not correct?
+//Also found that RC632 IRQ pin goes down but never goes back then
 	struct req_ctx *irq_rctx;
 	struct openpcd_hdr *irq_opcdh;
 	u_int8_t cause;
-	
+
 	/* CL RC632 has interrupted us */
 	opcd_rc632_reg_read(NULL, RC632_REG_INTERRUPT_RQ, &cause);
 
@@ -343,11 +343,11 @@ static void rc632_irq(void)
 	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
 	//by Shan: the true purpose of above is to write 0 to SetIrq bit, to clear all other bits in RC632_REG_INTERRUPT_RQ
 	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, 0x3F);
-	DEBUGP("rc632_irq: ");
+	//DEBUGP("rc632_irq: ");
 
 	if (cause & RC632_INT_LOALERT) {
 		/* FIFO is getting low, refill from virtual FIFO */
-		DEBUGP("FIFO_low ");
+		//DEBUGP("FIFO_low ");
 		#if 0
 		if (!fifo_available(&rc632.fifo))
 			return;
@@ -356,21 +356,26 @@ static void rc632_irq(void)
 	}
 	if (cause & RC632_INT_HIALERT) {
 		/* FIFO is getting full, empty into virtual FIFO */
-		DEBUGP("FIFO_high ");
+		//DEBUGP("FIFO_high ");
 		/* FIXME */
 	}
 	/* All interrupts below can be reported directly to the host */
-	if (cause & RC632_INT_TIMER)
+	if (cause & RC632_INT_TIMER){
+		//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
 		clearFlagRxTimeout();
-		DEBUGP("Timer ");
-	if (cause & RC632_INT_IDLE)
-		DEBUGP("Idle ");
-	if (cause & RC632_INT_RX)
+		//DEBUGP("Timer ");
+	}
+	if (cause & RC632_INT_IDLE){
+		//DEBUGP("Idle ");
+	}
+	if (cause & RC632_INT_RX){
+		//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_RX);
 		clearFlagRxTimeout();
-		DEBUGP("RxComplete ");
-	if (cause & RC632_INT_TX)
-		DEBUGP("TxComplete ");
-	//TODO: added by shan, need to find a timer+RX solution for tracking the tranceiving, need to add some code here
+		//DEBUGP("RxComplete ");
+	}
+	if (cause & RC632_INT_TX){
+		//DEBUGP("TxComplete ");
+	}
 
 	//by Shan: following code allocate a context for the interrupt and notify the usb host
 	//Consider if we may delete or disable this since we don't use this at all.
@@ -558,9 +563,13 @@ void rc632_init(void)
 
 	AT91F_SPI_CfgPMC();
 
+	//AT91F_PIO_CfgPeriph(AT91C_BASE_PIOA,
+	//			AT91C_PA11_NPCS0|AT91C_PA12_MISO|
+	//			AT91C_PA13_MOSI |AT91C_PA14_SPCK, 0);
+	//by Shan: config PA30 as IRQ1 input.
 	AT91F_PIO_CfgPeriph(AT91C_BASE_PIOA,
 				AT91C_PA11_NPCS0|AT91C_PA12_MISO|
-				AT91C_PA13_MOSI |AT91C_PA14_SPCK, 0);
+				AT91C_PA13_MOSI |AT91C_PA14_SPCK|AT91C_PA30_IRQ1, 0);
 
 	AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, AT91C_ID_SPI,
 			      OPENPCD_IRQ_PRIO_SPI,
@@ -590,11 +599,15 @@ void rc632_init(void)
 	AT91F_SPI_Enable(pSPI);
 
 	/* Register rc632_irq */
+	//AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632,
+	//		      OPENPCD_IRQ_PRIO_RC632,
+	//		      AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, &rc632_irq);//equal to AT91C_AIC_SRCTYPE_EXT_LOW_LEVEL
+	//Shan: make it negative edge trigged			  
 	AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632,
 			      OPENPCD_IRQ_PRIO_RC632,
-			      AT91C_AIC_SRCTYPE_INT_HIGH_LEVEL, &rc632_irq);
+			      AT91C_AIC_SRCTYPE_EXT_NEGATIVE_EDGE, &rc632_irq);
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC, OPENPCD_IRQ_RC632);
-
+	
 	AT91F_PIO_CfgOutput(AT91C_BASE_PIOA, OPENPCD_PIO_RC632_RESET);
 
 	rc632_reset();
@@ -604,7 +617,7 @@ void rc632_init(void)
 			     RC632_IRQCFG_CMOS|RC632_IRQCFG_INV);
 	/* enable interrupts */
 	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_TIMER);//Shan: not using the highest bit, problem?
-	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET||RC632_INT_RX||RC632_INT_TIMER);
+	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET|RC632_INT_RX|RC632_INT_TIMER);
 	/* configure AUX to test signal four */
 	opcd_rc632_reg_write(NULL, RC632_REG_TEST_ANA_SELECT, 0x04);
 

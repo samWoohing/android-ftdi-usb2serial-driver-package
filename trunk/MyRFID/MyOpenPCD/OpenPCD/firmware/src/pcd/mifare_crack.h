@@ -24,4 +24,7 @@ struct mifare_crack_params{
 }__attribute__ ((packed));
 
 extern int mifare_fixed_Nt_attack(struct mifare_crack_params *params);
-extern void clearFlagIdleTimeout();
+extern void clearFlagRxTimeout();
+extern void setFlagRxTimeout();
+extern void waitFlagRxTimeout();
+extern volatile u_int8_t FlagRxTimeout;

@@ -16,7 +16,8 @@ pcd_dev_hdl = libusb_usb_open(pcd_dev)
 result = libusb_usb_set_configuration(pcd_dev_hdl, config1);
 result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 
-
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
+result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
 %[bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
 
 %bytedata = int8([22, 0, 17, 1]);
