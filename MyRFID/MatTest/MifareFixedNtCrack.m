@@ -1,7 +1,7 @@
 function [bytes, result] = MifareFixedNtCrack(hdl, Nr_Ar_Parity)
 EP1W=int32(hex2dec('1'));%write endpoint
 EP2R=int32(hex2dec('82')); %note that read endpoint always begins with 8
-timeout = int32(1024);
+timeout = int32(8192);
 
 params = zeros(1,21, 'uint8');
 params(2)=uint8(1);

@@ -16,9 +16,14 @@ pcd_dev_hdl = libusb_usb_open(pcd_dev)
 result = libusb_usb_set_configuration(pcd_dev_hdl, config1);
 result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 
-result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
-result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
-%[bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
+
+%result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
+%result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
+result = OpenPCD_WriteReg(pcd_dev_hdl, 33, 6)%find a optimum Rxwait value!
+for i=1:100
+    [bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [0,0,0,0,0,0,0,0,0])
+end
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 88)%disable the TX pins! don't forget!
 
 %bytedata = int8([22, 0, 17, 1]);
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)

