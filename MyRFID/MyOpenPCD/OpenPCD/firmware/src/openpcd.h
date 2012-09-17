@@ -169,6 +169,7 @@
 #define OPENPCD_IRQ_PRIO_TC_FDT (AT91C_AIC_PRIOR_LOWEST+3)
 #define OPENPCD_IRQ_PRIO_UDP	(AT91C_AIC_PRIOR_LOWEST+2)
 #define OPENPCD_IRQ_PRIO_PIT	(AT91C_AIC_PRIOR_LOWEST+1)
-#define OPENPCD_IRQ_PRIO_RC632	AT91C_AIC_PRIOR_LOWEST//by shan: highest means less possible to get disturbed
+#define OPENPCD_IRQ_PRIO_RC632	(AT91C_AIC_PRIOR_HIGHEST-3)//by shan: highest means less possible to get disturbed
+#define OPENPCD_IRQ_PRIO_TC0		(AT91C_AIC_PRIOR_HIGHEST-4)//by shan, for timer counter
 
 #endif /* _OPENPCD_H */

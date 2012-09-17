@@ -64,7 +64,8 @@ void tc_cdiv_init(void)
 	AT91F_PMC_EnablePeriphClock(AT91C_BASE_PMC, 
 				    ((unsigned int) 1 << AT91C_ID_TC0));
 
-	/* Enable Clock for TC0 */
+	/* Enable Clock for TC0 and TC1 */
+	tcb->TCB_TC0.TC_CCR = AT91C_TC_CLKEN;
 	tcb->TCB_TC0.TC_CCR = AT91C_TC_CLKEN;
 
 	/* Connect TCLK1 to XC1, TCLK2 to XC2 */

@@ -27,4 +27,6 @@ extern int mifare_fixed_Nt_attack(struct mifare_crack_params *params);
 extern void clearFlagRxTimeout();
 extern void setFlagRxTimeout();
 extern void waitFlagRxTimeout();
+extern void tc0_tc1_interval_init(void);
+extern int mifare_fixed_Nt_attack_async(struct mifare_crack_params *params);
 extern volatile u_int8_t FlagRxTimeout;

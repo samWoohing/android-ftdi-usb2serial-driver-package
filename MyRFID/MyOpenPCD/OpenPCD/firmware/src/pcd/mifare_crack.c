@@ -20,6 +20,7 @@
 #include "rc632.h"
 #include <os/pit.h>
 #include <lib_AT91SAM7.h>
+#include "../openpcd.h"
 #include "mifare_crack.h"
 
 
@@ -289,3 +290,84 @@ exit:
 	return params->result;
 }
 
+enum PROC_STATUS {IDLE=0,INIT=1,PROC=2,};
+volatile u_int8_t proc_status=IDLE;
+volatile struct mifare_crack_params *params_to_proc=NULL;
+
+int mifare_fixed_Nt_attack_async(struct mifare_crack_params *params)
+{
+	if(proc_status != IDLE) return -1;
+	
+	params_to_proc = params;
+	proc_status = INIT;
+	//while loop waiting for finish
+	while(proc_status != IDLE){}
+	params_to_proc = NULL;
+	return params->result;
+}
+
+static void tc0_irq(void)
+{
+	//do the actual fixed Nt read here
+	if(proc_status == INIT){
+		if(params_to_proc == NULL) return;
+		proc_status = PROC;
+		mifare_fixed_Nt_attack((struct mifare_crack_params *)params_to_proc);
+		proc_status = IDLE;
+	}
+}
+
+static AT91PS_TCB tcb = AT91C_BASE_TCB;
+void tc0_tc1_interval_init(void)
+{
+	/* Cfg PA28(TCLK1), and PA0 (TIOA0) as peripheral B */
+	AT91F_PIO_CfgPeriph(AT91C_BASE_PIOA, 0, 
+			    AT91C_PA28_TCLK1|AT91C_PA0_TIOA0 );
+				
+	/* Enable peripheral Clock for TC0 and TC1 */
+	AT91F_PMC_EnablePeriphClock(AT91C_BASE_PMC, 
+				    ((unsigned int) 1 << AT91C_ID_TC0));
+	AT91F_PMC_EnablePeriphClock(AT91C_BASE_PMC, 
+				    ((unsigned int) 1 << AT91C_ID_TC1));
+	
+	/* Enable Clock for TC0 and TC1 */
+	tcb->TCB_TC0.TC_CCR = AT91C_TC_CLKEN;
+	tcb->TCB_TC1.TC_CCR = AT91C_TC_CLKEN;
+	
+	/* Connect TCLK1 to XC1, TIOA1 to XC0, so TC0 and 1 are chained */
+	tcb->TCB_BMR &= ~(AT91C_TCB_TC1XC1S | AT91C_TCB_TC0XC0S);
+	tcb->TCB_BMR |=  (AT91C_TCB_TC1XC1S_TCLK1 | AT91C_TCB_TC0XC0S_TIOA1);
+	
+	/*TC1 is set to waveform mode, 128 divider, 50% dutycycle waveform*/
+	//WAVSEL=10, RC=128,
+	tcb->TCB_TC1.TC_CMR = 	AT91C_TC_CLKS_XC1 | AT91C_TC_WAVE |				//runs from XC1, waveform mode
+							AT91C_TC_WAVESEL_UP_AUTO |						//up counting and auto reset on RC compare
+							AT91C_TC_ACPA_SET | AT91C_TC_ACPC_CLEAR |		//RA compare sets TIOA1, RC compare clears TIOA
+							AT91C_TC_BEEVT_NONE | AT91C_TC_BCPB_NONE |	//TIOB1 external event not used, RB compare not rounted out
+							AT91C_TC_EEVT_TIOB | AT91C_TC_ETRGEDG_NONE |	//External event set to TIOB1, but not used (None edge)
+							AT91C_TC_BSWTRG_CLEAR | AT91C_TC_ASWTRG_CLEAR;	//SW trigger resets TIOA, TIOB
+	tcb->TCB_TC1.TC_RC = 128;//128 divider
+	tcb->TCB_TC1.TC_RA = 65;//50 duty cycle
+	tcb->TCB_TC1.TC_RB = 0xFFFF;//RB setting is useless since RB not used at all
+	
+	/*TC0 is set to waveform mode, 65536 divider, 50% dutycycle waveform*/
+	tcb->TCB_TC0.TC_CMR = 	AT91C_TC_CLKS_XC0 | AT91C_TC_WAVE |				//runs from XC0, waveform mode
+							AT91C_TC_WAVESEL_UP |							//up counting and auto reset on 0xFFFF compare
+							AT91C_TC_ACPA_SET | AT91C_TC_ACPC_CLEAR |		//RA compare sets TIOA0, RC compare clears TIOA0
+							AT91C_TC_BEEVT_NONE | AT91C_TC_BCPB_NONE |	//TIOB1 external event not used, RB compare not rounted out
+							AT91C_TC_EEVT_TIOB | AT91C_TC_ETRGEDG_NONE |	//External event set to TIOB1, but not used (None edge)
+							AT91C_TC_BSWTRG_CLEAR | AT91C_TC_ASWTRG_CLEAR;	//SW trigger resets TIOA,  TIOB
+	tcb->TCB_TC0.TC_RC = 0xFFFF;//no use at all
+	tcb->TCB_TC0.TC_RA = 32769;//50 duty cycle for RA compare
+	tcb->TCB_TC0.TC_RB = 0xFFFF;//RB setting is useless since RB not used at all
+	
+	tcb->TCB_TC0.TC_IDR = 0xFF; //first disable all TC0 interrupts
+	tcb->TCB_TC0.TC_IER = AT91C_TC_COVFS;//Enable the counter overflow interrupt
+	tcb->TCB_BCR = 1;/* Reset to start timers */
+	
+	/*register the interrupt handler*/
+	AT91F_AIC_ConfigureIt(AT91C_BASE_AIC, AT91C_ID_TC0,
+			      OPENPCD_IRQ_PRIO_TC0,
+			      AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, &tc0_irq);
+	AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_TC0);
+}

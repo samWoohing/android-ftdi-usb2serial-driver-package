@@ -51,7 +51,7 @@ int main(void)
 	AT91F_PIOA_CfgPMC();
 	wdt_init();
 	pit_init();
-	//blinkcode_init();
+	//blinkcode_init();//by shan, this is unnecessary and deleting will not cause trouble.
 
 	/* initialize USB */
 	req_ctx_init();
