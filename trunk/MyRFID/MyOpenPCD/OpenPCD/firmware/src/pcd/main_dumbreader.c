@@ -28,12 +28,14 @@
 #include <os/usb_handler.h>
 #include "../openpcd.h"
 #include <os/main.h>
+#include "mifare_crack.h"
 
 #define RAH NULL
 
 void _init_func(void)
 {
 	rc632_init();
+	tc0_tc1_interval_init();
 }
 
 int _main_dbgu(char key)
