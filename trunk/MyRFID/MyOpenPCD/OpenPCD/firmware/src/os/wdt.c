@@ -45,10 +45,10 @@ void wdt_init(void)
 			 AT91C_WDTC_WDDBGHLT | AT91C_WDTC_WDIDLEHLT |
 			 AT91C_WDTC_WDFIEN);
 #else
-	AT91F_WDTSetMode(AT91C_BASE_WDTC, (0x80 << 16) |
-			 AT91C_WDTC_WDRSTEN | 0x80);//by Shan: 32768/128/128 = 2Hz, ~500ms interval
+	//AT91F_WDTSetMode(AT91C_BASE_WDTC, (0x80 << 16) |
+	//		 AT91C_WDTC_WDRSTEN | 0x80);//by Shan: 32768/128/128 = 2Hz, ~500ms interval
 	//so far pretty sure this is not the problem of the watchdog
-	//AT91F_WDTSetMode(AT91C_BASE_WDTC, (4095 << 16) |
-	//		 AT91C_WDTC_WDRSTEN | 4095);//by Shan: 32768/8192 = 4Hz, ~250ms interval. This shall leave enough time for Mifire hack reading
+	AT91F_WDTSetMode(AT91C_BASE_WDTC, (4095 << 16) |
+			 AT91C_WDTC_WDRSTEN | 4095);//by Shan: 32768/8192 = 4Hz, ~250ms interval. This shall leave enough time for Mifire hack reading
 #endif
 }

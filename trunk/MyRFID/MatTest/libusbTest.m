@@ -18,13 +18,13 @@ result = libusb_usb_claim_interface(pcd_dev_hdl, interface0)
 
 
 %result = OpenPCD_WriteReg(pcd_dev_hdl, 1, 0) %idle command
-%result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
+result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 91)%Enable the TX pins! don't forget!
 
-result = OpenPCD_WriteReg(pcd_dev_hdl, 33, 8)%Rxwait = 8 has the best success rate
+%result = OpenPCD_WriteReg(pcd_dev_hdl, 33, 8)%Rxwait = 8 has the best success rate
 n=0;
 for i=1:100
-    [bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [8,87,0,0,0,0,0,0,0])
-    pause(0.618);
+    [bytes, result] = MifareFixedNtCrack(pcd_dev_hdl, [8,0,0,0,0,0,0,0,0])%delay 90us ihas good result
+    %pause(0.618);
     if bytes(1)==250 || bytes(1)==0
         n=n+1;
     end
@@ -35,7 +35,7 @@ result = OpenPCD_WriteReg(pcd_dev_hdl, 17, 88)%disable the TX pins! don't forget
 %result = libusb_usb_bulk_write(pcd_dev_hdl, endpoint1, bytedata, timeout)
 %[bytes, result] = libusb_usb_bulk_read(pcd_dev_hdl, endpoint2, readsz, timeout)
 
-%[regvalue, flag, result] = OpenPCD_ReadReg(pcd_dev_hdl, 34)
+%[regvalue, result] = OpenPCD_ReadReg(pcd_dev_hdl, 34)
 
 %try to do a anti-collision stage on a Mifare card
 

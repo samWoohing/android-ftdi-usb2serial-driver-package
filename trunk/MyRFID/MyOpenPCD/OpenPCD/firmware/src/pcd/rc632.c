@@ -461,7 +461,8 @@ static int rc632_usb_in(struct req_ctx *rctx)
 		rctx->tot_len = sizeof(*poh)+sizeof(struct mifare_crack_params);//totally 25 bytes of return values
 		params = (struct mifare_crack_params *)poh->data;
 		//call the processing function here
-		mifare_fixed_Nt_attack(params);
+		//mifare_fixed_Nt_attack(params);//debug purpose
+		mifare_fixed_Nt_attack_async(params);
 		DEBUGP("MIFARE CRACK");
 		break;
 	case OPENPCD_CMD_READ_REG:

