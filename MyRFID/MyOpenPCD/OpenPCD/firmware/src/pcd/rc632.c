@@ -362,16 +362,16 @@ static void rc632_irq(void)
 	/* All interrupts below can be reported directly to the host */
 	if (cause & RC632_INT_TIMER){
 		//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_TIMER);
-		//clearFlagRxTimeout();
+		clearFlagRxTimeout();
 		//DEBUGP("Timer ");
 	}
 	if (cause & RC632_INT_IDLE){
-		clearFlagRxTimeout();//try if using idle irq can make a better result
+		clearFlagRxTimeout();//try if using idle irq can make a better result, still need to try
 		//DEBUGP("Idle ");
 	}
 	if (cause & RC632_INT_RX){
 		//opcd_rc632_reg_write(NULL, RC632_REG_INTERRUPT_RQ, RC632_INT_RX);
-		clearFlagRxTimeout();
+		//clearFlagRxTimeout();
 		//DEBUGP("RxComplete ");
 	}
 	if (cause & RC632_INT_TX){
@@ -592,7 +592,7 @@ void rc632_init(void)
 	/* CPOL = 0, NCPHA = 1, CSAAT = 0, BITS = 0000, SCBR = 10 (4.8MHz), 
 	 * DLYBS = 0, DLYBCT = 0 */
 #ifdef SPI_USES_DMA
-	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(10<<8));
+	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(6<<8));//shan, try the extreme value!, orignal value 10.
 #else
 	/* 320 kHz in case of I/O based SPI */
 	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(0x7f<<8));

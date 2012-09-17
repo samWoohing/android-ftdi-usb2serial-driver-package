@@ -45,7 +45,8 @@ static void sys_irq(void)
 			DEBUGP("DBGU(");
 			if (sysirq_hdlrs[AT91SAM7_SYSIRQ_DBGU]) {
 				DEBUGP("handler ");
-				sysirq_hdlrs[AT91SAM7_SYSIRQ_DBGU](sr);
+				//by Shan. We'll never call the long DBGU process rountine, no interrupt handling for DBGU, time saving.
+				//sysirq_hdlrs[AT91SAM7_SYSIRQ_DBGU](sr);
 			} else {
 				*AT91C_DBGU_IDR = *AT91C_DBGU_IMR;
 				DEBUGP("no handler ");
