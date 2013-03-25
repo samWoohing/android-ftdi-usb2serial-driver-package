@@ -64,7 +64,8 @@
 #define SPI_DEBUG_LOOPBACK
 #endif
 
-#define SPI_USES_DMA
+//by Shan: remove to reduce uncertaity
+//#define SPI_USES_DMA
 
 #define SPI_MAX_XFER_LEN	65
 
@@ -596,7 +597,8 @@ void rc632_init(void)
 	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(6<<8));//shan, try the extreme value!, orignal value 10.
 #else
 	/* 320 kHz in case of I/O based SPI */
-	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(0x7f<<8));
+	//AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(0x7f<<8));
+	AT91F_SPI_CfgCs(pSPI, 0, AT91C_SPI_BITS_8|AT91C_SPI_NCPHA|(0xff<<8));
 #endif
 	AT91F_SPI_Enable(pSPI);
 

