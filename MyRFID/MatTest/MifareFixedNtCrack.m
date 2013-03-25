@@ -6,7 +6,7 @@ timeout = int32(8192);
 params = zeros(1,21, 'uint8');
 params(2)=uint8(1);%TODO: change this to input parameter later
 params(3:7)=uint8([179   41  218   79   15]);%blank sample card
-%params(3:7)=uint8([14  135   61  234   94]);%yuanshen card
+params(3:7)=uint8([14  135   61  234   94]);%yuanshen card
 params(12:20)=uint8(Nr_Ar_Parity);
 byteW = [uint8([28, 0, 0, 21]),params];
 
