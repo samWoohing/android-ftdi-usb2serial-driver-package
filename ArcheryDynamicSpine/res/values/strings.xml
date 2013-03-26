@@ -16,4 +16,11 @@
 	<string name="nock_end_weight">nock end weight(grain):</string>
 	<string name="fletching_type">fletching type:</string>
 	<string name="fletching_weight">fletching weight(grain):</string>
+	
+	<string name="bow_type">Bow Type:</string>
+	<string name="rated_weight">rated weight(lbs):</string>
+	<string name="rated_draw">rated draw(inch):</string>
+	<string name="your_draw">YOUR draw(inch):</string>
+	<string name="strike_plate">strike plate position(inch):</string>
+	<string name="string_type">string type:</string>
 </resources>
