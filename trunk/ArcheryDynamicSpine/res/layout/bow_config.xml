@@ -13,7 +13,7 @@
 		        android:id="@+id/textView1"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:text="@string/arrow_shaft_type"
+		        android:text="@string/bow_type"
 		        android:textAppearance="?android:attr/textAppearanceSmall" />
             
         </TableRow>
@@ -45,7 +45,7 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/rated_weight"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
@@ -71,7 +71,7 @@
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/rated_draw"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
@@ -94,7 +94,7 @@
                 android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/your_draw"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
@@ -117,7 +117,7 @@
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/strike_plate"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
@@ -140,7 +140,7 @@
                 android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium Text"
+                android:text="@string/string_type"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <EditText
