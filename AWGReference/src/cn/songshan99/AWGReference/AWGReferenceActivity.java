@@ -6,6 +6,11 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.TextView;
 
@@ -22,6 +27,8 @@ public class AWGReferenceActivity extends SherlockActivity {
     	setTheme(R.style.Theme_Sherlock_Light);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        Spinner spn = (Spinner)findViewById(R.id.spinnerAWG);
+        spn.setOnItemSelectedListener(mAWGSizeSelectedListener);
     }
 
 	@Override
@@ -71,7 +78,7 @@ public class AWGReferenceActivity extends SherlockActivity {
 			tv.setText(R.string.area_kcmil);
 			tv = (TextView)this.findViewById(R.id.textViewResistance);
 			tv.setText(R.string.res_mOhm_per_ft);
-			//TODO: converter displayed numbers
+			//TODO: convert displayed numbers
 		}
 		else if(UNIT == UNIT_METRIC){
 			TextView tv = (TextView)this.findViewById(R.id.textViewDiameter);
@@ -80,9 +87,20 @@ public class AWGReferenceActivity extends SherlockActivity {
 			tv.setText(R.string.area_mm2);
 			tv = (TextView)this.findViewById(R.id.textViewResistance);
 			tv.setText(R.string.res_mOhm_per_m);
-			//TODO: converter displayed numbers
+			//TODO: convert displayed numbers
 		}	
 	}
 	
-	
+    private OnItemSelectedListener mAWGSizeSelectedListener = new OnItemSelectedListener(){
+    	
+    	public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+    		//lookup the AWG information
+    		
+    		//update the drawing
+    	}
+    	
+    	public void onNothingSelected(AdapterView<?> parentView){         
+    		//this should not happen
+    	}
+	};
 }
