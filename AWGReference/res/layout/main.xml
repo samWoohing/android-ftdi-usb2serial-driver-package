@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="1">
+
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="AWG size:"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightSkyBlue" />
+
+        <Spinner
+            android:id="@+id/spinnerAWG"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </TableRow>
+    
+    <View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
+
+    <TableRow>
+        <TextView
+            android:id="@+id/textViewDiameter"
+            android:layout_column="0"
+            android:text="Diameter(mm):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/PaleGreen" />
+        <TextView
+            android:id="@+id/textViewDiameterNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:id="@+id/textViewArea"
+            android:layout_column="0"
+            android:text="Area (mm^2):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/PaleGreen" />
+        <TextView
+            android:id="@+id/textViewAreaNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <TableRow>
+        <TextView
+            android:id="@+id/textViewResistance"
+            android:layout_column="0"
+            android:text="Resistance (mOhm/m):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/PaleGreen" />
+        <TextView
+            android:id="@+id/textViewResistanceNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
+        
+    <TableRow
+        android:background="@color/LightPink">
+        <TextView
+            android:layout_column="0"
+            android:text="Fusing current (A):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightPink" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="Preece (~10s):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightPink" />
+        <TextView
+            android:id="@+id/textViewFuseCurrPreece10sNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="Onderdonk (~1s):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightPink" />
+        <TextView
+            android:id="@+id/textViewFuseCurrOnderdonk1sNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:text="Onderdonk (~30ms):"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightPink" />
+        <TextView
+            android:id="@+id/textViewFuseCurrOnderdonk30msNum"
+            android:layout_column="1"
+            android:text="NA"
+            android:gravity="right"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
+    
+	<TableRow>
+	    <TextView
+	        android:text="Actual size:"
+	        android:padding="3dip"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	    
+	</TableRow>
+	
+	<TextView
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	        android:text="note: only copper represents actual size"
+	        android:padding="3dip"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	<cn.songshan99.AWGReference.AWGDisplayView
+	    android:id="@+id/view1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="match_parent"
+	    android:background="#FF909090" />
+   
+</TableLayout>
