@@ -88,6 +88,9 @@ public class AWGReferenceActivity extends SherlockActivity {
 			tv = (TextView)this.findViewById(R.id.textViewResistance);
 			tv.setText(R.string.res_mOhm_per_m);
 			//TODO: convert displayed numbers
+			//test only:
+			AWGDisplayView v = (AWGDisplayView)this.findViewById(R.id.awgDisplayView);
+			v.setAWGWire(0);
 		}	
 	}
 	
