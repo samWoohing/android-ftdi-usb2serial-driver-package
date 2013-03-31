@@ -1,26 +1,32 @@
 package cn.songshan99.AWGReference;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.ArrayAdapter;
 
 public class AWGWire {
 	
 	private String AWGSize;
-	private double diameter_mm;
-	private double area_mm2;
-	private double resistance_mOhm_per_m;
-	private double diameter_in;
-	private double area_kcmil;
-	private double resistance_mOhm_per_ft;
-	private double fusingCurrentPreece10s;
-	private double fusingCurrentOnderdonk1s;
-	private double fusingCurrentOnderdonk30ms;
+	private float diameter_mm;
+	private float area_mm2;
+	private float resistance_mOhm_per_m;
+	private float diameter_in;
+	private float area_kcmil;
+	private float resistance_mOhm_per_ft;
+	private float fusingCurrentPreece10s;
+	private float fusingCurrentOnderdonk1s;
+	private float fusingCurrentOnderdonk30ms;
 	
-	private static String DBPATH = "/data/data/cn.songshan99.AWGReference/databases/;";
+	private static String DBPATH = "/data/data/cn.songshan99.AWGReference/databases/";
 	private static String DBNAME = "AWGDB.db3";
 	private static String TABLENAME = "AWGDATA";
 	
@@ -36,51 +42,57 @@ public class AWGWire {
 	
 	private AWGDBOpenHelper mAWGDBOpenHelper;
 	
-	public AWGWire(String aWGSize, Context context) throws SQLException {
-		AWGSize = aWGSize;
-		//TODO: implement database lookup and number calculating
-		AWGDBOpenHelper mAWGDBOpenHelper = new AWGDBOpenHelper(context);
+	public AWGWire(Context context) throws SQLException, IOException {
+		//AWGSize = aWGSize;
+		//Initialize and open database.
+		mAWGDBOpenHelper = new AWGDBOpenHelper(context);
+		mAWGDBOpenHelper.createDataBase();
 		mAWGDBOpenHelper.openDataBase();
 	}
 
 	public void setAWGSize(String awgsize){
 		//TODO: implement database lookup and number calculating
+		AWGSize = awgsize;
+		mAWGDBOpenHelper.queryAWGandRefresh();
 	}
 	
 	public String getAWGSize() {
 		return AWGSize;
 	}
-	public double getDiameter_mm() {
+	public float getDiameter_mm() {
 		return diameter_mm;
 	}
-	public double getArea_mm2() {
+	public float getArea_mm2() {
 		return area_mm2;
 	}
-	public double getResistance_mOhm_per_m() {
+	public float getResistance_mOhm_per_m() {
 		return resistance_mOhm_per_m;
 	}
-	public double getDiameter_in() {
+	public float getDiameter_in() {
 		return diameter_in;
 	}
-	public double getArea_kcmil() {
+	public float getArea_kcmil() {
 		return area_kcmil;
 	}
-	public double getResistance_mOhm_per_ft() {
+	public float getResistance_mOhm_per_ft() {
 		return resistance_mOhm_per_ft;
 	}
 
-	public double getFusingCurrentPreece10s() {
+	public float getFusingCurrentPreece10s() {
 		return fusingCurrentPreece10s;
 	}
 
-	public double getFusingCurrentOnderdonk1s() {
+	public float getFusingCurrentOnderdonk1s() {
 		return fusingCurrentOnderdonk1s;
 	}
 
-	public double getFusingCurrentOnderdonk30ms() {
+	public float getFusingCurrentOnderdonk30ms() {
 		return fusingCurrentOnderdonk30ms;
 	}
 	
+	public String[] queryAWGSizes(){
+		return mAWGDBOpenHelper.queryAWGSizes();
+	}
 	private class AWGDBOpenHelper extends SQLiteOpenHelper {
 		
 		
@@ -89,6 +101,7 @@ public class AWGWire {
 		
 		public AWGDBOpenHelper(Context context) {
 			super(context, DBNAME, null, 1);
+			mContext = context;
 		}
 		
 		public void openDataBase() throws SQLException{
@@ -103,8 +116,8 @@ public class AWGWire {
 		}
 		
 		public void queryAWGandRefresh(){
-			Cursor cursor = mDatabase.query(TABLENAME, COLUMNS_TO_SELECT, "AWG=\""+ AWGSize +"\"", null, null, null, null);
-			
+			Cursor cursor = mDatabase.query(TABLENAME, COLUMNS_TO_SELECT, "_id=\""+ AWGSize +"\"", null, null, null, null);
+			cursor.moveToFirst();
 			//TODO: check if we get multiple result, and check if result is null,
 			diameter_in = cursor.getFloat(0);
 			diameter_mm = cursor.getFloat(1);
@@ -121,10 +134,17 @@ public class AWGWire {
 		
 		public String[] queryAWGSizes(){
 			//get all the available sizes from database. This will be used to initialize the spinner
-			String[] awgcol = {"AWG"};
-			Cursor cursor = mDatabase.query(TABLENAME, awgcol , null, null, null, null, null);
-			
+			String[] awgcol = {"_id"};
+			Cursor cursor;
+			try{
+				cursor = mDatabase.query(TABLENAME, awgcol , null, null, null, null, null);
+			}catch(SQLiteException e){
+				e.printStackTrace();
+				return null;
+			}
 			int cnt = cursor.getCount();
+			//TODO: make sure result is NOT null
+			cursor.moveToFirst();
 			//write it to string array
 			String[] result = new String[cnt];
 			for(int i=0;i<cnt;i++){
@@ -145,5 +165,90 @@ public class AWGWire {
 			// TODO Auto-generated method stub
 			
 		}
+		
+		  /**
+	     * Creates a empty database on the system and rewrites it with your own database.
+	     * */
+	    public void createDataBase() throws IOException{
+	 
+	    	boolean dbExist = checkDataBase();
+	 
+	    	if(dbExist){
+	    		//do nothing - database already exist
+	    	}else{
+	 
+	    		//By calling this method and empty database will be created into the default system path
+	               //of your application so we are gonna be able to overwrite that database with our database.
+	        	this.getReadableDatabase();
+	 
+	        	try {
+	 
+	    			copyDataBase();
+	 
+	    		} catch (IOException e) {
+	 
+	        		throw new Error("Error copying database");
+	 
+	        	}
+	    	}
+	 
+	    }
+	    
+	    /**
+	     * Check if the database already exist to avoid re-copying the file each time you open the application.
+	     * @return true if it exists, false if it doesn't
+	     */
+	    private boolean checkDataBase(){
+	 
+	    	SQLiteDatabase checkDB = null;
+	 
+	    	try{
+	    		String myPath = DBPATH + DBNAME;
+	    		checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+	 
+	    	}catch(SQLiteException e){
+	 
+	    		//database does't exist yet.
+	 
+	    	}
+	 
+	    	if(checkDB != null){
+	 
+	    		checkDB.close();
+	 
+	    	}
+	 
+	    	return checkDB != null ? true : false;
+	    }
+	 
+	    /**
+	     * Copies your database from your local assets-folder to the just created empty database in the
+	     * system folder, from where it can be accessed and handled.
+	     * This is done by transfering bytestream.
+	     * */
+	    private void copyDataBase() throws IOException{
+	 
+	    	//Open your local db as the input stream
+	    	InputStream myInput = mContext.getAssets().open(DBNAME);
+	 
+	    	// Path to the just created empty db
+	    	String outFileName = DBPATH + DBNAME;
+	 
+	    	//Open the empty db as the output stream
+	    	OutputStream myOutput = new FileOutputStream(outFileName);
+	 
+	    	//transfer bytes from the inputfile to the outputfile
+	    	byte[] buffer = new byte[1024];
+	    	int length;
+	    	while ((length = myInput.read(buffer))>0){
+	    		myOutput.write(buffer, 0, length);
+	    	}
+	 
+	    	//Close the streams
+	    	myOutput.flush();
+	    	myOutput.close();
+	    	myInput.close();
+	 
+	    }
 	}
 }
