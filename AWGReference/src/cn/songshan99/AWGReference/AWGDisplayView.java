@@ -69,6 +69,7 @@ public class AWGDisplayView extends View {
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
+		if(isInEditMode()) return;
 		
 		//get screen width, height
 		int width = getWidth();
@@ -77,14 +78,14 @@ public class AWGDisplayView extends View {
 		mBackgroundRectangleDrawable.setBounds(0, 0, width, height);
 		mBackgroundRectangleDrawable.draw(canvas);
 		
-		//if(mDiameter<=0) return;
+		if(mDiameter<=0) return;
 		
 		//requestLayout();
 		//draw the actual wire size, call canvas.drawpath()
-		canvas.drawPath(calculateCopperPath(0.5f,width,height), mStrokePaint);
-		canvas.drawPath(calculateCopperPath(0.5f,width,height), mCopperGradientPaint);
-		canvas.drawPath(calculateInsulationPath(0.5f,width,height), mStrokePaint);
-		canvas.drawPath(calculateInsulationPath(0.5f,width,height), mInsulationGradientPaint);
+		canvas.drawPath(calculateCopperPath(mDiameter,width,height), mStrokePaint);
+		canvas.drawPath(calculateCopperPath(mDiameter,width,height), mCopperGradientPaint);
+		canvas.drawPath(calculateInsulationPath(mDiameter,width,height), mStrokePaint);
+		canvas.drawPath(calculateInsulationPath(mDiameter,width,height), mInsulationGradientPaint);
 		//test purpose
 		
 	}
@@ -94,9 +95,6 @@ public class AWGDisplayView extends View {
 
 		invalidate();
 		requestLayout();
-		
-		// calculate the path here
-		
 	}
 	
 	private Path calculateCopperPath(float diameter_in_mm, float width, float height){
