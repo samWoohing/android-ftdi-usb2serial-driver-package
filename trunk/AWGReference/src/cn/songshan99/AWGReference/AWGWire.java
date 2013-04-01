@@ -49,6 +49,15 @@ public class AWGWire {
 		mAWGDBOpenHelper.createDataBase();
 		mAWGDBOpenHelper.openDataBase();
 	}
+	
+	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		mAWGDBOpenHelper.close();
+		super.finalize();
+	}
+
 
 	public void setAWGSize(String awgsize){
 		//TODO: implement database lookup and number calculating
@@ -130,6 +139,8 @@ public class AWGWire {
 			fusingCurrentPreece10s = cursor.getFloat(6);
 			fusingCurrentOnderdonk1s = cursor.getFloat(7);
 			fusingCurrentOnderdonk30ms = cursor.getFloat(8);
+			
+			cursor.close();
 		}
 		
 		public String[] queryAWGSizes(){
@@ -151,6 +162,7 @@ public class AWGWire {
 				result[i] = new String(cursor.getString(0));
 				cursor.moveToNext();
 			}
+			cursor.close();
 			return result;
 		}
 
