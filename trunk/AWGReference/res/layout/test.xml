@@ -1,76 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:stretchColumns="1">
+    android:stretchColumns="0">
+    
+	<TableRow android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/LightSkyBlue">
 
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="Open..."
-            android:padding="3dip" />
-        <TextView
-            android:text="Ctrl-O"
-            android:gravity="right"
-            android:padding="3dip" />
+		<TextView
+		    android:id="@+id/textView1"
+		    android:layout_column="0"
+		    android:layout_width="15sp"
+		    android:layout_height="fill_parent"
+		    android:ellipsize="marquee"
+		    android:minLines="2"
+		    android:padding="3dip"
+		    android:singleLine="false"
+		    android:text="Note: only copper represents actual size."
+		    android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <Button
+	        android:id="@+id/buttonClose"
+	        android:layout_column="1"
+	        android:padding="3dip"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Close"
+	        android:textAppearance="?android:attr/textAppearanceSmall" />
+	    
     </TableRow>
-
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="Save..."
-            android:padding="3dip" />
-        <TextView
-            android:text="Ctrl-S"
-            android:gravity="right"
-            android:padding="3dip" />
-    </TableRow>
-
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="Save As..."
-            android:padding="3dip" />
-        <TextView
-            android:text="Ctrl-Shift-S"
-            android:gravity="right"
-            android:padding="3dip" />
-    </TableRow>
-
-    <View
-        android:layout_height="2dip"
-        android:background="#FF909090" />
-
-    <TableRow>
-        <TextView
-            android:text="X"
-            android:padding="3dip" />
-        <TextView
-            android:text="Import..."
-            android:padding="3dip" />
-    </TableRow>
-
-    <TableRow>
-        <TextView
-            android:text="X"
-            android:padding="3dip" />
-        <TextView
-            android:text="Export..."
-            android:padding="3dip" />
-        <TextView
-            android:text="Ctrl-E"
-            android:gravity="right"
-            android:padding="3dip" />
-    </TableRow>
-
-    <View
-        android:layout_height="2dip"
-        android:background="#FF909090" />
-
-    <TableRow>
-        <TextView
-            android:layout_column="1"
-            android:text="Quit"
-            android:padding="3dip" />
-    </TableRow>
+    
+    <cn.songshan99.AWGReference.AWGDisplayView
+	    android:id="@+id/awgDisplayView12">
+	</cn.songshan99.AWGReference.AWGDisplayView>
+ 
+    	
 </TableLayout>
