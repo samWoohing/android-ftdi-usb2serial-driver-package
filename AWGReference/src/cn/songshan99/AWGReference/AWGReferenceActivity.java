@@ -3,23 +3,39 @@ package cn.songshan99.AWGReference;
 import java.io.IOException;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.view.Window;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.SQLException;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TableLayout;
 import android.widget.Toast;
 import android.widget.TextView;
+import android.view.ViewGroup.LayoutParams;
 
-public class AWGReferenceActivity extends SherlockActivity {
+public class AWGReferenceActivity extends SherlockFragmentActivity {
 	
 	public static final int UNIT_METRIC=1;
 	private static final int UNIT_IMPERIAL=2;
@@ -28,6 +44,12 @@ public class AWGReferenceActivity extends SherlockActivity {
 	private MenuItem mSubMenuItem;
 	
 	private AWGWire mAWGWire;
+	
+	private PopupWindow mShowAWGRealSizePopupWindow;
+	
+	private ShowAWGRealSizeDialogFragment mShowAWGRealSizeDialogFragment;
+	
+	private String AWG_REAL_SIZE_DIALOG_TAG = "AWGRealSzDlg";
 	
     /** Called when the activity is first created. */
     @Override
@@ -55,6 +77,14 @@ public class AWGReferenceActivity extends SherlockActivity {
         spn.setSelection(0);
         
         mCurrentUnit=UNIT_METRIC;
+        
+        //initialize mShowAWGRealSizePopupWindow
+        
+        //LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        //mShowAWGRealSizePopupWindow = new PopupWindow(inflater.inflate(R.layout.test, null, false),200,200,true);
+        //mShowAWGRealSizePopupWindow.setWindowLayoutMode(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+        //mShowAWGRealSizePopupWindow.showAtLocation(findViewById(R.id.main), Gravity.CENTER, 0, 0);
+        mShowAWGRealSizeDialogFragment = new ShowAWGRealSizeDialogFragment();
     }
 
 	@Override
@@ -80,6 +110,10 @@ public class AWGReferenceActivity extends SherlockActivity {
 			mSubMenuItem.setTitle("Unit: Metric");
 			item.setChecked(true);
 			toggleUnit(UNIT_METRIC);
+			//mShowAWGRealSizePopupWindow.showAsDropDown(findViewById(R.id.main).getRootView());
+			
+			//mShowAWGRealSizeDialogFragment.show(getSupportFragmentManager(), "test");
+			mShowAWGRealSizeDialogFragment.showDialog();
 			break;
 			
 		case 2:
@@ -135,6 +169,7 @@ public class AWGReferenceActivity extends SherlockActivity {
     		tv.setText(Float.toString(mAWGWire.getArea_kcmil()));
     		tv = (TextView)findViewById(R.id.textViewResistanceNum);
     		tv.setText(Float.toString(mAWGWire.getResistance_mOhm_per_ft()));
+    		
 		}
 		else if(mCurrentUnit == UNIT_METRIC){
 			tv = (TextView)findViewById(R.id.textViewDiameterNum);
@@ -168,6 +203,121 @@ public class AWGReferenceActivity extends SherlockActivity {
     	
     	public void onNothingSelected(AdapterView<?> parentView){         
     		//this should not happen
+    		
     	}
 	};
+	
+	@Override
+	public void onBackPressed(){
+		// show the main activity layout, so they won't be clicked!
+		mShowAWGRealSizeDialogFragment.hideDialog();
+	}
+	
+	private class ShowAWGRealSizeDialogFragment extends SherlockDialogFragment{
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			// TODO Auto-generated method stub
+			super.onCreate(savedInstanceState);
+			
+		}
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			
+			Dialog dialog = super.onCreateDialog(savedInstanceState);
+	        dialog.requestWindowFeature((int) Window.FEATURE_NO_TITLE);
+	        return dialog;
+		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+				Bundle savedInstanceState) {
+			
+			View v = inflater.inflate(R.layout.test, container, false);
+			
+			// TODO set the onclick listner here!
+			Button btn = (Button)v.findViewById(R.id.buttonClose);
+			btn.setOnClickListener(mCancelButtonClickListener);
+			return v;    
+		}
+		
+		public void showDialog() {
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+			Fragment prev = fragmentManager.findFragmentByTag(
+					AWG_REAL_SIZE_DIALOG_TAG);
+
+			// if a previous frag already exists, just show it!
+			if (prev != null) {
+				transaction.show(prev);
+				transaction.commit();
+				
+			} else {// if prev does not exist, create a new one
+				ShowAWGRealSizeDialogFragment newFragment = new ShowAWGRealSizeDialogFragment();
+				//below doesn't work
+				//newFragment.show(transaction, AWG_REAL_SIZE_DIALOG_TAG);return;
+				// For a little polish, specify a transition animation
+				transaction
+						.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				// To make it fullscreen, use the 'content' root view as the
+				// container
+				// for the fragment, which is always the root view for the
+				// activity
+				transaction.add(android.R.id.content, newFragment,AWG_REAL_SIZE_DIALOG_TAG)
+				.addToBackStack(null).commit();
+			}
+
+			// hide the main activity layout, so they won't be clicked!
+			TableLayout tl = (TableLayout) findViewById(R.id.main);
+			tl.setVisibility(View.GONE);
+		}
+		
+		public void hideDialog(){
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+			Fragment prev = fragmentManager.findFragmentByTag(
+					AWG_REAL_SIZE_DIALOG_TAG);
+
+			// if a previous frag already exists, just hide it!
+			if (prev != null && prev.isVisible()) {
+				transaction.hide(prev);
+				transaction.commit();
+			}
+		}
+		@Override
+		public void onCancel(DialogInterface dialog) {
+			TableLayout tl = (TableLayout) findViewById(R.id.main);
+			tl.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		public void onDismiss(DialogInterface dialog) {
+			// show the main activity layout, so they won't be clicked!
+			TableLayout tl = (TableLayout) findViewById(R.id.main);
+			tl.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		public void onHiddenChanged(boolean hidden) {
+			if(hidden){
+			// show the main activity layout, so they won't be clicked!
+			TableLayout tl = (TableLayout) findViewById(R.id.main);
+			tl.setVisibility(View.VISIBLE);
+			}
+		}
+		
+		private OnClickListener mCancelButtonClickListener = new OnClickListener(){
+			public void onClick(View v){
+				hideDialog();//NOTE: cannot use dismiss here because the fragment still exist after dismissing
+				//TableLayout tl = (TableLayout) findViewById(R.id.main);
+				//tl.setVisibility(View.VISIBLE);
+				//dismiss();
+			}
+		};
+	}
 }

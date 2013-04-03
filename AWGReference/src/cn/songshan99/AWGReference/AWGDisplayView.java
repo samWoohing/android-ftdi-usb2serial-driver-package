@@ -32,10 +32,26 @@ public class AWGDisplayView extends View {
 	private static float inch2mm = 25.4f;
 	private static float arcRatio = 0.3f;
 	
+	
+	public AWGDisplayView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		if(isInEditMode()) return;
+		init();
+	}
+
+	public AWGDisplayView(Context context) {
+		super(context);
+		if(isInEditMode()) return;
+		init();
+	}
+
 	public AWGDisplayView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		if(isInEditMode()) return;
-		
+		init();
+	}
+	
+	private void init(){
 		mDiameter=0;
 		//get display metrics, dpi and relative dpi
 		mDisplayMetrics = new DisplayMetrics();
@@ -61,8 +77,6 @@ public class AWGDisplayView extends View {
 		
 	    mBackgroundRectangleDrawable = new ShapeDrawable(new RectShape());
 	    mBackgroundRectangleDrawable.getPaint().setColor(getResources().getColor(R.color.White));
-	    
-	    
 	}
 
 	@Override
