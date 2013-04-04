@@ -17,7 +17,7 @@
 
         <Spinner
             android:id="@+id/spinnerAWG"
-            android:gravity="right"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -31,15 +31,15 @@
         <TextView
             android:id="@+id/textViewDiameter"
             android:layout_column="0"
-            android:text="Diameter(mm):"
+            android:text="@string/diameter_mm"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:background="@color/PaleGreen" />
         <TextView
             android:id="@+id/textViewDiameterNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -48,15 +48,15 @@
         <TextView
             android:id="@+id/textViewArea"
             android:layout_column="0"
-            android:text="Area (mm^2):"
+            android:text="@string/area_mm2"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:background="@color/PaleGreen" />
         <TextView
             android:id="@+id/textViewAreaNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -65,15 +65,15 @@
         <TextView
             android:id="@+id/textViewResistance"
             android:layout_column="0"
-            android:text="Resistance (mOhm/m):"
+            android:text="@string/res_mohm_per_m"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:background="@color/PaleGreen" />
         <TextView
             android:id="@+id/textViewResistanceNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -81,9 +81,46 @@
     <View
         android:layout_height="2dip"
         android:background="#FF909090" />
+    
+    <TableRow>
+        <TextView
+            android:id="@+id/textViewNumStrand"
+            android:layout_column="0"
+            android:text="@string/num_strand"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightSkyBlue" />
+        <TextView
+            android:id="@+id/textViewNumStrandNum"
+            android:layout_column="1"
+            android:text="@string/na"
+            android:gravity="center"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+    <TableRow>
+        <TextView
+            android:id="@+id/textViewStrandDia"
+            android:layout_column="0"
+            android:text="@string/strand_dia_mm"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/LightSkyBlue" />
+        <TextView
+            android:id="@+id/textViewStrandDiaNum"
+            android:layout_column="1"
+            android:text="@string/na"
+            android:gravity="center"
+            android:padding="3dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </TableRow>
+    
+	<View
+        android:layout_height="2dip"
+        android:background="#FF909090" />
         
-    <TableRow
-        android:background="@color/LightPink">
+    <TableRow>
         <TextView
             android:layout_column="0"
             android:text="Fusing current (A):"
@@ -102,8 +139,8 @@
         <TextView
             android:id="@+id/textViewFuseCurrPreece10sNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -118,8 +155,8 @@
         <TextView
             android:id="@+id/textViewFuseCurrOnderdonk1sNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -134,8 +171,8 @@
         <TextView
             android:id="@+id/textViewFuseCurrOnderdonk30msNum"
             android:layout_column="1"
-            android:text="NA"
-            android:gravity="right"
+            android:text="@string/na"
+            android:gravity="center"
             android:padding="3dip"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </TableRow>
@@ -143,26 +180,20 @@
     <View
         android:layout_height="2dip"
         android:background="#FF909090" />
+
+    <TextView
+        android:id="@+id/textViewNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/uncoated_copper"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:background="@color/LemonChiffon"
+        android:singleLine="false" />
     
-	<TableRow>
-	    <TextView
-	        android:text="Actual size:"
-	        android:padding="3dip"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	    
-	</TableRow>
-	
-	<TextView
+	<Button
+	    android:id="@+id/buttonShowActualSize"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	        android:text="note: only copper represents actual size"
-	        android:padding="3dip"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	
-	<cn.songshan99.AWGReference.AWGDisplayView
-	    android:id="@+id/awgDisplayView"
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:background="#FF909090" />
+	    android:text="@string/show_actual_size" />
    
 </TableLayout>
