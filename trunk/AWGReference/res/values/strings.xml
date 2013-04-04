@@ -8,8 +8,14 @@
     <string name="diameter_mm">Diameter (mm):</string>
     <string name="area_kcmil">Area (kcmil):</string>
     <string name="area_mm2">Area (mm^2):</string>
-    <string name="res_mOhm_per_ft">Resistance (mOhm/ft):</string>
-    <string name="res_mOhm_per_m">Resistance (mOhm/m):</string>
-    
+    <string name="res_mohm_per_ft">Resistance (mOhm/ft):</string>
+    <string name="res_mohm_per_m">Resistance (mOhm/m):</string>
+    <string name="num_strand">Number of strands:</string>
+    <string name="strand_dia_in">strand diameter (in):</string>
+    <string name="strand_dia_mm">strand diameter (mm):</string>
+    <string name="na">N/A</string>
+    <string name="show_actual_size">Show actual wire size</string>
+    <string name="only_copper_real">Note: only copper represents actual size.</string>
+    <string name="uncoated_copper">Note: values are for uncoated copper.</string>
 
 </resources>

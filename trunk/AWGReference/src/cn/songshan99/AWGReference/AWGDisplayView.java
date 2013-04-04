@@ -13,10 +13,12 @@ import android.graphics.drawable.shapes.RectShape;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
+import java.lang.Math;
 
 public class AWGDisplayView extends View {
 
-	private float mDiameter;//diameter in mm!
+	//private float mDiameter;//diameter in mm!
+	private AWGWire mAWGWire;
 	private DisplayMetrics mDisplayMetrics;
 	private ShapeDrawable mBackgroundRectangleDrawable;
 	private Paint mStrokePaint;
@@ -30,7 +32,7 @@ public class AWGDisplayView extends View {
 	private static float insulationDiameterRatio = 1.5f;
 	private static float insulationXPos = 0f;
 	private static float inch2mm = 25.4f;
-	private static float arcRatio = 0.3f;
+	private static float arcRatio = 0.5f;
 	
 	
 	public AWGDisplayView(Context context, AttributeSet attrs, int defStyle) {
@@ -52,7 +54,7 @@ public class AWGDisplayView extends View {
 	}
 	
 	private void init(){
-		mDiameter=0;
+		//mDiameter=0;
 		//get display metrics, dpi and relative dpi
 		mDisplayMetrics = new DisplayMetrics();
 		Activity hostactivity = (Activity) getContext();
@@ -92,21 +94,22 @@ public class AWGDisplayView extends View {
 		mBackgroundRectangleDrawable.setBounds(0, 0, width, height);
 		mBackgroundRectangleDrawable.draw(canvas);
 		
-		if(mDiameter<=0) return;
+		if(mAWGWire.getDiameter_mm()<=0 || mAWGWire == null) return;
 		
 		//requestLayout();
 		//draw the actual wire size, call canvas.drawpath()
-		canvas.drawPath(calculateCopperPath(mDiameter,width,height), mStrokePaint);
-		canvas.drawPath(calculateCopperPath(mDiameter,width,height), mCopperGradientPaint);
-		canvas.drawPath(calculateInsulationPath(mDiameter,width,height), mStrokePaint);
-		canvas.drawPath(calculateInsulationPath(mDiameter,width,height), mInsulationGradientPaint);
+		canvas.drawPath(calculateCopperPath(mAWGWire.getDiameter_mm(),width,height), mStrokePaint);
+		canvas.drawPath(calculateCopperPath(mAWGWire.getDiameter_mm(),width,height), mCopperGradientPaint);
+		canvas.drawPath(calculateStrandPath(mAWGWire.getDiameter_mm(),mAWGWire.getStrand_num(),width,height), mStrokePaint);
+		canvas.drawPath(calculateInsulationPath(mAWGWire.getDiameter_mm(),width,height), mStrokePaint);
+		canvas.drawPath(calculateInsulationPath(mAWGWire.getDiameter_mm(),width,height), mInsulationGradientPaint);
 		//test purpose
 		
 	}
 	
-	public void setAWGWire(float diameter_in_mm){
-		mDiameter=diameter_in_mm;
-
+	public void setAWGWire(AWGWire awgwire){
+		//mDiameter=diameter_in_mm;
+		mAWGWire=awgwire; 
 		invalidate();
 		requestLayout();
 	}
@@ -126,9 +129,9 @@ public class AWGDisplayView extends View {
 		float lowerLeftX = copperXPos * width;
 		float lowerLeftY = height/2 + diameter_in_px/2;		
 		
-		RectF rectf = new RectF(	upperRightX - diameter_in_px * arcRatio,
+		RectF rectf = new RectF(	upperRightX - diameter_in_px * arcRatio/2,
 								upperRightY,
-								lowerRightX + diameter_in_px * arcRatio,
+								lowerRightX + diameter_in_px * arcRatio/2,
 								lowerRightY);
 
 		
@@ -146,6 +149,35 @@ public class AWGDisplayView extends View {
 		return path;
 	}
 	
+	private Path calculateStrandPath(float diameter_in_mm, int numStrand, float width, float height){
+		Path path = new Path();
+		float diameter_in_px = diameter_in_mm * mDisplayMetrics.ydpi/inch2mm;
+		
+		//calculate 4 points and radius of the arc
+		float upperLeftX = copperXPos * width;
+		float upperLeftY = height/2 - diameter_in_px/2;
+		float upperRightX = (copperXPos + copperLength) * width;
+		float upperRightY = height/2 - diameter_in_px/2;
+		float lowerRightX = (copperXPos + copperLength) * width;
+		float lowerRightY = height/2 + diameter_in_px/2;
+		float lowerLeftX = copperXPos * width;
+		float lowerLeftY = height/2 + diameter_in_px/2;
+		
+		float ovalA = diameter_in_px * arcRatio/2;
+		float ovalB = diameter_in_px/2;
+		
+		int shownStrand = numStrand*4/7;
+		float xright, yline;
+		for(int i=1;i<shownStrand;i++){
+			yline = lowerLeftY - diameter_in_px/shownStrand*i;
+			path.moveTo(lowerLeftX, yline);
+			xright = (float) Math.sqrt((1-Math.pow((yline-height/2),2.0) / Math.pow(ovalB,2f))*Math.pow(ovalA,2.0)) + upperRightX;
+			path.lineTo(xright, yline);
+		}
+		
+		return path;
+	}
+	
 	private Path calculateInsulationPath(float diameter_in_mm, float width, float height){
 		Path path = new Path();
 		
@@ -160,9 +192,9 @@ public class AWGDisplayView extends View {
 		float lowerLeftX = insulationXPos * width;
 		float lowerLeftY = height / 2 + diameter_in_px / 2;
 		
-		RectF rectf = new RectF(upperRightX - diameter_in_px * arcRatio,
+		RectF rectf = new RectF(upperRightX - diameter_in_px * arcRatio/2,
 								upperRightY,
-								lowerRightX + diameter_in_px * arcRatio,
+								lowerRightX + diameter_in_px * arcRatio/2,
 								lowerRightY);
 
 		// use lineto method to complete the path
