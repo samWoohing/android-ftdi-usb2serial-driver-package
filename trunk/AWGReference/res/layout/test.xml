@@ -18,23 +18,29 @@
 		    android:minLines="2"
 		    android:padding="3dip"
 		    android:singleLine="false"
-		    android:text="Note: only copper represents actual size."
+		    android:text="@string/only_copper_real"
 		    android:textAppearance="?android:attr/textAppearanceMedium" />
 	
-	    <Button
-	        android:id="@+id/buttonClose"
-	        android:layout_column="1"
-	        android:padding="3dip"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="Close"
-	        android:textAppearance="?android:attr/textAppearanceSmall" />
-	    
-    </TableRow>
-    
-    <cn.songshan99.AWGReference.AWGDisplayView
-	    android:id="@+id/awgDisplayView12">
+		<Button
+		    android:id="@+id/buttonClose"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_column="1"
+		    android:padding="3dip"
+		    android:text="Close"
+		    android:textAppearance="?android:attr/textAppearanceSmall" />
+	</TableRow>
+
+	<TextView
+		android:id="@+id/textViewAWGInfo"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:ellipsize="marquee"
+		android:padding="3dip"
+		android:text="@string/na"
+		android:textAppearance="?android:attr/textAppearanceMedium" />
+
+	<cn.songshan99.AWGReference.AWGDisplayView android:id="@+id/awgDisplayViewInDlg" >
 	</cn.songshan99.AWGReference.AWGDisplayView>
- 
     	
 </TableLayout>
