@@ -118,7 +118,7 @@ public class ArcheryDynamicSpineActivity extends SherlockFragmentActivity {
 	TabManager mTabManager;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) { 
 	    setTheme(R.style.Theme_Sherlock_Light); //Used for theme switching in samples
 	    super.onCreate(savedInstanceState);
 	
