@@ -276,14 +276,14 @@ public class AWGWire {
 		    		checkDB.close();
 		    		return true;
 		    	}
-		    	if(cursor.getInt(0)!=CURRENT_DB_VERSION){
+		    	if(cursor.getInt(0)!=CURRENT_DB_VERSION){ 
 		    		checkDB.close();
 		    		return true;
 		    	}
 	    	}catch(SQLiteException e){
 	    		return true;
 	    	}
-	    	
+	    	checkDB.close();
 			return false;
 	    }
 	    /**

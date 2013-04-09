@@ -35,6 +35,10 @@ public class AboutDialog extends Dialog {
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.instruction))); 
 		tv = (TextView) findViewById(R.id.info_text);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.info)));
+		tv = (TextView) findViewById(R.id.version_history_txt);
+		tv.setText(Html.fromHtml(readRawTextFile(R.raw.version_history)));
+		tv = (TextView) findViewById(R.id.disclaimer_txt);
+		tv.setText(Html.fromHtml(readRawTextFile(R.raw.disclaimer)));
 		tv.setLinkTextColor(Color.BLUE);
 		Linkify.addLinks(tv, Linkify.ALL); 
 	}

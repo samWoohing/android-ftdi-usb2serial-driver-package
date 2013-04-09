@@ -42,7 +42,7 @@ import android.widget.Toast;
 import android.widget.TextView;
 import android.view.ViewGroup.LayoutParams;
 
-public class AWGReferenceActivity extends SherlockFragmentActivity {
+public class AWGReferenceActivity extends SherlockFragmentActivity { 
 	
 	public static final int UNIT_METRIC=1;
 	private static final int UNIT_IMPERIAL=2;
@@ -271,8 +271,14 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 	@Override
 	public void onBackPressed(){
 		// show the main activity layout, so they won't be clicked!
-		mShowAWGRealSizeDialogFragment.hideDialog();
-		super.onBackPressed();
+		if(mShowAWGRealSizeDialogFragment.checkIsVisible()){
+			mShowAWGRealSizeDialogFragment.hideDialog();
+		}
+		else{
+			this.finish();
+		}
+		
+		//super.onBackPressed();
 	}
 	
 	private class ShowAWGRealSizeDialogFragment extends SherlockDialogFragment{
@@ -362,8 +368,25 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 			// if a previous frag already exists, just hide it!
 			if (prev != null && prev.isVisible()) {
 				transaction.hide(prev);
+//				transaction
+//				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+//				transaction.remove(prev);
 				transaction.commit();
+				TableLayout tl = (TableLayout) findViewById(R.id.main);
 			}
+		}
+		
+		public boolean checkIsVisible(){
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+			Fragment prev = fragmentManager.findFragmentByTag(
+					AWG_REAL_SIZE_DIALOG_TAG);
+
+			// if a previous frag already exists, just hide it!
+			if (prev != null && prev.isVisible()) return true;
+			return false;
 		}
 		@Override
 		public void onCancel(DialogInterface dialog) {
@@ -372,7 +395,7 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 		}
 
 		@Override
-		public void onDismiss(DialogInterface dialog) {
+		public void onDismiss(DialogInterface dialog) { 
 			// show the main activity layout, so they won't be clicked!
 			TableLayout tl = (TableLayout) findViewById(R.id.main);
 			tl.setVisibility(View.VISIBLE);
