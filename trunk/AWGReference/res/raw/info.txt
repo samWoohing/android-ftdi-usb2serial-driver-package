@@ -1,6 +1,8 @@
 <h1>AWG Wire Reference</h1>
 Version 1.0<br>
-Copyright 2012<br>
+Copyright &copy; 2013<br>
+Shan Song<br>
+<br>
 Author: Shan Song<br>
 Email: <b>songshan99@gmail.com</b><br>
-xxx-xxx-xxxx-xxxx
+Website: Upcomming soon...<br>
