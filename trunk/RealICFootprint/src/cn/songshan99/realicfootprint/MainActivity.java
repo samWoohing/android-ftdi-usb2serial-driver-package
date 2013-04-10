@@ -1,7 +1,7 @@
 package cn.songshan99.realicfootprint;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.example.realicfootprint.R;
+import cn.songshan99.realicfootprint.R;
 
 import android.os.Bundle;
 import android.view.Menu;
