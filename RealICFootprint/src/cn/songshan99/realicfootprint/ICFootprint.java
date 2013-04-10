@@ -1,30 +1,119 @@
 package cn.songshan99.realicfootprint;
 
+import java.util.ArrayList;
+import static java.lang.Math.*;
+import static android.util.FloatMath.*;
+import android.graphics.RectF;
+
 public class ICFootprint {
 
+	private ArrayList<PinOrPadOrDraftLine> mListPinOrPad;
+	private ArrayList<PinOrPadOrDraftLine> mListDraftLine;
+	private Mark mMark,mTextLoc;
+	private String mDesc, mName, mValue;
 	
+	public ArrayList<PinOrPadOrDraftLine> getmListPinOrPad() {
+		return mListPinOrPad;
+	}
+	public ArrayList<PinOrPadOrDraftLine> getmListDraftLine() {
+		return mListDraftLine;
+	}
+	public Mark getmMark() {
+		return mMark;
+	}
 	
-	public class PinOrPad{
+	public ICFootprint() {
+		mListPinOrPad = new ArrayList<PinOrPadOrDraftLine>();
+		mListDraftLine = new ArrayList<PinOrPadOrDraftLine>();
+	}
+	
+	public void addPin(Pin pin){
+		mListPinOrPad.add(pin);
+	}
+	
+	public void addPad(Pad pad){
+		mListPinOrPad.add(pad);
+	}
+	
+	public void addLine(ElementLine line){
+		mListDraftLine.add(line);
+	}
+	
+	public void addArc(ElementArc arc){
+		mListDraftLine.add(arc);
+	}
+	
+	public void setMark(Mark mk){
+		mMark = mk;
+	}
+	private RectF calculatePinPadOverallBoundRectangle(){
+		//this function returns null of no pin or pad exists
+		RectF result = null;
+		for(PinOrPadOrDraftLine pin_pad: mListPinOrPad){
+			if(result != null){
+				result.union(pin_pad.calculateBoundRectangle());
+			}else{
+				result = pin_pad.calculateBoundRectangle();
+			}
+		}
+		return result;
+	}
+	
+	private RectF calculateDraftLineOverallBoundRectangle(){
+		// this function returns null of no pin or pad exists
+		RectF result = null;
+		for (PinOrPadOrDraftLine draftline : mListDraftLine) {
+			if (result != null) {
+				result.union(draftline.calculateBoundRectangle());
+			} else {
+				result = draftline.calculateBoundRectangle();
+			}
+		}
+		return result;
+	}
+	
+	public RectF calculateFootprintOverallBoundRectangle(){
+		//this function returns null if there is no pin, pad or draftline exists
+		RectF pin_rect, draftline_rect;
+		pin_rect = calculatePinPadOverallBoundRectangle();
+		draftline_rect = calculateDraftLineOverallBoundRectangle();
+		if(pin_rect == null) return draftline_rect;
+		if(draftline_rect == null) return pin_rect;
+		//when both are not null
+		pin_rect.union(draftline_rect);
+		return pin_rect;
+	}
+	
+	public void centerTheFootprint(){
+		//Offset everything so that the center of the bound rectangle is (0,0)
+		float ctX,ctY;
+		RectF bound = calculateFootprintOverallBoundRectangle();
+		if(bound == null) return;//need to do nothing
+		ctX = bound.centerX();
+		ctY = bound.centerY();
+		if(ctX== 0 && ctY == 0) return;
+		for(PinOrPadOrDraftLine pin_pad: mListPinOrPad){
+			pin_pad.offset(-ctX, -ctY);
+		}
+		
+		for (PinOrPadOrDraftLine draftline : mListDraftLine) {
+			draftline.offset(-ctX, -ctY);
+		}
+		
+		if(mMark!=null) mMark.offset(-ctX, -ctY);
+		if(mTextLoc!=null) mTextLoc.offset(-ctX, -ctY);
+	}
+	
+	public abstract class PinOrPadOrDraftLine{
 		public static final int TYPE_PIN=1;
 		public static final int TYPE_PAD=2;
+		public static final int TYPE_LINE=3;
+		public static final int TYPE_ARC=4;
 		
 		private int type;
 		
-		private Object pin_or_pad;
-
-		public PinOrPad(Pin pin) {
-			pin_or_pad = pin;
-			type = TYPE_PIN;
-		}
-		
-		public PinOrPad(Pad pad) {
-			pin_or_pad = pad;
-			type = TYPE_PAD;
-		}
-
-		public Object getPin_or_pad() {
-			return pin_or_pad;
-		}
+		public abstract RectF calculateBoundRectangle();
+		public abstract void offset(float dx, float dy);
 
 		public int getType() {
 			return type;
@@ -35,29 +124,200 @@ public class ICFootprint {
 		}
 	}
 	
-	public class Pin{
-		//TODO: include the draw path method to each pin and pad
-	}
-	
-	public class Pad{
-		//TODO: include the draw path method to each pin and pad
+	public class Pin extends PinOrPadOrDraftLine{
 		
-		String Name, Number;
+		protected float aX,aY,Thickness,Clearance,Mask,Drill;
+		protected String Name, Number;
+		
+		@Override
+		public RectF calculateBoundRectangle() {
+			// Calculate the bound rectangle
+			RectF rect = new RectF();
+			float largest_Radius = findLargestDiameter()/2;
+			rect.left = aX-largest_Radius;
+			rect.right = aX+largest_Radius;
+			rect.top = aY-largest_Radius;
+			rect.bottom = aY+largest_Radius;
+			return rect;
+		}
+
+		private float findLargestDiameter(){
+			float largestDiameter = Thickness + Clearance;
+			if(Mask> largestDiameter)largestDiameter = Mask;
+			if(Drill > largestDiameter)largestDiameter = Drill;
+			return largestDiameter;
+		}
+
+		@Override
+		public void offset(float dx, float dy) {
+			aX+=dx;
+			aY+=dy;
+		}
 	}
 	
-	public class ElementLine{
-		public CentiMil X1,Y1,X2,Y2,Thickness;
+	public class Pad extends PinOrPadOrDraftLine{
+		//TODO: include the draw path method to each pin and pad
+		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask,Drill;
+		protected String Name, Number;
+
+		@Override
+		public RectF calculateBoundRectangle() {
+			// TODO Auto-generated method stub
+			RectF rect = new RectF();
+			float topY,btmY,leftX,rightX,largest_Radius;
+			topY=(aY1<aY2)?aY1:aY2;
+			btmY=(aY1>aY2)?aY1:aY2;
+			leftX=(aX1<aX2)?aX1:aX2;
+			rightX=(aX1>aX2)?aX1:aX2;
+			largest_Radius = findLargestDiameter()/2;
+			
+			rect.left = leftX-largest_Radius;
+			rect.right=rightX+largest_Radius;
+			rect.top = topY-largest_Radius;
+			rect.bottom = btmY+largest_Radius;
+			return rect;
+		}
+		
+		private float findLargestDiameter(){
+			float largestDiameter = Thickness + Clearance;
+			if(Mask> largestDiameter)largestDiameter = Mask;
+			if(Drill > largestDiameter)largestDiameter = Drill;
+			return largestDiameter;
+		}
+		@Override
+		public void offset(float dx, float dy) {
+			aX1+=dx;
+			aY1+=dy;
+			aX2+=dx;
+			aY2+=dy;
+		}
 	}
 	
-	public class ElementArc{
-		public CentiMil X,Y,Width,Height,StartAngle,DeltaAngle,Thickness;
+//	public abstract class DraftLine{
+//		public static final int TYPE_LINE=1;
+//		public static final int TYPE_ARC=2;
+//		
+//		private int type;
+//		public abstract RectF calculateBoundRectangle();
+//		public int getType() {
+//			return type;
+//		}
+//		public void setType(int type) {
+//			this.type = type;
+//		}
+//	}
+	
+	public class ElementLine extends PinOrPadOrDraftLine{
+		protected float aX1,aY1,aX2,aY2,Thickness;
+
+		@Override
+		public RectF calculateBoundRectangle() {
+			RectF rect = new RectF();
+			rect.top=(aY1<aY2)?aY1:aY2;
+			rect.bottom=(aY1>aY2)?aY1:aY2;
+			rect.left=(aX1<aX2)?aX1:aX2;
+			rect.right=(aX1>aX2)?aX1:aX2;
+			return rect;
+		}
+		@Override
+		public void offset(float dx, float dy) {
+			aX1+=dx;
+			aY1+=dy;
+			aX2+=dx;
+			aY2+=dy;
+		}
+	}
+	
+	public class ElementArc extends PinOrPadOrDraftLine{
+		protected float aX,aY,Width,Height,StartAngle,DeltaAngle,Thickness;
+		
+		private float calculateR(float degree){
+			//degree to radius
+			float rad = (float)(degree/180.0*PI);
+			return Width*Height/sqrt(pow(Width*cos(rad),2)+pow(Height*sin(rad),2));
+		}
+		
+		@Override
+		public RectF calculateBoundRectangle() {
+			//a more accurate calculation of boundary
+			float strt_ang, del_ang, end_ang;//the "regulated" start angle and delta angle. start angle must be between 0~360, delta angle must be positive
+			del_ang = (DeltaAngle>=0)?DeltaAngle:-DeltaAngle;
+			strt_ang = (DeltaAngle>=0)?StartAngle:StartAngle+DeltaAngle;//reverse the start angle of delta angle is negative
+			strt_ang = strt_ang % 360.0f;//remainder operation, may get negative value.
+			strt_ang = (strt_ang >= 0)?	strt_ang:strt_ang+360.0f;
+			end_ang = strt_ang+del_ang;
+			
+			//now strt_ang 0~360 and delta angle is positive.
+			//calculate strt_ang is in which quadrant
+			//Note that geda define following quarant:
+			//		3	|	2
+			//0 deg-----|-----
+			//		0	|	1
+			int strt_quad, end_quad;
+			strt_quad = (int)(strt_ang/90.0f);
+			end_quad = (int)((strt_ang+del_ang)/90.0f);
+			
+			boolean included[]={false,false,false,false};//left,bottom,right,top
+			for(int i=strt_quad+1;i<=end_quad;i++){
+				included[i%4]=true;
+			}
+			
+			float strtX,strtY,endX,endY,strtR,endR;
+			strtR = calculateR(strt_ang);
+			endR = calculateR(end_ang);
+			//use sine/cosine to calculate start end XYs
+			strtX = -strtR*cos(strt_ang);
+			strtY = strtR*sin(strt_ang);
+			endX = -endR*cos(end_ang);
+			endY = endR*sin(end_ang);
+			RectF rect = new RectF();
+			if(!included[0])rect.left = min(strtX,endX);
+			else rect.left = -Width;
+			
+			if(!included[1])rect.bottom = max(strtY,endY);
+			else rect.bottom = Height;
+			
+			if(!included[2])rect.right = max(strtX,endX);
+			else rect.right = Width;
+			
+			if(!included[3])rect.top = min(strtY,endY);
+			else rect.top = -Height;
+			
+			//at last, offset to center
+			rect.offset(aX, aY);
+			
+//			rect.top=aY-Height;
+//			rect.bottom=aY+Height;
+//			rect.left=aX-Width;
+//			rect.right=aX+Width;
+			return rect;
+		}
+		
+		@Override
+		public void offset(float dx, float dy) {
+			aX+=dx;
+			aY+=dy;
+		}
 	}
 	
 	public class Mark{
-		public CentiMil X,Y;
+		protected float aX,aY;
+		
+		public Mark(float absX,float absY) {
+			aX=absX;aY=absY;
+		}
+		
+		public Mark(int absX,int absY){
+			aX=(float)absX;aY=(float)absY;
+		}
+
+		public void offset(float dx, float dy) {
+			aX+=dx;
+			aY+=dy;
+		}	
 	}
 	
-	public class CentiMil{
+	public static final class CentiMil{
 		//a unified coordinate uses 1/100 mil as base unit.
 		//and includes conversion functions
 		
@@ -72,12 +332,12 @@ public class ICFootprint {
 		static final int UNIT_KM	= 8;
 		static final int UNIT_PIXEL = 9;
 		
-		static final double INCH_TO_M = 0.0254;
+		static final float INCH_TO_M = 0.0254f;
 		
-		private double HowMuchCmilPerType(int type){
+		private static float HowMuchCmilPerType(int type){
 			switch(type){
 			case UNIT_CMIL:
-				return 1.0;
+				return 1.0f;
 			case UNIT_UMIL:
 				return 1/10000;
 			case UNIT_MIL:
@@ -87,7 +347,7 @@ public class ICFootprint {
 			case UNIT_NM:
 				return 1/10000/INCH_TO_M;
 			case UNIT_UM:
-				return 0.1/INCH_TO_M;
+				return 0.1f/INCH_TO_M;
 			case UNIT_MM:
 				return 100/INCH_TO_M;
 			case UNIT_M:
@@ -95,22 +355,35 @@ public class ICFootprint {
 			case UNIT_KM:
 				return 100000000/INCH_TO_M;
 			default:
-				return 1.0;
+				return 1.0f;
 			}
 		}
 		
-		double mValue;//this is in cmil (1/100mil)
+//		private float mValue;//this is in cmil (1/100mil)
+//
+//		public CentiMil(float d, int type) {
+//			mValue = d*HowMuchCmilPerType(type);
+//		}
+//		
+//		public CentiMil(int v, int type){
+//			mValue = (float)v*HowMuchCmilPerType(type);
+//		}
+		
+		public static final float toCentiMil(float value, int unit_type){
+			return value*HowMuchCmilPerType(unit_type);
+		}
+		public static final float toCentiMil(int value, int unit_type){
+			return (float)value*HowMuchCmilPerType(unit_type);
+		}
+		
+		public static final float CentiMilToPixel(float CentiMil, float dpi){
+			return CentiMil/HowMuchCmilPerType(UNIT_INCH)*dpi;
+		}
 
-		public CentiMil(float v, int type) {
-			mValue = v*HowMuchCmilPerType(type);
-		}
+//		public float getValue() {
+//			return mValue;
+//		}
 		
-		public CentiMil(int v, int type){
-			mValue = (double)v*HowMuchCmilPerType(type);
-		}
 		
-		public double toPixel(double dpi){
-			return mValue/HowMuchCmilPerType(UNIT_INCH)*dpi;
-		}
 	}
 }
