@@ -129,6 +129,10 @@ public class ICFootprint {
 		protected float aX,aY,Thickness,Clearance,Mask,Drill;
 		protected String Name, Number;
 		
+		public Pin(){
+			
+		}
+		
 		@Override
 		public RectF calculateBoundRectangle() {
 			// Calculate the bound rectangle
@@ -159,7 +163,11 @@ public class ICFootprint {
 		//TODO: include the draw path method to each pin and pad
 		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask,Drill;
 		protected String Name, Number;
-
+		
+		public Pad(){
+			
+		}
+		
 		@Override
 		public RectF calculateBoundRectangle() {
 			// TODO Auto-generated method stub
@@ -209,7 +217,10 @@ public class ICFootprint {
 	
 	public class ElementLine extends PinOrPadOrDraftLine{
 		protected float aX1,aY1,aX2,aY2,Thickness;
-
+		
+		public ElementLine(float ax1, float ay1, float ax2, float ay2, float thickness){
+			aX1=ax1;aY1=ay1;aX2=ax2;aY2=ay2;Thickness=thickness;
+		}
 		@Override
 		public RectF calculateBoundRectangle() {
 			RectF rect = new RectF();
@@ -231,6 +242,9 @@ public class ICFootprint {
 	public class ElementArc extends PinOrPadOrDraftLine{
 		protected float aX,aY,Width,Height,StartAngle,DeltaAngle,Thickness;
 		
+		public ElementArc(float ax,float ay, float wid, float hgt, float strt_ang, float del_ang, float thickness){
+			aX=ax;aY=ay;Width=wid;Height=hgt;StartAngle=strt_ang;DeltaAngle=del_ang;Thickness=thickness;
+		}
 		private float calculateR(float degree){
 			//degree to radius
 			float rad = (float)(degree/180.0*PI);
