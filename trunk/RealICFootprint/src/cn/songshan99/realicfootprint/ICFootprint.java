@@ -3,6 +3,7 @@ package cn.songshan99.realicfootprint;
 import java.util.ArrayList;
 import static java.lang.Math.*;
 import static android.util.FloatMath.*;
+import android.graphics.Path;
 import android.graphics.RectF;
 
 public class ICFootprint {
@@ -110,11 +111,16 @@ public class ICFootprint {
 		public static final int TYPE_LINE=3;
 		public static final int TYPE_ARC=4;
 		
+		protected static final int SHAPE_ROUND=1;
+		protected static final int SHAPE_RECT=2;
+		protected static final int SHAPE_OCT=3;
+		
 		private int type;
 		
 		public abstract RectF calculateBoundRectangle();
 		public abstract void offset(float dx, float dy);
-
+		public abstract Path toPath(int layer);//TODO: add dpi as parameter
+		
 		public int getType() {
 			return type;
 		}
@@ -128,6 +134,7 @@ public class ICFootprint {
 		
 		protected float aX,aY,Thickness,Clearance,Mask,Drill;
 		protected String Name, Number;
+		protected int Flags;
 		
 		public Pin(){
 			
@@ -156,6 +163,53 @@ public class ICFootprint {
 		public void offset(float dx, float dy) {
 			aX+=dx;
 			aY+=dy;
+		}
+		
+		private int getShape(){
+			//TODO: check Flags, decide octal, round, square
+			return 0;
+		}
+		//TODO: continue
+		private Path generateBound(float width_in_cmil, Path.Direction dir, float dpi){
+			Path path = new Path();
+			float aXdpi,aYdpi,raddpi;
+			aXdpi=CentiMil.CentiMilToPixel(aX, dpi);
+			aYdpi=CentiMil.CentiMilToPixel(aY, dpi);
+			raddpi=CentiMil.CentiMilToPixel(width_in_cmil, dpi)/2;
+			
+			switch(getShape()){
+			case SHAPE_ROUND:
+				path.addCircle(aXdpi, aYdpi, raddpi, dir);
+				return path;
+			case SHAPE_RECT:
+				
+				break;
+			case SHAPE_OCT:
+				break;
+			default:
+				break;
+			}
+			return null;
+		}
+		
+		@Override
+		public Path toPath(int layer) {
+			switch(layer){
+			case ICFootprintRender.LAYER_DRAFT:
+				return null;
+			case ICFootprintRender.LAYER_MASK:
+				//decide shape
+				break;
+			case ICFootprintRender.LAYER_CLEARANCE:
+				break;
+			case ICFootprintRender.LAYER_DRILL:
+				break;
+			case ICFootprintRender.LAYER_COPPER:
+				break;
+			default:
+				return null;
+			}
+			return null;
 		}
 	}
 	
@@ -199,6 +253,25 @@ public class ICFootprint {
 			aX2+=dx;
 			aY2+=dy;
 		}
+
+		@Override
+		public Path toPath(int layer) {
+			switch(layer){
+			case ICFootprintRender.LAYER_DRAFT:
+				return null;
+			case ICFootprintRender.LAYER_MASK:
+				break;
+			case ICFootprintRender.LAYER_CLEARANCE:
+				break;
+			case ICFootprintRender.LAYER_DRILL:
+				return null;
+			case ICFootprintRender.LAYER_COPPER:
+				break;
+			default:
+				return null;
+			}
+			return null;
+		}
 	}
 	
 //	public abstract class DraftLine{
@@ -236,6 +309,24 @@ public class ICFootprint {
 			aY1+=dy;
 			aX2+=dx;
 			aY2+=dy;
+		}
+		@Override
+		public Path toPath(int layer) {
+			switch(layer){
+			case ICFootprintRender.LAYER_DRAFT:
+				break;
+			case ICFootprintRender.LAYER_MASK:
+				return null;
+			case ICFootprintRender.LAYER_CLEARANCE:
+				return null;
+			case ICFootprintRender.LAYER_DRILL:
+				return null;
+			case ICFootprintRender.LAYER_COPPER:
+				return null;
+			default:
+				return null;
+			}
+			return null;
 		}
 	}
 	
@@ -311,6 +402,24 @@ public class ICFootprint {
 		public void offset(float dx, float dy) {
 			aX+=dx;
 			aY+=dy;
+		}
+		@Override
+		public Path toPath(int layer) {
+			switch(layer){
+			case ICFootprintRender.LAYER_DRAFT:
+				break;
+			case ICFootprintRender.LAYER_MASK:
+				return null;
+			case ICFootprintRender.LAYER_CLEARANCE:
+				return null;
+			case ICFootprintRender.LAYER_DRILL:
+				return null;
+			case ICFootprintRender.LAYER_COPPER:
+				return null;
+			default:
+				return null;
+			}
+			return null;
 		}
 	}
 	
