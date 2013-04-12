@@ -6,6 +6,7 @@ options {
 
 @header {
 import java.util.HashMap;
+import cn.songshan99.realicfootprint;
 }
 
 @lexer::header {
@@ -70,110 +71,88 @@ definitions which use absolute coordinates.
 
 %end-doc */
 
-element
-    : element_oldformat
-    | element_1_3_4_format
-    | element_newformat
-    | element_1_7_format
-    | element_hi_format
+element returns [ICFootprint footprint]
+@init {
+	//$elementList = new ArrayList<PinOrPadOrDraftLine>();
+	$footprint = new ICFootprint;
+}
+    : element_oldformat[$footprint]
+    | element_1_3_4_format[$footprint]
+    | element_newformat[$footprint]
+    | element_1_7_format[$footprint]
+    | element_hi_format[$footprint]
     ;
 
-element_oldformat
+element_oldformat[ICFootprint footprint]
       /* element_flags, description, pcb-name,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     : T_ELEMENT '(' STRING STRING measure measure INTEGER ')' '('
       {
-        yyElement = CreateNewElement(yyData, yyElement, yyFont, NoFlags(),
-          $3, $4, NULL, OU ($5), OU ($6), $7, 100, NoFlags(), false);
-        free ($3);
-        free ($4);
-        pin_num = 1;
+        //set the element parameters
       }
-      elementdefinitions ')'
+      elementdefinitions[$footprint] ')'
       {
-        SetElementBoundingBox(yyData, yyElement, yyFont);
+        //do the element centering, recalculate the bounding box
       }
     ;
 
-element_1_3_4_format
+element_1_3_4_format[ICFootprint footprint]
       /* element_flags, description, pcb-name,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     : T_ELEMENT '(' INTEGER STRING STRING measure measure measure measure INTEGER ')' '('
       {
-        yyElement = CreateNewElement(yyData, yyElement, yyFont, OldFlags($3),
-          $4, $5, NULL, OU ($6), OU ($7), IV ($8), IV ($9), OldFlags($10), false);
-        free ($4);
-        free ($5);
-        pin_num = 1;
+        //set the element parameters
       }
-      elementdefinitions ')'
+      elementdefinitions[$footprint] ')'
       {
-        SetElementBoundingBox(yyData, yyElement, yyFont);
+        //do the element centering, recalculate the bounding box
       }
     ;
 
-element_newformat
+element_newformat[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, 
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     : T_ELEMENT '(' INTEGER STRING STRING STRING measure measure measure measure INTEGER ')' '('
       {
-        yyElement = CreateNewElement(yyData, yyElement, yyFont, OldFlags($3),
-          $4, $5, $6, OU ($7), OU ($8), IV ($9), IV ($10), OldFlags($11), false);
-        free ($4);
-        free ($5);
-        free ($6);
-        pin_num = 1;
+        //set the element parameters
       }
-      elementdefinitions ')'
+      elementdefinitions[$footprint] ')'
       {
-        SetElementBoundingBox(yyData, yyElement, yyFont);
+        //do the element centering, recalculate the bounding box
       }
     ;
 
-element_1_7_format
+element_1_7_format[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, mark_x, mark_y,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     : T_ELEMENT '(' INTEGER STRING STRING STRING measure measure
       measure measure number number INTEGER ')' '('
       {
-        yyElement = CreateNewElement(yyData, yyElement, yyFont, OldFlags($3),
-          $4, $5, $6, OU ($7) + OU ($9), OU ($8) + OU ($10),
-          $11, $12, OldFlags($13), false);
-        yyElement->MarkX = OU ($7);
-        yyElement->MarkY = OU ($8);
-        free ($4);
-        free ($5);
-        free ($6);
+        //set the element parameters
       }
-      relementdefs ')'
+      relementdefs[$footprint] ')'
       {
-        SetElementBoundingBox(yyData, yyElement, yyFont);
+        //do the element centering, recalculate the bounding box
       }
     ;
 
-element_hi_format
+element_hi_format[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, mark_x, mark_y,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     : T_ELEMENT '[' flags STRING STRING STRING measure measure
       measure measure number number flags ']' '('
       {
-        yyElement = CreateNewElement(yyData, yyElement, yyFont, $3,
-          $4, $5, $6, NU ($7) + NU ($9), NU ($8) + NU ($10),
-          $11, $12, $13, false);
-        yyElement->MarkX = NU ($7);
-        yyElement->MarkY = NU ($8);
-        free ($4);
-        free ($5);
-        free ($6);
+        //set the element parameters
       }
-      relementdefs ')'
+      relementdefs[$footprint] ')'
       {
-        SetElementBoundingBox(yyData, yyElement, yyFont);
+		//Add returnvalues (pins, pads, ) from elementdefs to the element
+        //do the element centering, recalculate the bounding box
       }
     ;
 
@@ -239,98 +218,118 @@ the mark as part of the Element line.
 
 %end-doc */
 
-elementdefinitions
-    : elementdefinition+
+elementdefinitions [ICFootprint footprint] returns [int totalPadPinNum, int totalDraftLineNum]
+@init {
+	//$elementList = new ArrayList<PinOrPadOrDraftLine>();
+	$totalPadPinNum = 0;
+	$totalDraftLineNum = 0;
+}
+    : (elementdefinition{/*TODO: check the type of element, and insert to elementList*/})+
     ;
 //    : elementdefinition
 //    | elementdefinitions elementdefinition
 //    ;
 
-elementdefinition
-    : pin_1_6_3_format
-    | pin_newformat
-    | pin_oldformat
-    | pad_newformat
-    | pad
+elementdefinition returns [PinOrPadOrDraftLine obj]
+    : pinpad=pin_1_6_3_format{$obj = $pinpad.newpin}
+    | pinpad=pin_newformat{$obj = $pinpad.newpin}
+    | pinpad=pin_oldformat{$obj = $pinpad.newpin}
+    | pinpad=pad_newformat{$obj = $pinpad.newpad}
+    | pinpad=pad{$obj = $pinpad.newpad}
       /* x1, y1, x2, y2, thickness */
-    | T_ELEMENTLINE '[' measure measure measure measure measure ']'
+    | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
       {
-        CreateNewLineInElement(yyElement, NU ($3), NU ($4), NU ($5), NU ($6), NU ($7));
+        //this is new unit, use directly
+		//create element line object
+		$obj = new ElementLine();
       }
       /* x1, y1, x2, y2, thickness */
-    | T_ELEMENTLINE '(' measure measure measure measure measure ')'
+    | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
       {
-        CreateNewLineInElement(yyElement, OU ($3), OU ($4), OU ($5), OU ($6), OU ($7));
+        //this is old unit, need to convert to CentiMil
+		//create element line object
+		$obj = new ElementLine();
       }
       /* x, y, width, height, startangle, anglediff, thickness */
-    | T_ELEMENTARC '[' measure measure measure measure number number measure ']'
+    | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
       {
-        CreateNewArcInElement(yyElement, NU ($3), NU ($4), NU ($5), NU ($6), $7, $8, NU ($9));
+        //this is new unit, use directly
+		//create element line object
+		$obj = new ElementArc();
       }
       /* x, y, width, height, startangle, anglediff, thickness */
-    | T_ELEMENTARC '(' measure measure measure measure number number measure ')'
+    | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
       {
-        CreateNewArcInElement(yyElement, OU ($3), OU ($4), OU ($5), OU ($6), $7, $8, OU ($9));
+        //this is old unit, need to convert to CentiMil
+		//create element line object
+		$obj = new ElementArc();
       }
       /* x, y position */
-    | T_MARK '[' measure measure ']'
+    | T_MARK '[' x=measure y=measure ']'
       {
-        yyElement->MarkX = NU ($3);
-        yyElement->MarkY = NU ($4);
+        //this is new unit, use directly
+		//create mark object
+		$obj = new Mark();
       }
-    | T_MARK '(' measure measure ')'
+    | T_MARK '(' x=measure y=measure ')'
       {
-        yyElement->MarkX = OU ($3);
-        yyElement->MarkY = OU ($4);
+        //this is old unit, need to convert to CentiMil
+		//create mark object
+		$obj = new Mark();
       }
-    | { attr_list = & yyElement->Attributes; } attribute
+    | { /*do the attibute related works, prefer to ignore*/ } attribute
     ;
 
 attribute
     : T_ATTRIBUTE '(' STRING STRING ')'
       {
-        CreateNewAttribute (attr_list, $3, $4 ? $4 : (char *)"");
-        free ($3);
-        free ($4);
+        //attribute will not be used by gEDA/PCB, let's ignore it. no action needed
       }
     ;
     
-relementdefs
-    : relementdef+
+relementdefs [ICFootprint footprint] returns [int totalPadPinNum, int totalDraftLineNum]
+@init {
+	//$elementList = new ArrayList<PinOrPadOrDraftLine>();
+	$totalPadPinNum = 0;
+	$totalDraftLineNum = 0;
+}
+    : (relementdef{/*TODO: check the type of element, and insert to elementList*/})+
     ;
 //    | relementdefs relementdef
 //    ;
 
-relementdef
-    : pin_1_7_format
-    | pin_hi_format
-    | pad_1_7_format
-    | pad_hi_format
+relementdef returns [PinOrPadOrDraftLine obj]
+    : pinpad=pin_1_7_format{$obj = $pinpad.newpin}
+    | pinpad=pin_hi_format{$obj = $pinpad.newpin}
+    | pinpad=pad_1_7_format{$obj = $pinpad.newpad}
+    | pinpad=pad_hi_format{$obj = $pinpad.newpad}
       /* x1, y1, x2, y2, thickness */
-    | T_ELEMENTLINE '[' measure measure measure measure measure ']'
+    | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
       {
-        CreateNewLineInElement(yyElement, NU ($3) + yyElement->MarkX,
-          NU ($4) + yyElement->MarkY, NU ($5) + yyElement->MarkX,
-          NU ($6) + yyElement->MarkY, NU ($7));
+        //this is new unit, use directly
+		//create element line object
+		$obj = new ElementLine();
       }
-    | T_ELEMENTLINE '(' measure measure measure measure measure ')'
+    | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
       {
-        CreateNewLineInElement(yyElement, OU ($3) + yyElement->MarkX,
-          OU ($4) + yyElement->MarkY, OU ($5) + yyElement->MarkX,
-          OU ($6) + yyElement->MarkY, OU ($7));
+		//this is old unit, need to convert to CentiMil
+        //create element line object
+		$obj = new ElementLine();
       }
       /* x, y, width, height, startangle, anglediff, thickness */
-    | T_ELEMENTARC '[' measure measure measure measure number number measure ']'
+    | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
       {
-        CreateNewArcInElement(yyElement, NU ($3) + yyElement->MarkX,
-          NU ($4) + yyElement->MarkY, NU ($5), NU ($6), $7, $8, NU ($9));
+        //this is new unit, use directly
+		//create element line object
+		$obj = new ElementArc();
       }
-    | T_ELEMENTARC '(' measure measure measure measure number number measure ')'
+    | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
       {
-        CreateNewArcInElement(yyElement, OU ($3) + yyElement->MarkX,
-          OU ($4) + yyElement->MarkY, OU ($5), OU ($6), $7, $8, OU ($9));
+		//this is old unit, need to convert to CentiMil
+        //create element line object
+		$obj = new ElementArc();
       }
-    | { attr_list = & yyElement->Attributes; } attribute
+    | { /*do the attibute related works, prefer to ignore*/ } attribute
     ;
 
 /* %start-doc pcbfile Pin
@@ -368,74 +367,57 @@ numerical flags only
 
 %end-doc */
 
-pin_hi_format
+pin_hi_format returns [Pin newpin]
       /* x, y, thickness, clearance, mask, drilling hole, name,
          number, flags */
-    : T_PIN '[' measure measure measure measure measure measure STRING STRING flags ']'
+    : T_PIN '[' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=flags ']'
       {
-        CreateNewPin(yyElement, NU ($3) + yyElement->MarkX,
-          NU ($4) + yyElement->MarkY, NU ($5), NU ($6), NU ($7), NU ($8), $9,
-          $10, $11);
-        free ($9);
-        free ($10);
+        //convert name and pin number string
+		//create a new pin
+		$newpin = new Pin();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
-pin_1_7_format
+pin_1_7_format returns [Pin newpin]
       /* x, y, thickness, clearance, mask, drilling hole, name,
          number, flags */
-    : T_PIN '(' measure measure measure measure measure measure STRING STRING INTEGER ')'
+    : T_PIN '(' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
-        CreateNewPin(yyElement, OU ($3) + yyElement->MarkX,
-          OU ($4) + yyElement->MarkY, OU ($5), OU ($6), OU ($7), OU ($8), $9,
-          $10, OldFlags($11));
-        free ($9);
-        free ($10);
+        //create a new pin
+		$newpin = new Pin();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pin_1_6_3_format
+pin_1_6_3_format returns [Pin newpin]
       /* x, y, thickness, drilling hole, name, number, flags */
-    : T_PIN '(' measure measure measure measure STRING STRING INTEGER ')'
+    : T_PIN '(' x=measure y=measure th=measure dr=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
-        CreateNewPin(yyElement, OU ($3), OU ($4), OU ($5), 2*GROUNDPLANEFRAME,
-          OU ($5) + 2*MASKFRAME, OU ($6), $7, $8, OldFlags($9));
-        free ($7);
-        free ($8);
+        //create a new pin
+		$newpin = new Pin();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pin_newformat
+pin_newformat returns [Pin newpin]
       /* x, y, thickness, drilling hole, name, flags */
-    : T_PIN '(' measure measure measure measure STRING INTEGER ')'
+    : T_PIN '(' x=measure y=measure th=measure dr=measure nm=STRING fl=INTEGER ')'
       {
-        char  p_number[8];
-
-        sprintf(p_number, "%d", pin_num++);
-        CreateNewPin(yyElement, OU ($3), OU ($4), OU ($5), 2*GROUNDPLANEFRAME,
-          OU ($5) + 2*MASKFRAME, OU ($6), $7, p_number, OldFlags($8));
-
-        free ($7);
+        //create a new pin
+		$newpin = new Pin();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pin_oldformat
+pin_oldformat returns [Pin newpin]
       /* old format: x, y, thickness, name, flags
        * drilling hole is 40% of the diameter
        */
-    : T_PIN '(' measure measure measure STRING INTEGER ')'
+    : T_PIN '(' x=measure y=measure th=measure nm=STRING fl=INTEGER ')'
       {
-        Coord hole = OU ($5) * DEFAULT_DRILLINGHOLE;
-        char  p_number[8];
-
-          /* make sure that there's enough copper left */
-        if (OU ($5) - hole < MIN_PINORVIACOPPER && 
-          OU ($5) > MIN_PINORVIACOPPER)
-          hole = OU ($5) - MIN_PINORVIACOPPER;
-
-        sprintf(p_number, "%d", pin_num++);
-        CreateNewPin(yyElement, OU ($3), OU ($4), OU ($5), 2*GROUNDPLANEFRAME,
-          OU ($5) + 2*MASKFRAME, hole, $6, p_number, OldFlags($7));
-        free ($6);
+        //create a new pin
+		$newpin = new Pin();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
@@ -474,59 +456,49 @@ numerical flags only
 
 %end-doc */
 
-pad_hi_format
+pad_hi_format returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
-    : T_PAD '[' measure measure measure measure measure measure measure STRING STRING flags ']'
+    : T_PAD '[' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=flags ']'
       {
-        CreateNewPad(yyElement, NU ($3) + yyElement->MarkX,
-          NU ($4) + yyElement->MarkY,
-          NU ($5) + yyElement->MarkX,
-          NU ($6) + yyElement->MarkY, NU ($7), NU ($8), NU ($9),
-          $10, $11, $12);
-        free ($10);
-        free ($11);
+        //create a new pad
+		$newpad = new Pad();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pad_1_7_format
+pad_1_7_format returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
-    : T_PAD '(' measure measure measure measure measure measure measure STRING STRING INTEGER ')'
+    : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
-        CreateNewPad(yyElement,OU ($3) + yyElement->MarkX,
-          OU ($4) + yyElement->MarkY, OU ($5) + yyElement->MarkX,
-          OU ($6) + yyElement->MarkY, OU ($7), OU ($8), OU ($9),
-          $10, $11, OldFlags($12));
-        free ($10);
-        free ($11);
+        //create a new pad
+		$newpad = new Pad();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pad_newformat
+pad_newformat returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name , pad number, flags */
-    : T_PAD '(' measure measure measure measure measure STRING STRING INTEGER ')'
+    : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
-        CreateNewPad(yyElement,OU ($3),OU ($4),OU ($5),OU ($6),OU ($7), 2*GROUNDPLANEFRAME,
-          OU ($7) + 2*MASKFRAME, $8, $9, OldFlags($10));
-        free ($8);
-        free ($9);
+        //create a new pad
+		$newpad = new Pad();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-pad
+pad returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name and flags */
-    : T_PAD '(' measure measure measure measure measure STRING INTEGER ')'
+    : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING fl=INTEGER ')'
       {
-        char    p_number[8];
-
-        sprintf(p_number, "%d", pin_num++);
-        CreateNewPad(yyElement,OU ($3),OU ($4),OU ($5),OU ($6),OU ($7), 2*GROUNDPLANEFRAME,
-          OU ($7) + 2*MASKFRAME, $8,p_number, OldFlags($9));
-        free ($8);
+        //create a new pad
+		$newpad = new Pad();
+		//return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       }
     ;
 
-flags   : INTEGER { $$ = OldFlags($1); }
-    | STRING  { $$ = string_to_flags ($1, yyerror); }
+flags returns [int value]  
+	: INTEGER { $value = Integer.valueof($INTEGER.text);/*converter to integer as return value*/ }
+    | STRING  { /*converter to integer as return value, depends on the function in ICFootprint*/ }
     ;
 
 //symbols
@@ -534,26 +506,47 @@ flags   : INTEGER { $$ = OldFlags($1); }
 //    | symbols symbol
 //    ;
     
-number
-    : FLOATING  { $$ = $1; }
-    | INTEGER { $$ = $1; }
+number returns [float value]
+    : FLOATING  { $value = Float.valueof($FLOATING.text);/*convert to float and return the value*/ }
+    | INTEGER { $value = Float.valueof($INTEGER.text);/*convert to float and return the value*/ }
     ;
 
-measure
+measure returns [float value]
     /* Default unit (no suffix) is cmil */
-    : number  { do_measure(&$$, $1, MIL_TO_COORD ($1) / 100.0, 0); }
-    | number T_UMIL { M ($$, $1, MIL_TO_COORD ($1) / 100000.0); }
-    | number T_CMIL { M ($$, $1, MIL_TO_COORD ($1) / 100.0); }
-    | number T_MIL  { M ($$, $1, MIL_TO_COORD ($1)); }
-    | number T_IN { M ($$, $1, INCH_TO_COORD ($1)); }
-    | number T_NM { M ($$, $1, MM_TO_COORD ($1) / 1000000.0); }
-    | number T_UM { M ($$, $1, MM_TO_COORD ($1) / 1000.0); }
-    | number T_MM { M ($$, $1, MM_TO_COORD ($1)); }
-    | number T_M  { M ($$, $1, MM_TO_COORD ($1) * 1000.0); }
-    | number T_KM { M ($$, $1, MM_TO_COORD ($1) * 1000000.0); }
+    : r=number  { $value = $r.value;/*default unit is CentiMil*/ }
+    | r=number T_UMIL { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_UMIL);/*umil*/ }
+    | r=number T_CMIL { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_CMIL);/*centimil*/ }
+    | r=number T_MIL  { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_MIL);/*mil*/ }
+    | r=number T_IN { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_INCH);/*inch*/ }
+    | r=number T_NM { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_NM);/*nm*/ }
+    | r=number T_UM { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_UM);/*um*/ }
+    | r=number T_MM { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_MM);/*mm*/ }
+    | r=number T_M  { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_M);/*m*/ }
+    | r=number T_KM { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.toCentiMil.UNIT_KM);/*km*/ }
     ;
     
-HEX :         '0''x'('0'..'9'|'a'..'f'|'A'..'F');//[0-9a-fA-F]+;
-INTEGER :       ('+'|'-')?('1'..'9')('0'..'9')*|'0'; //[+-]?([1-9][0-9]*|0);
-FLOATING :     {INTEGER}'.'('0'..'9')*;
-STRINGCHAR :   ( ~('"'|'\\'|'\n'|'\r')|'\\'.) ;//([^"\n\r\\]|\\.);转义字符
+HEX :         '0''x'('0'..'9'|'a'..'f'|'A'..'F')+;//[0-9a-fA-F]+;
+INTEGER :       ('+'|'-')?(('1'..'9')('0'..'9')*)|'0'; //[+-]?([1-9][0-9]*|0);
+FLOATING :     (INTEGER)'.'('0'..'9')*;
+STRINGCHAR :   ( ~('"'|'\\'|'\n'|'\r')|('\\'.)) ;//([^"\n\r\\]|\\.);转义字符?
+STRING:		'"'(STRINGCHAR)*'"';
+
+//basic token definitions
+T_PIN:	"Pin";
+T_PAD:	"Pad";
+T_ELEMENTLINE: "ElementLine";
+T_ELEMENTARC:	"ElementArc";
+T_ELEMENT:		"Element";
+T_MARK:			"Mark";
+T_ATTRIBUTE		"Attribute";
+
+//unit token definitions. Not very useful though...
+T_NM:	"nm";
+T_UM:	"um";
+T_MM	"mm";
+T_M		"m";
+T_KM	"km";
+T_UMIL	"umil";
+T_CMIL	"cmil";
+T_MIL	"mil";
+T_IN	"in";
