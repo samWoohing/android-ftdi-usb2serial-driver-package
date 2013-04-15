@@ -165,7 +165,7 @@ public class ICFootprint {
 			aY+=dy;
 		}
 		
-		private int getShape(){
+		public int getShape(){
 			//TODO: check Flags, decide octal, round, square
 			return 0;
 		}
@@ -253,7 +253,12 @@ public class ICFootprint {
 			aX2+=dx;
 			aY2+=dy;
 		}
-
+		
+		public int getShape(){
+			//check if this is round or square
+			//TODO
+			return 0;
+		}
 //		@Override
 //		public Path toPath(int layer) {
 //			switch(layer){
