@@ -119,7 +119,7 @@ public class ICFootprint {
 		
 		public abstract RectF calculateBoundRectangle();
 		public abstract void offset(float dx, float dy);
-		public abstract Path toPath(int layer);//TODO: add dpi as parameter
+		//public abstract Path toPath(int layer);//TODO: add dpi as parameter
 		
 		public int getType() {
 			return type;
@@ -192,25 +192,25 @@ public class ICFootprint {
 			return null;
 		}
 		
-		@Override
-		public Path toPath(int layer) {
-			switch(layer){
-			case ICFootprintRender.LAYER_DRAFT:
-				return null;
-			case ICFootprintRender.LAYER_MASK:
-				//decide shape
-				break;
-			case ICFootprintRender.LAYER_CLEARANCE:
-				break;
-			case ICFootprintRender.LAYER_DRILL:
-				break;
-			case ICFootprintRender.LAYER_COPPER:
-				break;
-			default:
-				return null;
-			}
-			return null;
-		}
+//		@Override
+//		public Path toPath(int layer) {
+//			switch(layer){
+//			case ICFootprintRender.LAYER_DRAFT:
+//				return null;
+//			case ICFootprintRender.LAYER_MASK:
+//				//decide shape
+//				break;
+//			case ICFootprintRender.LAYER_CLEARANCE:
+//				break;
+//			case ICFootprintRender.LAYER_DRILL:
+//				break;
+//			case ICFootprintRender.LAYER_COPPER:
+//				break;
+//			default:
+//				return null;
+//			}
+//			return null;
+//		}
 	}
 	
 	public class Pad extends PinOrPadOrDraftLine{
@@ -254,24 +254,24 @@ public class ICFootprint {
 			aY2+=dy;
 		}
 
-		@Override
-		public Path toPath(int layer) {
-			switch(layer){
-			case ICFootprintRender.LAYER_DRAFT:
-				return null;
-			case ICFootprintRender.LAYER_MASK:
-				break;
-			case ICFootprintRender.LAYER_CLEARANCE:
-				break;
-			case ICFootprintRender.LAYER_DRILL:
-				return null;
-			case ICFootprintRender.LAYER_COPPER:
-				break;
-			default:
-				return null;
-			}
-			return null;
-		}
+//		@Override
+//		public Path toPath(int layer) {
+//			switch(layer){
+//			case ICFootprintRender.LAYER_DRAFT:
+//				return null;
+//			case ICFootprintRender.LAYER_MASK:
+//				break;
+//			case ICFootprintRender.LAYER_CLEARANCE:
+//				break;
+//			case ICFootprintRender.LAYER_DRILL:
+//				return null;
+//			case ICFootprintRender.LAYER_COPPER:
+//				break;
+//			default:
+//				return null;
+//			}
+//			return null;
+//		}
 	}
 	
 //	public abstract class DraftLine{
@@ -310,24 +310,24 @@ public class ICFootprint {
 			aX2+=dx;
 			aY2+=dy;
 		}
-		@Override
-		public Path toPath(int layer) {
-			switch(layer){
-			case ICFootprintRender.LAYER_DRAFT:
-				break;
-			case ICFootprintRender.LAYER_MASK:
-				return null;
-			case ICFootprintRender.LAYER_CLEARANCE:
-				return null;
-			case ICFootprintRender.LAYER_DRILL:
-				return null;
-			case ICFootprintRender.LAYER_COPPER:
-				return null;
-			default:
-				return null;
-			}
-			return null;
-		}
+//		@Override
+//		public Path toPath(int layer) {
+//			switch(layer){
+//			case ICFootprintRender.LAYER_DRAFT:
+//				break;
+//			case ICFootprintRender.LAYER_MASK:
+//				return null;
+//			case ICFootprintRender.LAYER_CLEARANCE:
+//				return null;
+//			case ICFootprintRender.LAYER_DRILL:
+//				return null;
+//			case ICFootprintRender.LAYER_COPPER:
+//				return null;
+//			default:
+//				return null;
+//			}
+//			return null;
+//		}
 	}
 	
 	public class ElementArc extends PinOrPadOrDraftLine{
@@ -403,24 +403,24 @@ public class ICFootprint {
 			aX+=dx;
 			aY+=dy;
 		}
-		@Override
-		public Path toPath(int layer) {
-			switch(layer){
-			case ICFootprintRender.LAYER_DRAFT:
-				break;
-			case ICFootprintRender.LAYER_MASK:
-				return null;
-			case ICFootprintRender.LAYER_CLEARANCE:
-				return null;
-			case ICFootprintRender.LAYER_DRILL:
-				return null;
-			case ICFootprintRender.LAYER_COPPER:
-				return null;
-			default:
-				return null;
-			}
-			return null;
-		}
+//		@Override
+//		public Path toPath(int layer) {
+//			switch(layer){
+//			case ICFootprintRender.LAYER_DRAFT:
+//				break;
+//			case ICFootprintRender.LAYER_MASK:
+//				return null;
+//			case ICFootprintRender.LAYER_CLEARANCE:
+//				return null;
+//			case ICFootprintRender.LAYER_DRILL:
+//				return null;
+//			case ICFootprintRender.LAYER_COPPER:
+//				return null;
+//			default:
+//				return null;
+//			}
+//			return null;
+//		}
 	}
 	
 	public class Mark{
