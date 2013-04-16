@@ -8,6 +8,7 @@ import cn.songshan99.realicfootprint.ICFootprint.ElementLine;
 import cn.songshan99.realicfootprint.ICFootprint.Pad;
 import cn.songshan99.realicfootprint.ICFootprint.Pin;
 import cn.songshan99.realicfootprint.ICFootprint.PinOrPadOrDraftLine;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -25,16 +26,16 @@ public class ICFootprintRender {
 	public static final int LAYER_DRILL=2;
 	public static final int LAYER_COPPER=1;
 	
-	private PathPaint mCopper,mDrill, mClearance, mDraftLine;
-	
-	private Color mCopperColor,mDrillColor,mClearanceColor,mDraftLineColor;
+	private ICDisplayLayer mLayerDraft, mLayerMask, mLayerDrill, mLayerCopper;
+	//private PathPaint mCopper,mDrill, mClearance, mDraftLine;
+	//private Color mCopperColor,mDrillColor,mClearanceColor,mDraftLineColor;
 	
 	public void rendorFootprint(ICFootprint footprint){
 		//first, center the footprint
 		//then, navigate through pins and draft lines to  
 	}
 	
-	public class PathPaint{
+	public static class PathPaint{
 		
 		public Path mPath;
 		public Paint mPaint;
@@ -43,9 +44,12 @@ public class ICFootprintRender {
 		}
 	}
 	
-	public class ICDisplayLayer{
+	public static class ICDisplayLayer{
 		
 		public int mType;
+		private int mColor;
+		private boolean mVisible;
+		
 		ArrayList<PathPaint> mListPathPaint;
 		
 		public ICDisplayLayer(){
@@ -54,12 +58,34 @@ public class ICFootprintRender {
 		
 		public void AddPathPaint(PathPaint pp){
 			if(pp!=null && mListPathPaint!=null){
+				pp.mPaint.setColor(mColor);//overwrite whatever color setting
 				mListPathPaint.add(pp);
 			}
 		}
+		
+		public void setColor(int color){
+			mColor=color;
+			if(mListPathPaint!=null){
+				for(PathPaint pp: mListPathPaint){
+					pp.mPaint.setColor(color);
+				}
+			}
+		}
+		
+		public int getColor(){
+			return mColor;
+		}
+
+		public boolean isVisible() {
+			return mVisible;
+		}
+
+		public void setVisible(boolean Visible) {
+			this.mVisible = Visible;
+		}
 	}
 	
-	private void drawOctal(float dpiX, float dpiY, float dpiR, Path.Direction dir, Path path){
+	private static void drawOctal(float dpiX, float dpiY, float dpiR, Path.Direction dir, Path path){
 		float delta=(45f/180f*(float)java.lang.Math.PI);
 		if(dir == Path.Direction.CW) delta *=-1;
 		float x=0.0f,y=0.0f,theta=0.0f;
@@ -82,7 +108,7 @@ public class ICFootprintRender {
 	 * @param dpi: pixel per inch for the current display
 	 * @param path: the path into which the lines are added to
 	 */
-	private void PinToPath(Pin pin, int layer, float dpi, Path path){
+	private static void PinToPath(Pin pin, int layer, float dpi, Path path){
 		//directly add the drawing into path
 		float dpiX,dpiY,dpiR_outer,dpiR_inner;
 		dpiX=ICFootprint.CentiMil.CentiMilToPixel(pin.aX, dpi);
@@ -151,7 +177,7 @@ public class ICFootprintRender {
 	 * @param dpi: pixel per inch for the current display
 	 * @param path: the path into which the lines are added to
 	 */
-	private void PadToPath(Pad pad, int layer, float dpi, Path path){
+	private static void PadToPath(Pad pad, int layer, float dpi, Path path){
 		float leftX,rightX,topY,bottomY,dpiR_outer,dpiR_inner;
 		leftX	=min(pad.aX1,pad.aX2);
 		rightX	=max(pad.aX1,pad.aX2);
@@ -203,15 +229,23 @@ public class ICFootprintRender {
 		}
 	}
 	
-	private void lineToPath(ElementLine line, float dpi, Path path){
+	private static void lineToPath(ElementLine line, float dpi, Path path){
 		
 	}
 	
-	private void arcToPath(ElementArc arc, float dpi, Path path){
+	private static void arcToPath(ElementArc arc, float dpi, Path path){
 		
 	}
 
-	public ICDisplayLayer calculateLayer(ICFootprint footprint, int layer, float dpi){
+	/**
+	 * Calculate a given layer from a given footprint, according to given dpi.
+	 *
+	 * @param footprint: the ICFootprint recognized from the footprint file.
+	 * @param layer: the layer, copper, drill, mask, draft..etc
+	 * @param dpi: the dpi of current display
+	 * @return the ICDisplayLayer instance for the given layer
+	 */
+	public static ICDisplayLayer calculateLayer(ICFootprint footprint, int layer, float dpi){
 		ArrayList<PinOrPadOrDraftLine> pinorpadlist = footprint.getmListPinOrPad();
 		ArrayList<PinOrPadOrDraftLine> draftlinelist = footprint.getmListDraftLine();
 		
@@ -224,7 +258,7 @@ public class ICFootprintRender {
 		case LAYER_DRILL:
 		case LAYER_MASK:
 		case LAYER_CLEARANCE:
-			Path pinpath,icpath;
+			Path icpath;
 			if(pinorpadlist == null)return null;
 			icpath = new Path();
 			for(PinOrPadOrDraftLine pinpad:pinorpadlist){
@@ -235,7 +269,7 @@ public class ICFootprintRender {
 				else return null;
 			}
 			//add the new pathpaint to displayLayer, note that unlike draftline, we can only get one pathpaint...
-			displayLayer.mListPathPaint.add(new PathPaint(icpath,null));//TODO: add the proper paint here...
+			displayLayer.mListPathPaint.add(new PathPaint(icpath,createFilledPaint()));
 			return displayLayer;
 			
 		case LAYER_DRAFT:
@@ -260,12 +294,10 @@ public class ICFootprintRender {
 						pp=onepp;
 				}
 				
-				if(pp==null){
+				if(pp==null)
 					//of no create new PathPaint and begin to add line
-					pp = new PathPaint(new Path(), new Paint());//TODO: correct the paint
-					displayLayer.mListPathPaint.add(pp);
-				}
-				
+					pp = new PathPaint(new Path(), createPaintFromThickness(thickness));		
+
 				//if yes,(found existing width) continue adding lines to path
 				//pp is the PathPaint object for the given draftline.
 				//convert the line, arc to dpi based paths
@@ -274,12 +306,150 @@ public class ICFootprintRender {
 				else if(draftline.getType()==PinOrPadOrDraftLine.TYPE_LINE)
 					lineToPath((ElementLine)draftline,dpi,pp.mPath);
 				else
-					return null;	
+					return null;
+				
+				displayLayer.mListPathPaint.add(pp);
 			}
 			return displayLayer;
 			
 		default:
 			return null;
 		}
+	}
+	
+	/**
+	 * Calculate all layers from a given footprint and dpi.
+	 *
+	 * @param footprint the footprint
+	 * @param dpi the dpi
+	 */
+	public void calculateAllLayers(ICFootprint footprint, float dpi){
+		mLayerCopper = calculateLayer(footprint, LAYER_COPPER,dpi);
+		mLayerDrill = calculateLayer(footprint, LAYER_DRILL,dpi);
+		mLayerMask = calculateLayer(footprint, LAYER_MASK,dpi);
+		mLayerDraft = calculateLayer(footprint, LAYER_DRAFT,dpi);
+	}
+	
+	private static Paint createPaintFromThickness(float thickness){
+		Paint pt = new Paint();
+		pt.setStyle(Paint.Style.STROKE);
+		pt.setStrokeWidth(thickness);
+		return pt;
+	}
+	
+	private static Paint createFilledPaint(){
+		Paint pt = new Paint();
+		pt.setStyle(Paint.Style.FILL);
+		return pt;
+	}
+	
+	/**
+	 * Gets the color of a specified layer.
+	 *
+	 * @param layer the layer
+	 * @return the layer color
+	 */
+	public int getLayerColor(int layer){
+		switch(layer){
+		case LAYER_DRAFT:
+			if(mLayerDraft!=null)
+				return mLayerDraft.getColor();
+			else
+				return 0;
+
+		case LAYER_MASK:
+			if(mLayerMask!=null)
+				return mLayerMask.getColor();
+			else
+				return 0;
+			
+		case LAYER_CLEARANCE:
+			return 0;
+			
+		case LAYER_DRILL:
+			if(mLayerDrill!=null)
+				return mLayerDrill.getColor();
+			else
+				return 0;
+			
+		case LAYER_COPPER:
+			if(mLayerCopper!=null)
+				return mLayerCopper.getColor();
+			else
+				return 0;
+			
+		default:
+			return 0;
+		}
+	}
+	
+	/**
+	 * Sets the color of a specified layer.
+	 *
+	 * @param layer the layer
+	 * @param color the color
+	 */
+	public void setLayerColor(int layer, int color){
+		switch(layer){
+		case LAYER_DRAFT:
+			if(mLayerDraft!=null)
+				mLayerDraft.setColor(color);
+			else
+				return;
+			
+		case LAYER_MASK:
+			if(mLayerMask!=null)
+				mLayerMask.setColor(color);
+			else
+				return;
+			
+		case LAYER_CLEARANCE:
+				return;
+			
+		case LAYER_DRILL:
+			if(mLayerDrill!=null)
+				mLayerDrill.setColor(color);
+			else
+				return;
+			
+		case LAYER_COPPER:
+			if(mLayerCopper!=null)
+				mLayerCopper.setColor(color);
+			else
+				return;
+			
+		default:
+			break;
+		}
+	}
+	
+	private static void offsetOneLayer(ICDisplayLayer layer, float dx, float dy){
+		if(layer==null)return;
+		if(layer.mListPathPaint== null)return;
+		for(PathPaint pp: layer.mListPathPaint){
+			pp.mPath.offset(dx, dy);
+		}
+	}
+	
+	public static void offsetFootprintRender(ICFootprintRender icfprd, float dx, float dy){
+		offsetOneLayer(icfprd.mLayerCopper,dx,dy);
+		offsetOneLayer(icfprd.mLayerDrill,dx,dy);
+		offsetOneLayer(icfprd.mLayerMask,dx,dy);
+		offsetOneLayer(icfprd.mLayerDraft,dx,dy);
+	}
+	
+	private static void drawOneLayer(ICDisplayLayer layer, Canvas canvas){
+		if(layer==null)return;
+		if(!layer.isVisible())return;
+		for(PathPaint pp:layer.mListPathPaint)
+			canvas.drawPath(pp.mPath, pp.mPaint);
+	}
+	
+	public static final void drawFootprintRender(ICFootprintRender icfprd, Canvas canvas){
+		//draw the given icfprd on the given canvas
+		drawOneLayer(icfprd.mLayerCopper,canvas);
+		drawOneLayer(icfprd.mLayerDrill,canvas);
+		drawOneLayer(icfprd.mLayerMask,canvas);
+		drawOneLayer(icfprd.mLayerDraft,canvas);
 	}
 }
