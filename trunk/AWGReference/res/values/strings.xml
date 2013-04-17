@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, AWGReferenceActivity!</string>
-    <string name="app_name">AWG Reference</string>
+    <string name="app_name">Real AWG Wire</string>
     
     <string name="diameter_inch">Diameter (in):</string>
     <string name="diameter_mm">Diameter (mm):</string>

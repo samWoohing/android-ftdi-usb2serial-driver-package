@@ -30,7 +30,7 @@ public class AWGWire {
 	private float fusingCurrentOnderdonk1s;
 	private float fusingCurrentOnderdonk30ms;
 	
-	private static String DBPATH = "/data/data/cn.songshan99.AWGReference/databases/";
+	private String DBPATHNAME ;//= "/data/data/cn.songshan99.AWGReference/databases/";
 	private static String DBNAME = "AWGDB.db3";
 	private static String TABLENAME = "AWGDATA";
 	
@@ -54,11 +54,13 @@ public class AWGWire {
 	private AWGDBOpenHelper mAWGDBOpenHelper;
 	
 	public AWGWire(Context context) throws SQLException, IOException {
+		DBPATHNAME=context.getDatabasePath(DBNAME).getPath();
 		//AWGSize = aWGSize;
 		//Initialize and open database.
 		mAWGDBOpenHelper = new AWGDBOpenHelper(context);
 		mAWGDBOpenHelper.createDataBase();
 		mAWGDBOpenHelper.openDataBase();
+		//DBPATH="/data/data/"+context.getPackageName()+"/databases/";
 	}
 	
 	
@@ -139,7 +141,7 @@ public class AWGWire {
 		
 		public void openDataBase() throws SQLException{
 	    	//Open the database
-			mDatabase = SQLiteDatabase.openDatabase(DBPATH + DBNAME, null, SQLiteDatabase.OPEN_READONLY);
+			mDatabase = SQLiteDatabase.openDatabase(DBPATHNAME, null, SQLiteDatabase.OPEN_READONLY);
 	    }
 
 		@Override
@@ -261,8 +263,8 @@ public class AWGWire {
 	    private boolean checkDataBaseNeedsUpdate(){
 	    	SQLiteDatabase checkDB = null;
 	    	try{
-	    		String myPath = DBPATH + DBNAME;
-	    		checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+	    		//String myPath = DBPATHNAME;
+	    		checkDB = SQLiteDatabase.openDatabase(DBPATHNAME, null, SQLiteDatabase.OPEN_READONLY);
 	 
 	    	}catch(SQLiteException e){
 	    		checkDB.close();
@@ -295,8 +297,8 @@ public class AWGWire {
 	    	SQLiteDatabase checkDB = null;
 	 
 	    	try{
-	    		String myPath = DBPATH + DBNAME;
-	    		checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+	    		//String myPath = DBPATHNAME;
+	    		checkDB = SQLiteDatabase.openDatabase(DBPATHNAME, null, SQLiteDatabase.OPEN_READONLY);
 	 
 	    	}catch(SQLiteException e){
 	 
@@ -324,10 +326,10 @@ public class AWGWire {
 	    	InputStream myInput = mContext.getAssets().open(DBNAME);
 	 
 	    	// Path to the just created empty db
-	    	String outFileName = DBPATH + DBNAME;
+	    	//String outFileName = DBPATHNAME;
 	 
 	    	//Open the empty db as the output stream
-	    	OutputStream myOutput = new FileOutputStream(outFileName);
+	    	OutputStream myOutput = new FileOutputStream(DBPATHNAME);
 	 
 	    	//transfer bytes from the inputfile to the outputfile
 	    	byte[] buffer = new byte[1024];
