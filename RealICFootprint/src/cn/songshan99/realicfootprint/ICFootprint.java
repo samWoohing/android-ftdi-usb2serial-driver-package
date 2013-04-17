@@ -13,6 +13,9 @@ public class ICFootprint {
 	private Mark mMark,mTextLoc;
 	private String mDesc, mName, mValue;
 	
+	private int flags;
+	private ICText mICText;
+	
 	public ArrayList<PinOrPadOrDraftLine> getmListPinOrPad() {
 		return mListPinOrPad;
 	}
@@ -24,6 +27,13 @@ public class ICFootprint {
 	}
 	
 	public ICFootprint() {
+		mListPinOrPad = new ArrayList<PinOrPadOrDraftLine>();
+		mListDraftLine = new ArrayList<PinOrPadOrDraftLine>();
+	}
+	
+	public ICFootprint(int icflags, ICText ictext) {
+		flags = icflags;
+		mICText = ictext;
 		mListPinOrPad = new ArrayList<PinOrPadOrDraftLine>();
 		mListDraftLine = new ArrayList<PinOrPadOrDraftLine>();
 	}
@@ -513,5 +523,16 @@ public class ICFootprint {
 //		}
 		
 		
+	}
+	
+	public static final class ICText{
+		public float aX;
+		public float aY;
+		public float dir;
+		public float scale;
+		public int flags;
+		public String description;
+		public String name;
+		public String value;
 	}
 }

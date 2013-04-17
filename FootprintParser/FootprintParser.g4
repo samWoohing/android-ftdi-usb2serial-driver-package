@@ -7,8 +7,14 @@ options {
 
 
 @header {
+package cn.songshan99.realicfootprint;
+
 import java.util.HashMap;
-import cn.songshan99.realicfootprint;
+import cn.songshan99.realicfootprint.ICFootprint.ElementArc;
+import cn.songshan99.realicfootprint.ICFootprint.ElementLine;
+import cn.songshan99.realicfootprint.ICFootprint.Pad;
+import cn.songshan99.realicfootprint.ICFootprint.Pin;
+import cn.songshan99.realicfootprint.ICFootprint.ICText;
 }
 
 @members {
@@ -85,13 +91,19 @@ element_oldformat[ICFootprint footprint]
       /* element_flags, description, pcb-name,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
-    : T_ELEMENT '(' STRING STRING measure measure INTEGER ')' '('//set the element parameters
+    : T_ELEMENT '(' x=STRING y=STRING dir=measure scale=measure flags=INTEGER ')' '('//set the element parameters
       {
-        
+		ICText ictext = new ICText();
+		ictext.aX=Float.valueof($x.text);//TODO: should fetch the substring?
+		ictext.aY=Float.valueof($y.text);
+		ictext.dir = $dir.value;
+		ictext.scale = $scale.value;
+		ictext.flags = $flags.value;
+		$footprint.mICText = ictext;
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
-        
+        $footprint.centerTheFootprint();
       }
     ;
 
@@ -105,7 +117,7 @@ element_1_3_4_format[ICFootprint footprint]
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
-        
+        $footprint.centerTheFootprint();
       }
     ;
 
@@ -119,7 +131,7 @@ element_newformat[ICFootprint footprint]
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
-        
+        $footprint.centerTheFootprint();
       }
     ;
 
@@ -134,7 +146,7 @@ element_1_7_format[ICFootprint footprint]
       }
       relementdefs[$footprint] ')'//do the element centering, recalculate the bounding box
       {
-        
+        $footprint.centerTheFootprint();
       }
     ;
 
@@ -150,7 +162,7 @@ element_hi_format[ICFootprint footprint]
       relementdefs[$footprint] ')'//Add returnvalues (pins, pads, ) from elementdefs to the element
         //do the element centering, recalculate the bounding box
       {
-		
+		$footprint.centerTheFootprint();
       }
     ;
 
@@ -221,18 +233,18 @@ elementdefinitions [ICFootprint footprint] returns [int totalPadPinNum, int tota
 	$totalPadPinNum = 0;
 	$totalDraftLineNum = 0;
 }
-    : (elementdefinition{})+/*TODO: check the type of element, and insert to elementList*/
+    : (elementdefinition[$footprint]{})+/*TODO: check the type of element, and insert to elementList*/
     ;
 //    : elementdefinition
 //    | elementdefinitions elementdefinition
 //    ;
 
-elementdefinition returns [PinOrPadOrDraftLine obj]
-    : npin=pin_1_6_3_format{$obj = $npin.newpin}
-    | npin=pin_newformat{$obj = $npin.newpin}
-    | npin=pin_oldformat{$obj = $npin.newpin}
-    | npad=pad_newformat{$obj = $npad.newpad}
-    | npad=pad{$obj = $npad.newpad}
+elementdefinition [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
+    : npin=pin_1_6_3_format[$footprint]{$obj = $npin.newpin}
+    | npin=pin_newformat[$footprint]{$obj = $npin.newpin}
+    | npin=pin_oldformat[$footprint]{$obj = $npin.newpin}
+    | npad=pad_newformat[$footprint]{$obj = $npad.newpad}
+    | npad=pad[$footprint]{$obj = $npad.newpad}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
       {
@@ -282,16 +294,16 @@ relementdefs [ICFootprint footprint] returns [int totalPadPinNum, int totalDraft
 	$totalPadPinNum = 0;
 	$totalDraftLineNum = 0;
 }
-    : (relementdef{})+/*TODO: check the type of element, and insert to elementList*/
+    : (relementdef[$footprint]{})+/*TODO: check the type of element, and insert to elementList*/
     ;
 //    | relementdefs relementdef
 //    ;
 
-relementdef returns [PinOrPadOrDraftLine obj]
-    : npin=pin_1_7_format{$obj = $npin.newpin}
-    | npin=pin_hi_format{$obj = $npin.newpin}
-    | npad=pad_1_7_format{$obj = $npad.newpad}
-    | npad=pad_hi_format{$obj = $npad.newpad}
+relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
+    : npin=pin_1_7_format[$footprint]{$obj = $npin.newpin}
+    | npin=pin_hi_format[$footprint]{$obj = $npin.newpin}
+    | npad=pad_1_7_format[$footprint]{$obj = $npad.newpad}
+    | npad=pad_hi_format[$footprint]{$obj = $npad.newpad}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
       {
@@ -352,7 +364,7 @@ numerical flags only
 
 %end-doc */
 
-pin_hi_format returns [Pin newpin]
+pin_hi_format [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, clearance, mask, drilling hole, name,
          number, flags */
           //convert name and pin number string
@@ -365,7 +377,7 @@ pin_hi_format returns [Pin newpin]
 		
       }
     ;
-pin_1_7_format returns [Pin newpin]
+pin_1_7_format [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, clearance, mask, drilling hole, name,
          number, flags */
     : T_PIN '(' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=INTEGER ')'
@@ -374,7 +386,7 @@ pin_1_7_format returns [Pin newpin]
       }
     ;
 
-pin_1_6_3_format returns [Pin newpin]
+pin_1_6_3_format [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, drilling hole, name, number, flags */
       //return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       //create a new pin
@@ -386,7 +398,7 @@ pin_1_6_3_format returns [Pin newpin]
       }
     ;
 
-pin_newformat returns [Pin newpin]
+pin_newformat [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, drilling hole, name, flags */
     : T_PIN '(' x=measure y=measure th=measure dr=measure nm=STRING fl=INTEGER ')'
       {
@@ -394,7 +406,7 @@ pin_newformat returns [Pin newpin]
       }
     ;
 
-pin_oldformat returns [Pin newpin]
+pin_oldformat [ICFootprint footprint] returns [Pin newpin]
       /* old format: x, y, thickness, name, flags
        * drilling hole is 40% of the diameter
        */
@@ -439,7 +451,7 @@ numerical flags only
 
 %end-doc */
 
-pad_hi_format returns [Pad newpad]
+pad_hi_format [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
     : T_PAD '[' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=flags ']'
       {
@@ -447,7 +459,7 @@ pad_hi_format returns [Pad newpad]
       }
     ;
 
-pad_1_7_format returns [Pad newpad]
+pad_1_7_format [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
@@ -455,7 +467,7 @@ pad_1_7_format returns [Pad newpad]
       }
     ;
 
-pad_newformat returns [Pad newpad]
+pad_newformat [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name , pad number, flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING pn=STRING fl=INTEGER ')'
       {
@@ -463,7 +475,7 @@ pad_newformat returns [Pad newpad]
       }
     ;
 
-pad returns [Pad newpad]
+pad [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name and flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING fl=INTEGER ')'
       {

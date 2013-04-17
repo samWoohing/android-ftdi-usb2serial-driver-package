@@ -30,11 +30,6 @@ public class ICFootprintRender {
 	//private PathPaint mCopper,mDrill, mClearance, mDraftLine;
 	//private Color mCopperColor,mDrillColor,mClearanceColor,mDraftLineColor;
 	
-	public void rendorFootprint(ICFootprint footprint){
-		//first, center the footprint
-		//then, navigate through pins and draft lines to  
-	}
-	
 	public static class PathPaint{
 		
 		public Path mPath;
@@ -230,11 +225,25 @@ public class ICFootprintRender {
 	}
 	
 	private static void lineToPath(ElementLine line, float dpi, Path path){
-		
+		float dpiX1,dpiY1,dpiX2,dpiY2;
+		dpiX1=ICFootprint.CentiMil.CentiMilToPixel(line.aX1, dpi);
+		dpiY1=ICFootprint.CentiMil.CentiMilToPixel(line.aY1, dpi);
+		dpiX2=ICFootprint.CentiMil.CentiMilToPixel(line.aX2, dpi);
+		dpiY2=ICFootprint.CentiMil.CentiMilToPixel(line.aY2, dpi);
+		path.moveTo(dpiX1, dpiY1);
+		path.lineTo(dpiX2, dpiY2);
 	}
 	
 	private static void arcToPath(ElementArc arc, float dpi, Path path){
-		
+		//convert gEda convention to Android convention
+		//note that gEDA use CCW as positive, while angle zero points left
+		//and Android uses CW as positive, while angle zero points right.
+		RectF rect = new RectF();
+		rect.left 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX-arc.Width, dpi);
+		rect.right 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX+arc.Width, dpi);
+		rect.top 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aY-arc.Height, dpi);
+		rect.bottom = ICFootprint.CentiMil.CentiMilToPixel(arc.aY+arc.Height, dpi);
+		path.addArc(rect, 180.0f-arc.StartAngle, -arc.DeltaAngle);
 	}
 
 	/**
