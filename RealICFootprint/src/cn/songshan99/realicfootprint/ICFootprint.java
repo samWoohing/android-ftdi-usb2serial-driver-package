@@ -10,11 +10,11 @@ public class ICFootprint {
 
 	private ArrayList<PinOrPadOrDraftLine> mListPinOrPad;
 	private ArrayList<PinOrPadOrDraftLine> mListDraftLine;
-	private Mark mMark,mTextLoc;
-	private String mDesc, mName, mValue;
+	protected Mark mMark,mTextLoc;
+	protected String mDesc, mName, mValue;
 	
-	private int flags;
-	private ICText mICText;
+	protected int flags;
+	protected ICText mICText;
 	
 	public ArrayList<PinOrPadOrDraftLine> getmListPinOrPad() {
 		return mListPinOrPad;
