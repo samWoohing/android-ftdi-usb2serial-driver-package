@@ -31,16 +31,21 @@ public class AboutDialog extends Dialog {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.about);
-		TextView tv = (TextView) findViewById(R.id.instruction_txt);
-		tv.setText(Html.fromHtml(readRawTextFile(R.raw.instruction))); 
-		tv = (TextView) findViewById(R.id.info_text);
+
+		TextView tv = (TextView) findViewById(R.id.info_text);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.info)));
+		tv.setLinkTextColor(Color.BLUE);
+		Linkify.addLinks(tv, Linkify.ALL);
+		
+		tv = (TextView) findViewById(R.id.instruction_txt);
+		tv.setText(Html.fromHtml(readRawTextFile(R.raw.instruction))); 
+		
 		tv = (TextView) findViewById(R.id.version_history_txt);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.version_history)));
+		
 		tv = (TextView) findViewById(R.id.disclaimer_txt);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.disclaimer)));
-		tv.setLinkTextColor(Color.BLUE);
-		Linkify.addLinks(tv, Linkify.ALL); 
+		 
 	}
 
 	public static String readRawTextFile(int id) {
