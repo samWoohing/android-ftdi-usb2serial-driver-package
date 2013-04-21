@@ -16,6 +16,12 @@ public class ICFootprint {
 	protected int flags;
 	protected ICText mICText;
 	
+	public ICText getmICText() {
+		return mICText;
+	}
+	public void setmICText(ICText mICText) {
+		this.mICText = mICText;
+	}
 	public ArrayList<PinOrPadOrDraftLine> getmListPinOrPad() {
 		return mListPinOrPad;
 	}
@@ -115,7 +121,7 @@ public class ICFootprint {
 		if(mTextLoc!=null) mTextLoc.offset(-ctX, -ctY);
 	}
 	
-	public abstract class PinOrPadOrDraftLine{
+	public static abstract class PinOrPadOrDraftLine{
 		public static final int TYPE_PIN=1;
 		public static final int TYPE_PAD=2;
 		public static final int TYPE_LINE=3;
@@ -140,7 +146,7 @@ public class ICFootprint {
 		}
 	}
 	
-	public class Pin extends PinOrPadOrDraftLine{
+	public static class Pin extends PinOrPadOrDraftLine{
 		
 		protected float aX,aY,Thickness,Clearance,Mask,Drill;
 		protected String Name, Number;
@@ -223,7 +229,7 @@ public class ICFootprint {
 //		}
 	}
 	
-	public class Pad extends PinOrPadOrDraftLine{
+	public static class Pad extends PinOrPadOrDraftLine{
 		//TODO: include the draw path method to each pin and pad
 		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask,Drill;
 		protected String Name, Number;
@@ -303,7 +309,7 @@ public class ICFootprint {
 //		}
 //	}
 	
-	public class ElementLine extends PinOrPadOrDraftLine{
+	public static class ElementLine extends PinOrPadOrDraftLine{
 		protected float aX1,aY1,aX2,aY2,Thickness;
 		
 		public ElementLine(float ax1, float ay1, float ax2, float ay2, float thickness){
@@ -345,7 +351,7 @@ public class ICFootprint {
 //		}
 	}
 	
-	public class ElementArc extends PinOrPadOrDraftLine{
+	public static class ElementArc extends PinOrPadOrDraftLine{
 		protected float aX,aY,Width,Height,StartAngle,DeltaAngle,Thickness;
 		
 		public ElementArc(float ax,float ay, float wid, float hgt, float strt_ang, float del_ang, float thickness){
@@ -438,7 +444,7 @@ public class ICFootprint {
 //		}
 	}
 	
-	public class Mark{
+	public static class Mark{
 		protected float aX,aY;
 		
 		public Mark(float absX,float absY) {
