@@ -83,15 +83,26 @@ element_oldformat[ICFootprint footprint]
        * text_x, text_y, text_direction, text_scale, text_flags
        */
     
-    : T_ELEMENT '(' x=STRING y=STRING dir=measure scale=measure fl=INTEGER ')' '('//set the element parameters
+    : T_ELEMENT '(' tx=STRING ty=STRING tdir=measure tscale=measure tflag=INTEGER ')' '('
+      //unit is mil. old format
       {
-	ICText ictext = new ICText();
-	ictext.aX=Float.valueOf($x.text);//TODO: should fetch the substring?
-	ictext.aY=Float.valueOf($y.text);
-	ictext.dir = $dir.value;
-	ictext.scale = $scale.value;
-	ictext.flags = Integer.valueOf($fl.text);
+        
+        ICText ictext = new ICText();
+	ictext.aX=Float.valueOf($tx.text)*100;//TODO: should fetch the substring?
+	ictext.aY=Float.valueOf($ty.text)*100;
+	ictext.dir = $tdir.value;
+	ictext.scale = $tscale.value;
+	ictext.flags = Integer.valueOf($tflag.text);
 	$footprint.setmICText(ictext);
+    
+        Mark mark = new Mark(0, 0);
+    
+        $footprint.setmICText(ictext);
+        $footprint.setmMark(mark);
+        $footprint.setFlags(0);
+        $footprint.setmDesc("");
+        $footprint.setmName("");
+        $footprint.setmValue("");
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
@@ -103,9 +114,29 @@ element_1_3_4_format[ICFootprint footprint]
       /* element_flags, description, pcb-name,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
-    : T_ELEMENT '(' INTEGER STRING STRING measure measure measure measure INTEGER ')' '('//set the element parameters
+    : T_ELEMENT '(' flag=INTEGER desc=STRING name=STRING tx=measure ty=measure tdir=measure tscale=measure tflag=INTEGER ')' '('//set the element parameters
+      //unit is mil. old format
       {
+        String dc, nm, vl;
+        dc = $desc.text.substring(1, $desc.text.length() - 2);
+        nm = $name.text.substring(1, $name.text.length() - 2);
+        vl = "";
         
+        ICText ictext = new ICText();
+        ictext.aX=$tx.value*100;
+	ictext.aY=$ty.value*100;
+	ictext.dir = $tdir.value;
+	ictext.scale = $tscale.value;
+	ictext.flags = Integer.valueOf($tflag.text);
+    
+        Mark mark = new Mark(0, 0);
+    
+        $footprint.setmICText(ictext);
+        $footprint.setmMark(mark);
+        $footprint.setFlags(Integer.valueOf($flag.text));
+        $footprint.setmDesc(dc);
+        $footprint.setmName(nm);
+        $footprint.setmValue(vl);
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
@@ -117,9 +148,29 @@ element_newformat[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, 
        * text_x, text_y, text_direction, text_scale, text_flags
        */
-    : T_ELEMENT '(' INTEGER STRING STRING STRING measure measure measure measure INTEGER ')' '('//set the element parameters
+    : T_ELEMENT '(' flag=INTEGER desc=STRING name=STRING value=STRING tx=measure ty=measure tdir=measure tscale=measure tflag=INTEGER ')' '('//set the element parameters
+      //unit is mil. old format
       {
+        String dc, nm, vl;
+        dc = $desc.text.substring(1, $desc.text.length() - 2);
+        nm = $name.text.substring(1, $name.text.length() - 2);
+        vl = $value.text.substring(1, $value.text.length() - 2);
         
+        ICText ictext = new ICText();
+        ictext.aX=$tx.value*100;
+	ictext.aY=$ty.value*100;
+	ictext.dir = $tdir.value;
+	ictext.scale = $tscale.value;
+	ictext.flags = Integer.valueOf($tflag.text);
+    
+        Mark mark = new Mark(0, 0);
+    
+        $footprint.setmICText(ictext);
+        $footprint.setmMark(mark);
+        $footprint.setFlags(Integer.valueOf($flag.text));
+        $footprint.setmDesc(dc);
+        $footprint.setmName(nm);
+        $footprint.setmValue(vl);
       }
       elementdefinitions[$footprint] ')'//do the element centering, recalculate the bounding box
       {
@@ -131,10 +182,30 @@ element_1_7_format[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, mark_x, mark_y,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
-    : T_ELEMENT '(' INTEGER STRING STRING STRING measure measure
-      measure measure number number INTEGER ')' '('//set the element parameters
+    : T_ELEMENT '(' flag=INTEGER desc=STRING name=STRING value=STRING mx=measure my=measure
+      tx=measure ty=measure tdir=number tscale=number tflag=INTEGER ')' '('//set the element parameters
+      //unit is mil. old format
       {
+        String dc, nm, vl;
+        dc = $desc.text.substring(1, $desc.text.length() - 2);
+        nm = $name.text.substring(1, $name.text.length() - 2);
+        vl = $value.text.substring(1, $value.text.length() - 2);
         
+        ICText ictext = new ICText();
+        ictext.aX=$tx.value*100;
+	ictext.aY=$ty.value*100;
+	ictext.dir = $tdir.value;
+	ictext.scale = $tscale.value;
+	ictext.flags = Integer.valueOf($tflag.text);
+    
+        Mark mark = new Mark($mx.value*100, $my.value*100);
+    
+        $footprint.setmICText(ictext);
+        $footprint.setmMark(mark);
+        $footprint.setFlags(Integer.valueOf($flag.text));
+        $footprint.setmDesc(dc);
+        $footprint.setmName(nm);
+        $footprint.setmValue(vl);
       }
       relementdefs[$footprint] ')'//do the element centering, recalculate the bounding box
       {
@@ -146,10 +217,30 @@ element_hi_format[ICFootprint footprint]
       /* element_flags, description, pcb-name, value, mark_x, mark_y,
        * text_x, text_y, text_direction, text_scale, text_flags
        */
-    : T_ELEMENT '[' flags STRING STRING STRING measure measure
-      measure measure number number flags ']' '('//set the element parameters
+    : T_ELEMENT '[' flag=flags desc=STRING name=STRING value=STRING mx=measure my=measure
+      tx=measure ty=measure tdir=number tscale=number tflag=flags ']' '('//set the element parameters
+      //unit is 1/100 mil. new format
       {
+        String dc, nm, vl;
+        dc = $desc.text.substring(1, $desc.text.length() - 2);
+        nm = $name.text.substring(1, $name.text.length() - 2);
+        vl = $value.text.substring(1, $value.text.length() - 2);
         
+        ICText ictext = new ICText();
+        ictext.aX=$tx.value;
+	ictext.aY=$ty.value;
+	ictext.dir = $tdir.value;
+	ictext.scale = $tscale.value;
+	ictext.flags = Integer.valueOf($tflag.text);
+    
+        Mark mark = new Mark($mx.value, $my.value);
+    
+        $footprint.setmICText(ictext);
+        $footprint.setmMark(mark);
+        $footprint.setFlags(Integer.valueOf($flag.text));
+        $footprint.setmDesc(dc);
+        $footprint.setmName(nm);
+        $footprint.setmValue(vl);
       }
       relementdefs[$footprint] ')'//Add returnvalues (pins, pads, ) from elementdefs to the element
         //do the element centering, recalculate the bounding box
@@ -225,7 +316,11 @@ elementdefinitions [ICFootprint footprint] returns [int totalPadPinNum, int tota
 	$totalPadPinNum = 0;
 	$totalDraftLineNum = 0;
 }
-    : (elementdefinition[$footprint]{})+/*TODO: check the type of element, and insert to elementList*/
+    : (val=elementdefinition[$footprint]
+       {
+        $footprint.addPinOrPadOrDraftLine($val.obj);
+       
+       })+/*check the type of element, and insert to elementList*/
     ;
 //    : elementdefinition
 //    | elementdefinitions elementdefinition
@@ -239,45 +334,57 @@ elementdefinition [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
     | npad1=pad[$footprint]{$obj = $npad1.newpad;}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
+      //unit is 1/100 mil. new format
       {
-        float ax1, ay1, ax2, ay2, thickness;
-	
-        $obj = new ElementLine(ax1, ay1, ax2, ay2, thickness);
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementLine($x1.value+mx, $y1.value+my, $x2.value+mx, $y2.value+my, $th.value);
       }
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
+      //unit is mil. old format. 
       {
-	float ax1, ay1, ax2, ay2, thickness;
-	
-        $obj = new ElementLine(ax1, ay1, ax2, ay2, thickness);
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+	$obj = new ElementLine($x1.value*100+mx, $y1.value*100+my, $x2.value*100+mx, $y2.value*100+my, $th.value*100);
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
+      //unit is 1/100 mil. new format
       {
-
-		$obj = new ElementArc();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementArc($x.value+mx, $y.value+my, $w.value, $h.value, $strt_ang.value, $diff_ang.value, $th.value);
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
+      //unit is mil. old format
       {
-
-		$obj = new ElementArc();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementArc($x.value*100+mx, $y.value*100+my, $w.value*100, $h.value*100, $strt_ang.value, $diff_ang.value, $th.value*100);
       }
       /* x, y position */
     | T_MARK '[' x=measure y=measure ']'
+      //unit is 1/100 mil. new format
       {
-
-		$obj = new Mark();
+        $obj = new Mark($x.value, $y.value);
       }
     | T_MARK '(' x=measure y=measure ')'//this is old unit, need to convert to CentiMil
+      //unit is mil. old format
       {
-		$obj = new Mark();
+        $obj = new Mark($x.value*100, $y.value*100);
       }
     | { } attribute/*do the attibute related works, prefer to ignore*/ 
     ;
 
 attribute
     : T_ATTRIBUTE '(' STRING STRING ')'//attribute will not be used by gEDA/PCB, let's ignore it. no action needed
+      //unit is mil. old format
       {
         
       }
@@ -288,7 +395,11 @@ relementdefs [ICFootprint footprint] returns [int totalPadPinNum, int totalDraft
 	$totalPadPinNum = 0;
 	$totalDraftLineNum = 0;
 }
-    : (relementdef[$footprint]{})+/*TODO: check the type of element, and insert to elementList*/
+    : (val=relementdef[$footprint]
+       {
+        $footprint.addPinOrPadOrDraftLine($val.obj);
+       
+       })+/*TODO: check the type of element, and insert to elementList*/
     ;
 //    | relementdefs relementdef
 //    ;
@@ -300,25 +411,36 @@ relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
     | npad1=pad_hi_format[$footprint]{$obj = $npad1.newpad;}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
+      //unit is 1/100 mil. new format
       {
-
-		$obj = new ElementLine();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementLine($x1.value+mx, $y1.value+my, $x2.value+mx, $y2.value+my, $th.value);
       }
     | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
+      //unit is mil. old format
       {
-
-		$obj = new ElementLine();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+	$obj = new ElementLine($x1.value*100+mx, $y1.value*100+my, $x2.value*100+mx, $y2.value*100+my, $th.value*100);
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
       {
-
-		$obj = new ElementArc();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementArc($x.value+mx, $y.value+my, $w.value, $h.value, $strt_ang.value, $diff_ang.value, $th.value);
       }
     | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
+      //unit is mil. old format
       {
-
-		$obj = new ElementArc();
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $obj = new ElementArc($x.value*100+mx, $y.value*100+my, $w.value*100, $h.value*100, $strt_ang.value, $diff_ang.value, $th.value*100);
       }
     | {  } attribute/*do the attibute related works, prefer to ignore*/
     ;
@@ -365,18 +487,34 @@ pin_hi_format [ICFootprint footprint] returns [Pin newpin]
     //create a new pin
     //return it as return value. HOW TO USE THE RETURN VALUE? $e.value
     : T_PIN '[' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=flags ']'
+      //unit is 1/100 mil. new format
       {
-       
-		$newpin = new Pin();
-		
+        $newpin = new Pin(  $x.value,
+                            $y.value,
+                            $th.value,
+                            $cl.value,
+                            $mk.value,
+                            $dr.value,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            $fl.value);	
       }
     ;
 pin_1_7_format [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, clearance, mask, drilling hole, name,
          number, flags */
     : T_PIN '(' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpin = new Pin();
+        $newpin = new Pin(  $x.value*100,
+                            $y.value*100,
+                            $th.value*100,
+                            $cl.value*100,
+                            $mk.value*100,
+                            $dr.value*100,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            Integer.valueOf($fl.text));
       }
     ;
 
@@ -385,18 +523,34 @@ pin_1_6_3_format [ICFootprint footprint] returns [Pin newpin]
       //return it as return value. HOW TO USE THE RETURN VALUE? $e.value
       //create a new pin
     : T_PIN '(' x=measure y=measure th=measure dr=measure nm=STRING pn=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-        
-		$newpin = new Pin();
-		
+        $newpin = new Pin(  $x.value*100,
+                            $y.value*100,
+                            $th.value*100,
+                            0.0f,
+                            0.0f,
+                            $dr.value*100,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            Integer.valueOf($fl.text));	
       }
     ;
 
 pin_newformat [ICFootprint footprint] returns [Pin newpin]
       /* x, y, thickness, drilling hole, name, flags */
     : T_PIN '(' x=measure y=measure th=measure dr=measure nm=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpin = new Pin();
+        $newpin = new Pin(  $x.value*100,
+                            $y.value*100,
+                            $th.value*100,
+                            0.0f,
+                            0.0f,
+                            $dr.value*100,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            "",
+                            Integer.valueOf($fl.text));
       }
     ;
 
@@ -405,8 +559,17 @@ pin_oldformat [ICFootprint footprint] returns [Pin newpin]
        * drilling hole is 40% of the diameter
        */
     : T_PIN '(' x=measure y=measure th=measure nm=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpin = new Pin();
+        $newpin = new Pin(  $x.value*100,
+                            $y.value*100,
+                            $th.value*100,
+                            0.0f,
+                            0.0f,
+                            $th.value*40,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            "",
+                            Integer.valueOf($fl.text));
       }
     ;
 
@@ -448,38 +611,78 @@ numerical flags only
 pad_hi_format [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
     : T_PAD '[' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=flags ']'
+      //unit is 1/100 mil. new format
       {
-		$newpad = new Pad();
+        $newpad = new Pad(  $x1.value,
+                            $y1.value,
+                            $x2.value,
+                            $y2.value,
+                            $th.value,
+                            $cl.value,
+                            $mk.value,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            $fl.value);
       }
     ;
 
 pad_1_7_format [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, clearance, mask, name , pad number, flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpad = new Pad();
+        $newpad = new Pad(  $x1.value*100,
+                            $y1.value*100,
+                            $x2.value*100,
+                            $y2.value*100,
+                            $th.value*100,
+                            $cl.value*100,
+                            $mk.value*100,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            Integer.valueOf($fl.text));
       }
     ;
 
 pad_newformat [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name , pad number, flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING pn=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpad = new Pad();
+        $newpad = new Pad(  $x1.value*100,
+                            $y1.value*100,
+                            $x2.value*100,
+                            $y2.value*100,
+                            $th.value*100,
+                            0.0f,
+                            0.0f,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            $pn.text.substring(1, $pn.text.length() - 2),
+                            Integer.valueOf($fl.text));
       }
     ;
 
 pad [ICFootprint footprint] returns [Pad newpad]
       /* x1, y1, x2, y2, thickness, name and flags */
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure nm=STRING fl=INTEGER ')'
+      //unit is mil. old format
       {
-		$newpad = new Pad();
+        $newpad = new Pad(  $x1.value*100,
+                            $y1.value*100,
+                            $x2.value*100,
+                            $y2.value*100,
+                            $th.value*100,
+                            0.0f,
+                            0.0f,
+                            $nm.text.substring(1, $nm.text.length() - 2),
+                            "",
+                            Integer.valueOf($fl.text));
       }
     ;
 
 flags returns [int value]  
-	: INTEGER { $value = Integer.valueOf($INTEGER.text); }/*converter to integer as return value*/
-    | STRING  {  }/*converter to integer as return value, depends on the function in ICFootprint*/
+    : INTEGER { $value = Integer.valueOf($INTEGER.text); }/*converter to integer as return value*/
+    | st=STRING  { $value = ICFootprint.stringToFlags($st.text.substring(1, $st.text.length() - 2)) }/*TODO: converter to integer as return value, depends on the function in ICFootprint*/
     ;
 
 //symbols
@@ -509,7 +712,7 @@ measure returns [float value]
 HEX :         '0''x'('0'..'9'|'a'..'f'|'A'..'F')+;//[0-9a-fA-F]+;
 INTEGER :       ('+'|'-')?(('1'..'9')('0'..'9')*)|'0'; //[+-]?([1-9][0-9]*|0);
 FLOATING :     (INTEGER)'.'('0'..'9')*;
-STRINGCHAR :   ( ~('"'|'\\'|'\n'|'\r')|('\\'.)) ;//([^"\n\r\\]|\\.);转义字符?
+STRINGCHAR :   (~('"'|'\\'|'\n'|'\r')|('\\'.)) ;//([^"\n\r\\]|\\.);转义字符?
 STRING:		'"'(STRINGCHAR)*'"';
 
 //basic token definitions

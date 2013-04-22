@@ -16,6 +16,30 @@ public class ICFootprint {
 	protected int flags;
 	protected ICText mICText;
 	
+	public String getmValue() {
+		return mValue;
+	}
+	public void setmValue(String mValue) {
+		this.mValue = mValue;
+	}
+	public String getmDesc() {
+		return mDesc;
+	}
+	public void setmDesc(String mDesc) {
+		this.mDesc = mDesc;
+	}
+	public String getmName() {
+		return mName;
+	}
+	public void setmName(String mName) {
+		this.mName = mName;
+	}
+	public int getFlags() {
+		return flags;
+	}
+	public void setFlags(int flags) {
+		this.flags = flags;
+	}
 	public ICText getmICText() {
 		return mICText;
 	}
@@ -30,6 +54,10 @@ public class ICFootprint {
 	}
 	public Mark getmMark() {
 		return mMark;
+	}
+	
+	public void setmMark(Mark mMark) {
+		this.mMark = mMark;
 	}
 	
 	public ICFootprint() {
@@ -63,6 +91,26 @@ public class ICFootprint {
 	public void setMark(Mark mk){
 		mMark = mk;
 	}
+	
+	public void addPinOrPadOrDraftLine(PinOrPadOrDraftLine obj){
+		switch(obj.getType()){
+		case PinOrPadOrDraftLine.TYPE_PIN:
+			addPin((Pin)obj);
+			break;
+		case PinOrPadOrDraftLine.TYPE_PAD:
+			addPad((Pad)obj);
+			break;
+		case PinOrPadOrDraftLine.TYPE_LINE:
+			addLine((ElementLine)obj);
+			break;
+		case PinOrPadOrDraftLine.TYPE_ARC:
+			addArc((ElementArc)obj);
+			break;
+		case PinOrPadOrDraftLine.TYPE_MARK:
+			setmMark((Mark)obj);
+		}
+	}
+	
 	private RectF calculatePinPadOverallBoundRectangle(){
 		//this function returns null of no pin or pad exists
 		RectF result = null;
@@ -121,11 +169,26 @@ public class ICFootprint {
 		if(mTextLoc!=null) mTextLoc.offset(-ctX, -ctY);
 	}
 	
+	/**
+	 * String to flags. Convert the given string to flags according to gEDA document.
+	 *
+	 * @param str the str
+	 * @return the int
+	 */
+	public static int stringToFlags(String str){
+		//TODO: complete the content
+		//convert to lower characters
+		String lstr = str.toLowerCase();
+		
+		return 0;
+	}
+	
 	public static abstract class PinOrPadOrDraftLine{
 		public static final int TYPE_PIN=1;
 		public static final int TYPE_PAD=2;
 		public static final int TYPE_LINE=3;
 		public static final int TYPE_ARC=4;
+		public static final int TYPE_MARK=5;
 		
 		protected static final int SHAPE_ROUND=1;
 		protected static final int SHAPE_RECT=2;
@@ -152,8 +215,11 @@ public class ICFootprint {
 		protected String Name, Number;
 		protected int Flags;
 		
-		public Pin(){
-			
+		public Pin(float ax, float ay, float thickness, float clearance, float mask, float drill, String name, String number, int flags){
+			aX=ax;aY=ay;Thickness=thickness;Clearance=clearance;Mask=mask;Drill=drill;
+			Name=name;Number=number;
+			Flags=flags;
+			setType(TYPE_PIN);
 		}
 		
 		@Override
@@ -231,11 +297,15 @@ public class ICFootprint {
 	
 	public static class Pad extends PinOrPadOrDraftLine{
 		//TODO: include the draw path method to each pin and pad
-		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask,Drill;
+		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask;
 		protected String Name, Number;
+		protected int Flags;
 		
-		public Pad(){
-			
+		public Pad(float ax1,float ay1, float ax2, float ay2, float thickness, float clearance, float mask, String name, String number, int flags){
+			aX1=ax1;aY1=ay1;aX2=ax2;aY2=ay2;Thickness=thickness;Clearance=clearance;Mask=mask;
+			Name=name;Number=number;
+			Flags=flags;
+			setType(TYPE_PAD);
 		}
 		
 		@Override
@@ -259,7 +329,7 @@ public class ICFootprint {
 		private float findLargestDiameter(){
 			float largestDiameter = Thickness + Clearance;
 			if(Mask> largestDiameter)largestDiameter = Mask;
-			if(Drill > largestDiameter)largestDiameter = Drill;
+
 			return largestDiameter;
 		}
 		@Override
@@ -314,6 +384,7 @@ public class ICFootprint {
 		
 		public ElementLine(float ax1, float ay1, float ax2, float ay2, float thickness){
 			aX1=ax1;aY1=ay1;aX2=ax2;aY2=ay2;Thickness=thickness;
+			setType(TYPE_LINE);
 		}
 		@Override
 		public RectF calculateBoundRectangle() {
@@ -356,6 +427,7 @@ public class ICFootprint {
 		
 		public ElementArc(float ax,float ay, float wid, float hgt, float strt_ang, float del_ang, float thickness){
 			aX=ax;aY=ay;Width=wid;Height=hgt;StartAngle=strt_ang;DeltaAngle=del_ang;Thickness=thickness;
+			setType(TYPE_ARC);
 		}
 		private float calculateR(float degree){
 			//degree to radius
@@ -444,20 +516,36 @@ public class ICFootprint {
 //		}
 	}
 	
-	public static class Mark{
+	public static class Mark extends PinOrPadOrDraftLine{
 		protected float aX,aY;
 		
+		public float getaX() {
+			return aX;
+		}
+
+		public float getaY() {
+			return aY;
+		}
+
 		public Mark(float absX,float absY) {
 			aX=absX;aY=absY;
+			setType(TYPE_MARK);
 		}
 		
 		public Mark(int absX,int absY){
 			aX=(float)absX;aY=(float)absY;
+			setType(TYPE_MARK);
 		}
 
 		public void offset(float dx, float dy) {
 			aX+=dx;
 			aY+=dy;
+		}
+
+		@Override
+		public RectF calculateBoundRectangle() {
+			// TODO Auto-generated method stub
+			return new RectF(aX,aY,aX,aY);
 		}	
 	}
 	
@@ -465,16 +553,16 @@ public class ICFootprint {
 		//a unified coordinate uses 1/100 mil as base unit.
 		//and includes conversion functions
 		
-		static final int UNIT_CMIL	= 0;
-		static final int UNIT_UMIL	= 1;
-		static final int UNIT_MIL	= 2;
-		static final int UNIT_INCH	= 3;
-		static final int UNIT_NM	= 4;
-		static final int UNIT_UM	= 5;
-		static final int UNIT_MM	= 6;
-		static final int UNIT_M		= 7;
-		static final int UNIT_KM	= 8;
-		static final int UNIT_PIXEL = 9;
+		public static final int UNIT_CMIL	= 0;
+		public static final int UNIT_UMIL	= 1;
+		public static final int UNIT_MIL	= 2;
+		public static final int UNIT_INCH	= 3;
+		public static final int UNIT_NM	= 4;
+		public static final int UNIT_UM	= 5;
+		public static final int UNIT_MM	= 6;
+		public static final int UNIT_M		= 7;
+		public static final int UNIT_KM	= 8;
+		public static final int UNIT_PIXEL = 9;
 		
 		static final float INCH_TO_M = 0.0254f;
 		

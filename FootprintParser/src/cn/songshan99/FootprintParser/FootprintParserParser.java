@@ -1,4 +1,4 @@
-// Generated from D:\ShanSong\Android-FTDI-usb2serial\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
+// Generated from D:\ShanSong\android\android-ftdi-usb2serial-driver-package\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
 
 package cn.songshan99.FootprintParser;
 
@@ -153,11 +153,11 @@ public class FootprintParserParser extends Parser {
 
 	public static class Element_oldformatContext extends ParserRuleContext {
 		public ICFootprint footprint;
-		public Token x;
-		public Token y;
-		public MeasureContext dir;
-		public MeasureContext scale;
-		public Token fl;
+		public Token tx;
+		public Token ty;
+		public MeasureContext tdir;
+		public MeasureContext tscale;
+		public Token tflag;
 		public TerminalNode INTEGER() { return getToken(FootprintParserParser.INTEGER, 0); }
 		public ElementdefinitionsContext elementdefinitions() {
 			return getRuleContext(ElementdefinitionsContext.class,0);
@@ -197,21 +197,31 @@ public class FootprintParserParser extends Parser {
 			{
 			setState(53); match(T_ELEMENT);
 			setState(54); match(4);
-			setState(55); ((Element_oldformatContext)_localctx).x = match(STRING);
-			setState(56); ((Element_oldformatContext)_localctx).y = match(STRING);
-			setState(57); ((Element_oldformatContext)_localctx).dir = measure();
-			setState(58); ((Element_oldformatContext)_localctx).scale = measure();
-			setState(59); ((Element_oldformatContext)_localctx).fl = match(INTEGER);
+			setState(55); ((Element_oldformatContext)_localctx).tx = match(STRING);
+			setState(56); ((Element_oldformatContext)_localctx).ty = match(STRING);
+			setState(57); ((Element_oldformatContext)_localctx).tdir = measure();
+			setState(58); ((Element_oldformatContext)_localctx).tscale = measure();
+			setState(59); ((Element_oldformatContext)_localctx).tflag = match(INTEGER);
 			setState(60); match(2);
 			setState(61); match(4);
 
-					//ICText ictext = new ICText();
-					//ictext.aX=Float.valueOf((((Element_oldformatContext)_localctx).x!=null?((Element_oldformatContext)_localctx).x.getText():null));//TODO: should fetch the substring?
-					//ictext.aY=Float.valueOf((((Element_oldformatContext)_localctx).y!=null?((Element_oldformatContext)_localctx).y.getText():null));
-					//ictext.dir = ((Element_oldformatContext)_localctx).dir.value;
-					//ictext.scale = ((Element_oldformatContext)_localctx).scale.value;
-					//ictext.flags = Integer.valueOf((((Element_oldformatContext)_localctx).fl!=null?((Element_oldformatContext)_localctx).fl.getText():null));
-					_localctx.footprint.setmICText(ictext);
+			        
+			        ICText ictext = new ICText();
+				ictext.aX=Float.valueOf((((Element_oldformatContext)_localctx).tx!=null?((Element_oldformatContext)_localctx).tx.getText():null))*100;//TODO: should fetch the substring?
+				ictext.aY=Float.valueOf((((Element_oldformatContext)_localctx).ty!=null?((Element_oldformatContext)_localctx).ty.getText():null))*100;
+				ictext.dir = ((Element_oldformatContext)_localctx).tdir.value;
+				ictext.scale = ((Element_oldformatContext)_localctx).tscale.value;
+				ictext.flags = Integer.valueOf((((Element_oldformatContext)_localctx).tflag!=null?((Element_oldformatContext)_localctx).tflag.getText():null));
+				_localctx.footprint.setmICText(ictext);
+			    
+			        Mark mark = new Mark(0, 0);
+			    
+			        _localctx.footprint.setmICText(ictext);
+			        _localctx.footprint.setmMark(mark);
+			        _localctx.footprint.setFlags(0);
+			        _localctx.footprint.setmDesc("");
+			        _localctx.footprint.setmName("");
+			        _localctx.footprint.setmValue("");
 			      
 			setState(63); elementdefinitions(_localctx.footprint);
 			setState(64); match(2);
@@ -233,6 +243,14 @@ public class FootprintParserParser extends Parser {
 
 	public static class Element_1_3_4_formatContext extends ParserRuleContext {
 		public ICFootprint footprint;
+		public Token flag;
+		public Token desc;
+		public Token name;
+		public MeasureContext tx;
+		public MeasureContext ty;
+		public MeasureContext tdir;
+		public MeasureContext tscale;
+		public Token tflag;
 		public List<TerminalNode> INTEGER() { return getTokens(FootprintParserParser.INTEGER); }
 		public ElementdefinitionsContext elementdefinitions() {
 			return getRuleContext(ElementdefinitionsContext.class,0);
@@ -275,18 +293,37 @@ public class FootprintParserParser extends Parser {
 			{
 			setState(67); match(T_ELEMENT);
 			setState(68); match(4);
-			setState(69); match(INTEGER);
-			setState(70); match(STRING);
-			setState(71); match(STRING);
-			setState(72); measure();
-			setState(73); measure();
-			setState(74); measure();
-			setState(75); measure();
-			setState(76); match(INTEGER);
+			setState(69); ((Element_1_3_4_formatContext)_localctx).flag = match(INTEGER);
+			setState(70); ((Element_1_3_4_formatContext)_localctx).desc = match(STRING);
+			setState(71); ((Element_1_3_4_formatContext)_localctx).name = match(STRING);
+			setState(72); ((Element_1_3_4_formatContext)_localctx).tx = measure();
+			setState(73); ((Element_1_3_4_formatContext)_localctx).ty = measure();
+			setState(74); ((Element_1_3_4_formatContext)_localctx).tdir = measure();
+			setState(75); ((Element_1_3_4_formatContext)_localctx).tscale = measure();
+			setState(76); ((Element_1_3_4_formatContext)_localctx).tflag = match(INTEGER);
 			setState(77); match(2);
 			setState(78); match(4);
 
+			        String dc, nm, vl;
+			        dc = (((Element_1_3_4_formatContext)_localctx).desc!=null?((Element_1_3_4_formatContext)_localctx).desc.getText():null).substring(1, (((Element_1_3_4_formatContext)_localctx).desc!=null?((Element_1_3_4_formatContext)_localctx).desc.getText():null).length() - 2);
+			        nm = (((Element_1_3_4_formatContext)_localctx).name!=null?((Element_1_3_4_formatContext)_localctx).name.getText():null).substring(1, (((Element_1_3_4_formatContext)_localctx).name!=null?((Element_1_3_4_formatContext)_localctx).name.getText():null).length() - 2);
+			        vl = "";
 			        
+			        ICText ictext = new ICText();
+			        ictext.aX=((Element_1_3_4_formatContext)_localctx).tx.value*100;
+				ictext.aY=((Element_1_3_4_formatContext)_localctx).ty.value*100;
+				ictext.dir = ((Element_1_3_4_formatContext)_localctx).tdir.value;
+				ictext.scale = ((Element_1_3_4_formatContext)_localctx).tscale.value;
+				ictext.flags = Integer.valueOf((((Element_1_3_4_formatContext)_localctx).tflag!=null?((Element_1_3_4_formatContext)_localctx).tflag.getText():null));
+			    
+			        Mark mark = new Mark(0, 0);
+			    
+			        _localctx.footprint.setmICText(ictext);
+			        _localctx.footprint.setmMark(mark);
+			        _localctx.footprint.setFlags(Integer.valueOf((((Element_1_3_4_formatContext)_localctx).flag!=null?((Element_1_3_4_formatContext)_localctx).flag.getText():null)));
+			        _localctx.footprint.setmDesc(dc);
+			        _localctx.footprint.setmName(nm);
+			        _localctx.footprint.setmValue(vl);
 			      
 			setState(80); elementdefinitions(_localctx.footprint);
 			setState(81); match(2);
@@ -308,6 +345,15 @@ public class FootprintParserParser extends Parser {
 
 	public static class Element_newformatContext extends ParserRuleContext {
 		public ICFootprint footprint;
+		public Token flag;
+		public Token desc;
+		public Token name;
+		public Token value;
+		public MeasureContext tx;
+		public MeasureContext ty;
+		public MeasureContext tdir;
+		public MeasureContext tscale;
+		public Token tflag;
 		public List<TerminalNode> INTEGER() { return getTokens(FootprintParserParser.INTEGER); }
 		public ElementdefinitionsContext elementdefinitions() {
 			return getRuleContext(ElementdefinitionsContext.class,0);
@@ -350,19 +396,38 @@ public class FootprintParserParser extends Parser {
 			{
 			setState(84); match(T_ELEMENT);
 			setState(85); match(4);
-			setState(86); match(INTEGER);
-			setState(87); match(STRING);
-			setState(88); match(STRING);
-			setState(89); match(STRING);
-			setState(90); measure();
-			setState(91); measure();
-			setState(92); measure();
-			setState(93); measure();
-			setState(94); match(INTEGER);
+			setState(86); ((Element_newformatContext)_localctx).flag = match(INTEGER);
+			setState(87); ((Element_newformatContext)_localctx).desc = match(STRING);
+			setState(88); ((Element_newformatContext)_localctx).name = match(STRING);
+			setState(89); ((Element_newformatContext)_localctx).value = match(STRING);
+			setState(90); ((Element_newformatContext)_localctx).tx = measure();
+			setState(91); ((Element_newformatContext)_localctx).ty = measure();
+			setState(92); ((Element_newformatContext)_localctx).tdir = measure();
+			setState(93); ((Element_newformatContext)_localctx).tscale = measure();
+			setState(94); ((Element_newformatContext)_localctx).tflag = match(INTEGER);
 			setState(95); match(2);
 			setState(96); match(4);
 
+			        String dc, nm, vl;
+			        dc = (((Element_newformatContext)_localctx).desc!=null?((Element_newformatContext)_localctx).desc.getText():null).substring(1, (((Element_newformatContext)_localctx).desc!=null?((Element_newformatContext)_localctx).desc.getText():null).length() - 2);
+			        nm = (((Element_newformatContext)_localctx).name!=null?((Element_newformatContext)_localctx).name.getText():null).substring(1, (((Element_newformatContext)_localctx).name!=null?((Element_newformatContext)_localctx).name.getText():null).length() - 2);
+			        vl = (((Element_newformatContext)_localctx).value!=null?((Element_newformatContext)_localctx).value.getText():null).substring(1, (((Element_newformatContext)_localctx).value!=null?((Element_newformatContext)_localctx).value.getText():null).length() - 2);
 			        
+			        ICText ictext = new ICText();
+			        ictext.aX=((Element_newformatContext)_localctx).tx.value*100;
+				ictext.aY=((Element_newformatContext)_localctx).ty.value*100;
+				ictext.dir = ((Element_newformatContext)_localctx).tdir.value;
+				ictext.scale = ((Element_newformatContext)_localctx).tscale.value;
+				ictext.flags = Integer.valueOf((((Element_newformatContext)_localctx).tflag!=null?((Element_newformatContext)_localctx).tflag.getText():null));
+			    
+			        Mark mark = new Mark(0, 0);
+			    
+			        _localctx.footprint.setmICText(ictext);
+			        _localctx.footprint.setmMark(mark);
+			        _localctx.footprint.setFlags(Integer.valueOf((((Element_newformatContext)_localctx).flag!=null?((Element_newformatContext)_localctx).flag.getText():null)));
+			        _localctx.footprint.setmDesc(dc);
+			        _localctx.footprint.setmName(nm);
+			        _localctx.footprint.setmValue(vl);
 			      
 			setState(98); elementdefinitions(_localctx.footprint);
 			setState(99); match(2);
@@ -384,10 +449,21 @@ public class FootprintParserParser extends Parser {
 
 	public static class Element_1_7_formatContext extends ParserRuleContext {
 		public ICFootprint footprint;
+		public Token flag;
+		public Token desc;
+		public Token name;
+		public Token value;
+		public MeasureContext mx;
+		public MeasureContext my;
+		public MeasureContext tx;
+		public MeasureContext ty;
+		public NumberContext tdir;
+		public NumberContext tscale;
+		public Token tflag;
+		public List<TerminalNode> INTEGER() { return getTokens(FootprintParserParser.INTEGER); }
 		public RelementdefsContext relementdefs() {
 			return getRuleContext(RelementdefsContext.class,0);
 		}
-		public List<TerminalNode> INTEGER() { return getTokens(FootprintParserParser.INTEGER); }
 		public NumberContext number(int i) {
 			return getRuleContext(NumberContext.class,i);
 		}
@@ -432,21 +508,40 @@ public class FootprintParserParser extends Parser {
 			{
 			setState(102); match(T_ELEMENT);
 			setState(103); match(4);
-			setState(104); match(INTEGER);
-			setState(105); match(STRING);
-			setState(106); match(STRING);
-			setState(107); match(STRING);
-			setState(108); measure();
-			setState(109); measure();
-			setState(110); measure();
-			setState(111); measure();
-			setState(112); number();
-			setState(113); number();
-			setState(114); match(INTEGER);
+			setState(104); ((Element_1_7_formatContext)_localctx).flag = match(INTEGER);
+			setState(105); ((Element_1_7_formatContext)_localctx).desc = match(STRING);
+			setState(106); ((Element_1_7_formatContext)_localctx).name = match(STRING);
+			setState(107); ((Element_1_7_formatContext)_localctx).value = match(STRING);
+			setState(108); ((Element_1_7_formatContext)_localctx).mx = measure();
+			setState(109); ((Element_1_7_formatContext)_localctx).my = measure();
+			setState(110); ((Element_1_7_formatContext)_localctx).tx = measure();
+			setState(111); ((Element_1_7_formatContext)_localctx).ty = measure();
+			setState(112); ((Element_1_7_formatContext)_localctx).tdir = number();
+			setState(113); ((Element_1_7_formatContext)_localctx).tscale = number();
+			setState(114); ((Element_1_7_formatContext)_localctx).tflag = match(INTEGER);
 			setState(115); match(2);
 			setState(116); match(4);
 
+			        String dc, nm, vl;
+			        dc = (((Element_1_7_formatContext)_localctx).desc!=null?((Element_1_7_formatContext)_localctx).desc.getText():null).substring(1, (((Element_1_7_formatContext)_localctx).desc!=null?((Element_1_7_formatContext)_localctx).desc.getText():null).length() - 2);
+			        nm = (((Element_1_7_formatContext)_localctx).name!=null?((Element_1_7_formatContext)_localctx).name.getText():null).substring(1, (((Element_1_7_formatContext)_localctx).name!=null?((Element_1_7_formatContext)_localctx).name.getText():null).length() - 2);
+			        vl = (((Element_1_7_formatContext)_localctx).value!=null?((Element_1_7_formatContext)_localctx).value.getText():null).substring(1, (((Element_1_7_formatContext)_localctx).value!=null?((Element_1_7_formatContext)_localctx).value.getText():null).length() - 2);
 			        
+			        ICText ictext = new ICText();
+			        ictext.aX=((Element_1_7_formatContext)_localctx).tx.value*100;
+				ictext.aY=((Element_1_7_formatContext)_localctx).ty.value*100;
+				ictext.dir = ((Element_1_7_formatContext)_localctx).tdir.value;
+				ictext.scale = ((Element_1_7_formatContext)_localctx).tscale.value;
+				ictext.flags = Integer.valueOf((((Element_1_7_formatContext)_localctx).tflag!=null?((Element_1_7_formatContext)_localctx).tflag.getText():null));
+			    
+			        Mark mark = new Mark(((Element_1_7_formatContext)_localctx).mx.value*100, ((Element_1_7_formatContext)_localctx).my.value*100);
+			    
+			        _localctx.footprint.setmICText(ictext);
+			        _localctx.footprint.setmMark(mark);
+			        _localctx.footprint.setFlags(Integer.valueOf((((Element_1_7_formatContext)_localctx).flag!=null?((Element_1_7_formatContext)_localctx).flag.getText():null)));
+			        _localctx.footprint.setmDesc(dc);
+			        _localctx.footprint.setmName(nm);
+			        _localctx.footprint.setmValue(vl);
 			      
 			setState(118); relementdefs(_localctx.footprint);
 			setState(119); match(2);
@@ -468,6 +563,17 @@ public class FootprintParserParser extends Parser {
 
 	public static class Element_hi_formatContext extends ParserRuleContext {
 		public ICFootprint footprint;
+		public FlagsContext flag;
+		public Token desc;
+		public Token name;
+		public Token value;
+		public MeasureContext mx;
+		public MeasureContext my;
+		public MeasureContext tx;
+		public MeasureContext ty;
+		public NumberContext tdir;
+		public NumberContext tscale;
+		public FlagsContext tflag;
 		public RelementdefsContext relementdefs() {
 			return getRuleContext(RelementdefsContext.class,0);
 		}
@@ -518,26 +624,45 @@ public class FootprintParserParser extends Parser {
 			{
 			setState(122); match(T_ELEMENT);
 			setState(123); match(3);
-			setState(124); flags();
-			setState(125); match(STRING);
-			setState(126); match(STRING);
-			setState(127); match(STRING);
-			setState(128); measure();
-			setState(129); measure();
-			setState(130); measure();
-			setState(131); measure();
-			setState(132); number();
-			setState(133); number();
-			setState(134); flags();
+			setState(124); ((Element_hi_formatContext)_localctx).flag = flags();
+			setState(125); ((Element_hi_formatContext)_localctx).desc = match(STRING);
+			setState(126); ((Element_hi_formatContext)_localctx).name = match(STRING);
+			setState(127); ((Element_hi_formatContext)_localctx).value = match(STRING);
+			setState(128); ((Element_hi_formatContext)_localctx).mx = measure();
+			setState(129); ((Element_hi_formatContext)_localctx).my = measure();
+			setState(130); ((Element_hi_formatContext)_localctx).tx = measure();
+			setState(131); ((Element_hi_formatContext)_localctx).ty = measure();
+			setState(132); ((Element_hi_formatContext)_localctx).tdir = number();
+			setState(133); ((Element_hi_formatContext)_localctx).tscale = number();
+			setState(134); ((Element_hi_formatContext)_localctx).tflag = flags();
 			setState(135); match(1);
 			setState(136); match(4);
 
+			        String dc, nm, vl;
+			        dc = (((Element_hi_formatContext)_localctx).desc!=null?((Element_hi_formatContext)_localctx).desc.getText():null).substring(1, (((Element_hi_formatContext)_localctx).desc!=null?((Element_hi_formatContext)_localctx).desc.getText():null).length() - 2);
+			        nm = (((Element_hi_formatContext)_localctx).name!=null?((Element_hi_formatContext)_localctx).name.getText():null).substring(1, (((Element_hi_formatContext)_localctx).name!=null?((Element_hi_formatContext)_localctx).name.getText():null).length() - 2);
+			        vl = (((Element_hi_formatContext)_localctx).value!=null?((Element_hi_formatContext)_localctx).value.getText():null).substring(1, (((Element_hi_formatContext)_localctx).value!=null?((Element_hi_formatContext)_localctx).value.getText():null).length() - 2);
 			        
+			        ICText ictext = new ICText();
+			        ictext.aX=((Element_hi_formatContext)_localctx).tx.value;
+				ictext.aY=((Element_hi_formatContext)_localctx).ty.value;
+				ictext.dir = ((Element_hi_formatContext)_localctx).tdir.value;
+				ictext.scale = ((Element_hi_formatContext)_localctx).tscale.value;
+				ictext.flags = Integer.valueOf((((Element_hi_formatContext)_localctx).tflag!=null?_input.getText(((Element_hi_formatContext)_localctx).tflag.start,((Element_hi_formatContext)_localctx).tflag.stop):null));
+			    
+			        Mark mark = new Mark(((Element_hi_formatContext)_localctx).mx.value, ((Element_hi_formatContext)_localctx).my.value);
+			    
+			        _localctx.footprint.setmICText(ictext);
+			        _localctx.footprint.setmMark(mark);
+			        _localctx.footprint.setFlags(Integer.valueOf((((Element_hi_formatContext)_localctx).flag!=null?_input.getText(((Element_hi_formatContext)_localctx).flag.start,((Element_hi_formatContext)_localctx).flag.stop):null)));
+			        _localctx.footprint.setmDesc(dc);
+			        _localctx.footprint.setmName(nm);
+			        _localctx.footprint.setmValue(vl);
 			      
 			setState(138); relementdefs(_localctx.footprint);
 			setState(139); match(2);
 
-					_localctx.footprint.centerTheFootprint();
+				_localctx.footprint.centerTheFootprint();
 			      
 			}
 		}
@@ -556,6 +681,7 @@ public class FootprintParserParser extends Parser {
 		public ICFootprint footprint;
 		public int totalPadPinNum;
 		public int totalDraftLineNum;
+		public ElementdefinitionContext val;
 		public ElementdefinitionContext elementdefinition(int i) {
 			return getRuleContext(ElementdefinitionContext.class,i);
 		}
@@ -595,8 +721,11 @@ public class FootprintParserParser extends Parser {
 			do {
 				{
 				{
-				setState(142); elementdefinition(_localctx.footprint);
+				setState(142); ((ElementdefinitionsContext)_localctx).val = elementdefinition(_localctx.footprint);
 
+				        _localctx.footprint.addPinOrPadOrDraftLine(((ElementdefinitionsContext)_localctx).val.obj);
+				       
+				       
 				}
 				}
 				setState(147); 
@@ -639,34 +768,34 @@ public class FootprintParserParser extends Parser {
 		public PadContext pad() {
 			return getRuleContext(PadContext.class,0);
 		}
-		public NumberContext number(int i) {
-			return getRuleContext(NumberContext.class,i);
-		}
 		public List<MeasureContext> measure() {
 			return getRuleContexts(MeasureContext.class);
 		}
-		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
+		public NumberContext number(int i) {
+			return getRuleContext(NumberContext.class,i);
+		}
 		public AttributeContext attribute() {
 			return getRuleContext(AttributeContext.class,0);
 		}
 		public List<NumberContext> number() {
 			return getRuleContexts(NumberContext.class);
 		}
-		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
-		public Pin_newformatContext pin_newformat() {
-			return getRuleContext(Pin_newformatContext.class,0);
-		}
 		public Pin_1_6_3_formatContext pin_1_6_3_format() {
 			return getRuleContext(Pin_1_6_3_formatContext.class,0);
+		}
+		public Pin_newformatContext pin_newformat() {
+			return getRuleContext(Pin_newformatContext.class,0);
 		}
 		public MeasureContext measure(int i) {
 			return getRuleContext(MeasureContext.class,i);
 		}
-		public Pad_newformatContext pad_newformat() {
-			return getRuleContext(Pad_newformatContext.class,0);
-		}
 		public Pin_oldformatContext pin_oldformat() {
 			return getRuleContext(Pin_oldformatContext.class,0);
+		}
+		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
+		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
+		public Pad_newformatContext pad_newformat() {
+			return getRuleContext(Pad_newformatContext.class,0);
 		}
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState, ICFootprint footprint) {
@@ -742,8 +871,10 @@ public class FootprintParserParser extends Parser {
 				setState(170); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(171); match(1);
 
-
-						((ElementdefinitionContext)_localctx).obj =  new ElementLine();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value+mx, ((ElementdefinitionContext)_localctx).y1.value+my, ((ElementdefinitionContext)_localctx).x2.value+mx, ((ElementdefinitionContext)_localctx).y2.value+my, ((ElementdefinitionContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -760,8 +891,10 @@ public class FootprintParserParser extends Parser {
 				setState(180); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(181); match(2);
 
-
-						((ElementdefinitionContext)_localctx).obj =  new ElementLine();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+					((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value*100+mx, ((ElementdefinitionContext)_localctx).y1.value*100+my, ((ElementdefinitionContext)_localctx).x2.value*100+mx, ((ElementdefinitionContext)_localctx).y2.value*100+my, ((ElementdefinitionContext)_localctx).th.value*100);
 				      
 				}
 				break;
@@ -780,8 +913,10 @@ public class FootprintParserParser extends Parser {
 				setState(192); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(193); match(1);
 
-
-						((ElementdefinitionContext)_localctx).obj =  new ElementArc();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value+mx, ((ElementdefinitionContext)_localctx).y.value+my, ((ElementdefinitionContext)_localctx).w.value, ((ElementdefinitionContext)_localctx).h.value, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -800,8 +935,10 @@ public class FootprintParserParser extends Parser {
 				setState(204); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(205); match(2);
 
-
-						((ElementdefinitionContext)_localctx).obj =  new ElementArc();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value*100+mx, ((ElementdefinitionContext)_localctx).y.value*100+my, ((ElementdefinitionContext)_localctx).w.value*100, ((ElementdefinitionContext)_localctx).h.value*100, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value*100);
 				      
 				}
 				break;
@@ -815,8 +952,7 @@ public class FootprintParserParser extends Parser {
 				setState(211); ((ElementdefinitionContext)_localctx).y = measure();
 				setState(212); match(1);
 
-
-						((ElementdefinitionContext)_localctx).obj =  new Mark();
+				        ((ElementdefinitionContext)_localctx).obj =  new Mark(((ElementdefinitionContext)_localctx).x.value, ((ElementdefinitionContext)_localctx).y.value);
 				      
 				}
 				break;
@@ -830,7 +966,7 @@ public class FootprintParserParser extends Parser {
 				setState(218); ((ElementdefinitionContext)_localctx).y = measure();
 				setState(219); match(2);
 
-						((ElementdefinitionContext)_localctx).obj =  new Mark();
+				        ((ElementdefinitionContext)_localctx).obj =  new Mark(((ElementdefinitionContext)_localctx).x.value*100, ((ElementdefinitionContext)_localctx).y.value*100);
 				      
 				}
 				break;
@@ -906,6 +1042,7 @@ public class FootprintParserParser extends Parser {
 		public ICFootprint footprint;
 		public int totalPadPinNum;
 		public int totalDraftLineNum;
+		public RelementdefContext val;
 		public RelementdefContext relementdef(int i) {
 			return getRuleContext(RelementdefContext.class,i);
 		}
@@ -945,8 +1082,11 @@ public class FootprintParserParser extends Parser {
 			do {
 				{
 				{
-				setState(233); relementdef(_localctx.footprint);
+				setState(233); ((RelementdefsContext)_localctx).val = relementdef(_localctx.footprint);
 
+				        _localctx.footprint.addPinOrPadOrDraftLine(((RelementdefsContext)_localctx).val.obj);
+				       
+				       
 				}
 				}
 				setState(238); 
@@ -1079,8 +1219,10 @@ public class FootprintParserParser extends Parser {
 				setState(258); ((RelementdefContext)_localctx).th = measure();
 				setState(259); match(1);
 
-
-						((RelementdefContext)_localctx).obj =  new ElementLine();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((RelementdefContext)_localctx).obj =  new ElementLine(((RelementdefContext)_localctx).x1.value+mx, ((RelementdefContext)_localctx).y1.value+my, ((RelementdefContext)_localctx).x2.value+mx, ((RelementdefContext)_localctx).y2.value+my, ((RelementdefContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -1097,8 +1239,10 @@ public class FootprintParserParser extends Parser {
 				setState(268); ((RelementdefContext)_localctx).th = measure();
 				setState(269); match(2);
 
-
-						((RelementdefContext)_localctx).obj =  new ElementLine();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+					((RelementdefContext)_localctx).obj =  new ElementLine(((RelementdefContext)_localctx).x1.value*100+mx, ((RelementdefContext)_localctx).y1.value*100+my, ((RelementdefContext)_localctx).x2.value*100+mx, ((RelementdefContext)_localctx).y2.value*100+my, ((RelementdefContext)_localctx).th.value*100);
 				      
 				}
 				break;
@@ -1117,8 +1261,10 @@ public class FootprintParserParser extends Parser {
 				setState(280); ((RelementdefContext)_localctx).th = measure();
 				setState(281); match(1);
 
-
-						((RelementdefContext)_localctx).obj =  new ElementArc();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((RelementdefContext)_localctx).obj =  new ElementArc(((RelementdefContext)_localctx).x.value+mx, ((RelementdefContext)_localctx).y.value+my, ((RelementdefContext)_localctx).w.value, ((RelementdefContext)_localctx).h.value, ((RelementdefContext)_localctx).strt_ang.value, ((RelementdefContext)_localctx).diff_ang.value, ((RelementdefContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -1137,8 +1283,10 @@ public class FootprintParserParser extends Parser {
 				setState(292); ((RelementdefContext)_localctx).th = measure();
 				setState(293); match(2);
 
-
-						((RelementdefContext)_localctx).obj =  new ElementArc();
+				        float mx,my;
+				        mx=_localctx.footprint.getmMark().getaX();
+				        my=_localctx.footprint.getmMark().getaY();
+				        ((RelementdefContext)_localctx).obj =  new ElementArc(((RelementdefContext)_localctx).x.value*100+mx, ((RelementdefContext)_localctx).y.value*100+my, ((RelementdefContext)_localctx).w.value*100, ((RelementdefContext)_localctx).h.value*100, ((RelementdefContext)_localctx).strt_ang.value, ((RelementdefContext)_localctx).diff_ang.value, ((RelementdefContext)_localctx).th.value*100);
 				      
 				}
 				break;
@@ -1224,9 +1372,15 @@ public class FootprintParserParser extends Parser {
 			setState(310); ((Pin_hi_formatContext)_localctx).fl = flags();
 			setState(311); match(1);
 
-			       
-					((Pin_hi_formatContext)_localctx).newpin =  new Pin();
-					
+			        ((Pin_hi_formatContext)_localctx).newpin =  new Pin(  ((Pin_hi_formatContext)_localctx).x.value,
+			                            ((Pin_hi_formatContext)_localctx).y.value,
+			                            ((Pin_hi_formatContext)_localctx).th.value,
+			                            ((Pin_hi_formatContext)_localctx).cl.value,
+			                            ((Pin_hi_formatContext)_localctx).mk.value,
+			                            ((Pin_hi_formatContext)_localctx).dr.value,
+			                            (((Pin_hi_formatContext)_localctx).nm!=null?((Pin_hi_formatContext)_localctx).nm.getText():null).substring(1, (((Pin_hi_formatContext)_localctx).nm!=null?((Pin_hi_formatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pin_hi_formatContext)_localctx).pn!=null?((Pin_hi_formatContext)_localctx).pn.getText():null).substring(1, (((Pin_hi_formatContext)_localctx).pn!=null?((Pin_hi_formatContext)_localctx).pn.getText():null).length() - 2),
+			                            ((Pin_hi_formatContext)_localctx).fl.value);	
 			      
 			}
 		}
@@ -1300,7 +1454,15 @@ public class FootprintParserParser extends Parser {
 			setState(324); ((Pin_1_7_formatContext)_localctx).fl = match(INTEGER);
 			setState(325); match(2);
 
-					((Pin_1_7_formatContext)_localctx).newpin =  new Pin();
+			        ((Pin_1_7_formatContext)_localctx).newpin =  new Pin(  ((Pin_1_7_formatContext)_localctx).x.value*100,
+			                            ((Pin_1_7_formatContext)_localctx).y.value*100,
+			                            ((Pin_1_7_formatContext)_localctx).th.value*100,
+			                            ((Pin_1_7_formatContext)_localctx).cl.value*100,
+			                            ((Pin_1_7_formatContext)_localctx).mk.value*100,
+			                            ((Pin_1_7_formatContext)_localctx).dr.value*100,
+			                            (((Pin_1_7_formatContext)_localctx).nm!=null?((Pin_1_7_formatContext)_localctx).nm.getText():null).substring(1, (((Pin_1_7_formatContext)_localctx).nm!=null?((Pin_1_7_formatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pin_1_7_formatContext)_localctx).pn!=null?((Pin_1_7_formatContext)_localctx).pn.getText():null).substring(1, (((Pin_1_7_formatContext)_localctx).pn!=null?((Pin_1_7_formatContext)_localctx).pn.getText():null).length() - 2),
+			                            Integer.valueOf((((Pin_1_7_formatContext)_localctx).fl!=null?((Pin_1_7_formatContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1370,9 +1532,15 @@ public class FootprintParserParser extends Parser {
 			setState(336); ((Pin_1_6_3_formatContext)_localctx).fl = match(INTEGER);
 			setState(337); match(2);
 
-			        
-					((Pin_1_6_3_formatContext)_localctx).newpin =  new Pin();
-					
+			        ((Pin_1_6_3_formatContext)_localctx).newpin =  new Pin(  ((Pin_1_6_3_formatContext)_localctx).x.value*100,
+			                            ((Pin_1_6_3_formatContext)_localctx).y.value*100,
+			                            ((Pin_1_6_3_formatContext)_localctx).th.value*100,
+			                            0.0f,
+			                            0.0f,
+			                            ((Pin_1_6_3_formatContext)_localctx).dr.value*100,
+			                            (((Pin_1_6_3_formatContext)_localctx).nm!=null?((Pin_1_6_3_formatContext)_localctx).nm.getText():null).substring(1, (((Pin_1_6_3_formatContext)_localctx).nm!=null?((Pin_1_6_3_formatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pin_1_6_3_formatContext)_localctx).pn!=null?((Pin_1_6_3_formatContext)_localctx).pn.getText():null).substring(1, (((Pin_1_6_3_formatContext)_localctx).pn!=null?((Pin_1_6_3_formatContext)_localctx).pn.getText():null).length() - 2),
+			                            Integer.valueOf((((Pin_1_6_3_formatContext)_localctx).fl!=null?((Pin_1_6_3_formatContext)_localctx).fl.getText():null)));	
 			      
 			}
 		}
@@ -1437,7 +1605,15 @@ public class FootprintParserParser extends Parser {
 			setState(347); ((Pin_newformatContext)_localctx).fl = match(INTEGER);
 			setState(348); match(2);
 
-					((Pin_newformatContext)_localctx).newpin =  new Pin();
+			        ((Pin_newformatContext)_localctx).newpin =  new Pin(  ((Pin_newformatContext)_localctx).x.value*100,
+			                            ((Pin_newformatContext)_localctx).y.value*100,
+			                            ((Pin_newformatContext)_localctx).th.value*100,
+			                            0.0f,
+			                            0.0f,
+			                            ((Pin_newformatContext)_localctx).dr.value*100,
+			                            (((Pin_newformatContext)_localctx).nm!=null?((Pin_newformatContext)_localctx).nm.getText():null).substring(1, (((Pin_newformatContext)_localctx).nm!=null?((Pin_newformatContext)_localctx).nm.getText():null).length() - 2),
+			                            "",
+			                            Integer.valueOf((((Pin_newformatContext)_localctx).fl!=null?((Pin_newformatContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1500,7 +1676,15 @@ public class FootprintParserParser extends Parser {
 			setState(357); ((Pin_oldformatContext)_localctx).fl = match(INTEGER);
 			setState(358); match(2);
 
-					((Pin_oldformatContext)_localctx).newpin =  new Pin();
+			        ((Pin_oldformatContext)_localctx).newpin =  new Pin(  ((Pin_oldformatContext)_localctx).x.value*100,
+			                            ((Pin_oldformatContext)_localctx).y.value*100,
+			                            ((Pin_oldformatContext)_localctx).th.value*100,
+			                            0.0f,
+			                            0.0f,
+			                            ((Pin_oldformatContext)_localctx).th.value*40,
+			                            (((Pin_oldformatContext)_localctx).nm!=null?((Pin_oldformatContext)_localctx).nm.getText():null).substring(1, (((Pin_oldformatContext)_localctx).nm!=null?((Pin_oldformatContext)_localctx).nm.getText():null).length() - 2),
+			                            "",
+			                            Integer.valueOf((((Pin_oldformatContext)_localctx).fl!=null?((Pin_oldformatContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1578,7 +1762,16 @@ public class FootprintParserParser extends Parser {
 			setState(372); ((Pad_hi_formatContext)_localctx).fl = flags();
 			setState(373); match(1);
 
-					((Pad_hi_formatContext)_localctx).newpad =  new Pad();
+			        ((Pad_hi_formatContext)_localctx).newpad =  new Pad(  ((Pad_hi_formatContext)_localctx).x1.value,
+			                            ((Pad_hi_formatContext)_localctx).y1.value,
+			                            ((Pad_hi_formatContext)_localctx).x2.value,
+			                            ((Pad_hi_formatContext)_localctx).y2.value,
+			                            ((Pad_hi_formatContext)_localctx).th.value,
+			                            ((Pad_hi_formatContext)_localctx).cl.value,
+			                            ((Pad_hi_formatContext)_localctx).mk.value,
+			                            (((Pad_hi_formatContext)_localctx).nm!=null?((Pad_hi_formatContext)_localctx).nm.getText():null).substring(1, (((Pad_hi_formatContext)_localctx).nm!=null?((Pad_hi_formatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pad_hi_formatContext)_localctx).pn!=null?((Pad_hi_formatContext)_localctx).pn.getText():null).substring(1, (((Pad_hi_formatContext)_localctx).pn!=null?((Pad_hi_formatContext)_localctx).pn.getText():null).length() - 2),
+			                            ((Pad_hi_formatContext)_localctx).fl.value);
 			      
 			}
 		}
@@ -1654,7 +1847,16 @@ public class FootprintParserParser extends Parser {
 			setState(387); ((Pad_1_7_formatContext)_localctx).fl = match(INTEGER);
 			setState(388); match(2);
 
-					((Pad_1_7_formatContext)_localctx).newpad =  new Pad();
+			        ((Pad_1_7_formatContext)_localctx).newpad =  new Pad(  ((Pad_1_7_formatContext)_localctx).x1.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).y1.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).x2.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).y2.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).th.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).cl.value*100,
+			                            ((Pad_1_7_formatContext)_localctx).mk.value*100,
+			                            (((Pad_1_7_formatContext)_localctx).nm!=null?((Pad_1_7_formatContext)_localctx).nm.getText():null).substring(1, (((Pad_1_7_formatContext)_localctx).nm!=null?((Pad_1_7_formatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pad_1_7_formatContext)_localctx).pn!=null?((Pad_1_7_formatContext)_localctx).pn.getText():null).substring(1, (((Pad_1_7_formatContext)_localctx).pn!=null?((Pad_1_7_formatContext)_localctx).pn.getText():null).length() - 2),
+			                            Integer.valueOf((((Pad_1_7_formatContext)_localctx).fl!=null?((Pad_1_7_formatContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1726,7 +1928,16 @@ public class FootprintParserParser extends Parser {
 			setState(400); ((Pad_newformatContext)_localctx).fl = match(INTEGER);
 			setState(401); match(2);
 
-					((Pad_newformatContext)_localctx).newpad =  new Pad();
+			        ((Pad_newformatContext)_localctx).newpad =  new Pad(  ((Pad_newformatContext)_localctx).x1.value*100,
+			                            ((Pad_newformatContext)_localctx).y1.value*100,
+			                            ((Pad_newformatContext)_localctx).x2.value*100,
+			                            ((Pad_newformatContext)_localctx).y2.value*100,
+			                            ((Pad_newformatContext)_localctx).th.value*100,
+			                            0.0f,
+			                            0.0f,
+			                            (((Pad_newformatContext)_localctx).nm!=null?((Pad_newformatContext)_localctx).nm.getText():null).substring(1, (((Pad_newformatContext)_localctx).nm!=null?((Pad_newformatContext)_localctx).nm.getText():null).length() - 2),
+			                            (((Pad_newformatContext)_localctx).pn!=null?((Pad_newformatContext)_localctx).pn.getText():null).substring(1, (((Pad_newformatContext)_localctx).pn!=null?((Pad_newformatContext)_localctx).pn.getText():null).length() - 2),
+			                            Integer.valueOf((((Pad_newformatContext)_localctx).fl!=null?((Pad_newformatContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1793,7 +2004,16 @@ public class FootprintParserParser extends Parser {
 			setState(412); ((PadContext)_localctx).fl = match(INTEGER);
 			setState(413); match(2);
 
-					((PadContext)_localctx).newpad =  new Pad();
+			        ((PadContext)_localctx).newpad =  new Pad(  ((PadContext)_localctx).x1.value*100,
+			                            ((PadContext)_localctx).y1.value*100,
+			                            ((PadContext)_localctx).x2.value*100,
+			                            ((PadContext)_localctx).y2.value*100,
+			                            ((PadContext)_localctx).th.value*100,
+			                            0.0f,
+			                            0.0f,
+			                            (((PadContext)_localctx).nm!=null?((PadContext)_localctx).nm.getText():null).substring(1, (((PadContext)_localctx).nm!=null?((PadContext)_localctx).nm.getText():null).length() - 2),
+			                            "",
+			                            Integer.valueOf((((PadContext)_localctx).fl!=null?((PadContext)_localctx).fl.getText():null)));
 			      
 			}
 		}
@@ -1965,7 +2185,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(431); ((MeasureContext)_localctx).r = number();
 				setState(432); match(T_UMIL);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_UMIL);/*umil*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_UMIL);/*umil*/ 
 				}
 				break;
 
@@ -1974,7 +2194,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(435); ((MeasureContext)_localctx).r = number();
 				setState(436); match(T_CMIL);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_CMIL);/*centimil*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_CMIL);/*centimil*/ 
 				}
 				break;
 
@@ -1983,7 +2203,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(439); ((MeasureContext)_localctx).r = number();
 				setState(440); match(T_MIL);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_MIL);/*mil*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_MIL);/*mil*/ 
 				}
 				break;
 
@@ -1992,7 +2212,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(443); ((MeasureContext)_localctx).r = number();
 				setState(444); match(T_IN);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_INCH);/*inch*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_INCH);/*inch*/ 
 				}
 				break;
 
@@ -2001,7 +2221,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(447); ((MeasureContext)_localctx).r = number();
 				setState(448); match(T_NM);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_NM);/*nm*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_NM);/*nm*/ 
 				}
 				break;
 
@@ -2010,7 +2230,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(451); ((MeasureContext)_localctx).r = number();
 				setState(452); match(T_UM);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_UM);/*um*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_UM);/*um*/ 
 				}
 				break;
 
@@ -2019,7 +2239,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(455); ((MeasureContext)_localctx).r = number();
 				setState(456); match(T_MM);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_MM);/*mm*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_MM);/*mm*/ 
 				}
 				break;
 
@@ -2028,7 +2248,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(459); ((MeasureContext)_localctx).r = number();
 				setState(460); match(T_M);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_M);/*m*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_M);/*m*/ 
 				}
 				break;
 
@@ -2037,7 +2257,7 @@ public class FootprintParserParser extends Parser {
 				{
 				setState(463); ((MeasureContext)_localctx).r = number();
 				setState(464); match(T_KM);
-				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.toCentiMil.UNIT_KM);/*km*/ 
+				 ((MeasureContext)_localctx).value =  ICFootprint.CentiMil.toCentiMil(((MeasureContext)_localctx).r.value,ICFootprint.CentiMil.UNIT_KM);/*km*/ 
 				}
 				break;
 			}
