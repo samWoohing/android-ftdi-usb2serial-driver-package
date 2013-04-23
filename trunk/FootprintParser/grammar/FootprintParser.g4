@@ -708,12 +708,25 @@ measure returns [float value]
     | r=number T_M  { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.UNIT_M);/*m*/ }
     | r=number T_KM { $value = ICFootprint.CentiMil.toCentiMil($r.value,ICFootprint.CentiMil.UNIT_KM);/*km*/ }
     ;
-    
+
+LINE_COMMENT: '#' ~[\r\n]* ('\r'? '\n' | EOF) -> channel(HIDDEN)
+            ;
+
+WS: ( ' ' | '\t' | '\r' | '\n' )+ -> channel(HIDDEN)
+    ;
+
 HEX :         '0''x'('0'..'9'|'a'..'f'|'A'..'F')+;//[0-9a-fA-F]+;
-INTEGER :       ('+'|'-')?(('1'..'9')('0'..'9')*)|'0'; //[+-]?([1-9][0-9]*|0);
+INTEGER :       ('+'|'-')?('1'..'9' '0'..'9'*)|'0'; //[+-]?([1-9][0-9]*|0);
 FLOATING :     (INTEGER)'.'('0'..'9')*;
-STRINGCHAR :   (~('"'|'\\'|'\n'|'\r')|('\\'.)) ;//([^"\n\r\\]|\\.);×ªÒå×Ö·û?
-STRING:		'"'(STRINGCHAR)*'"';
+
+//STRINGCHAR :   (~["\\\n\r]|('\\'.)) ;//([^"\n\r\\]|\\.);
+//STRING:		'"'(STRINGCHAR)*'"';
+
+STRING:  '"' ( STRESC | ~('\\'|'"') )* '"'
+    ;
+
+STRESC: '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')//escape sequence of the string.
+        ;
 
 //basic token definitions
 T_PIN:  'Pin';
