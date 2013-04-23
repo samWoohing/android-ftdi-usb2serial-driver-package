@@ -1,6 +1,8 @@
 package cn.songshan99.realicfootprint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import static java.lang.Math.*;
 import static android.util.FloatMath.*;
 import android.graphics.Path;
@@ -16,6 +18,36 @@ public class ICFootprint {
 	protected int flags;
 	protected ICText mICText;
 	
+	private static final HashMap<String, Integer> strFlagMap = new HashMap<String, Integer>(){
+        {
+        	put("pin",	0x0001);
+        	put("via",0x0002);
+        	put("found",0x0004);
+        	put("hole",0x0008);
+        	put("nopaste",0x0008);
+        	put("rat",0x0010);
+        	put("pininpoly",0x0010);
+        	put("clearpoly",0x0010);
+        	put("hidename",0x0010);
+        	put("showname",0x0020);
+        	put("clearline",0x0020);
+        	put("fullpoly",0x0020);
+        	put("selected",0x0040);
+        	put("onsolder",0x0080);
+        	put("auto",0x0080);
+        	put("square",0x0100);
+        	put("rubberend",0x0200);
+        	put("warn",0x0200);
+        	put("usetherm",0x0400);
+        	put("octagon",0x0800);
+        	put("drc",0x1000);
+        	put("lock",0x2000);
+        	put("edge2",0x4000);
+        	put("marker",0x8000);
+        	put("connected",0x10000);
+        }
+    };
+    
 	public String getmValue() {
 		return mValue;
 	}
@@ -176,11 +208,15 @@ public class ICFootprint {
 	 * @return the int
 	 */
 	public static int stringToFlags(String str){
-		//TODO: complete the content
+		//The string flags can be comma separated: "square,octal"
 		//convert to lower characters
 		String lstr = str.toLowerCase();
-		
-		return 0;
+		int i=0,ind,flag=0;
+		while((ind=lstr.indexOf(',',i))>=0){
+			flag |= strFlagMap.get(lstr.substring(i, ind-1));
+			i=ind+1;
+		}
+		return flag;
 	}
 	
 	public static abstract class PinOrPadOrDraftLine{
@@ -190,15 +226,15 @@ public class ICFootprint {
 		public static final int TYPE_ARC=4;
 		public static final int TYPE_MARK=5;
 		
-		protected static final int SHAPE_ROUND=1;
-		protected static final int SHAPE_RECT=2;
-		protected static final int SHAPE_OCT=3;
+		protected static final int SHAPE_ROUND=0;
+		protected static final int SHAPE_RECT=0x0100;
+		protected static final int SHAPE_OCT=0x0800;
 		
 		private int type;
 		
 		public abstract RectF calculateBoundRectangle();
 		public abstract void offset(float dx, float dy);
-		//public abstract Path toPath(int layer);//TODO: add dpi as parameter
+		//public abstract Path toPath(int layer);
 		
 		public int getType() {
 			return type;
@@ -248,8 +284,9 @@ public class ICFootprint {
 		}
 		
 		public int getShape(){
-			//TODO: check Flags, decide octal, round, square
-			return 0;
+			if((Flags | SHAPE_RECT)!=0) return SHAPE_RECT;
+			if((Flags | SHAPE_OCT)!=0) return SHAPE_OCT;
+			return SHAPE_ROUND;
 		}
 		//TODO: continue
 		private Path generateBound(float width_in_cmil, Path.Direction dir, float dpi){
@@ -296,7 +333,7 @@ public class ICFootprint {
 	}
 	
 	public static class Pad extends PinOrPadOrDraftLine{
-		//TODO: include the draw path method to each pin and pad
+		
 		protected float aX1,aY1, aX2,aY2,Thickness,Clearance,Mask;
 		protected String Name, Number;
 		protected int Flags;
@@ -310,7 +347,7 @@ public class ICFootprint {
 		
 		@Override
 		public RectF calculateBoundRectangle() {
-			// TODO Auto-generated method stub
+			
 			RectF rect = new RectF();
 			float topY,btmY,leftX,rightX,largest_Radius;
 			topY=(aY1<aY2)?aY1:aY2;
@@ -341,9 +378,9 @@ public class ICFootprint {
 		}
 		
 		public int getShape(){
-			//check if this is round or square
-			//TODO
-			return 0;
+			if((Flags | SHAPE_RECT)!=0) return SHAPE_RECT;
+			if((Flags | SHAPE_OCT)!=0) return SHAPE_OCT;
+			return SHAPE_ROUND;
 		}
 //		@Override
 //		public Path toPath(int layer) {
@@ -544,7 +581,7 @@ public class ICFootprint {
 
 		@Override
 		public RectF calculateBoundRectangle() {
-			// TODO Auto-generated method stub
+			
 			return new RectF(aX,aY,aX,aY);
 		}	
 	}
