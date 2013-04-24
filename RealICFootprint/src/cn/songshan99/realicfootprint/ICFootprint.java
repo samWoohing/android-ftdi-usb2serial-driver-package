@@ -288,7 +288,7 @@ public class ICFootprint {
 			if((Flags | SHAPE_OCT)!=0) return SHAPE_OCT;
 			return SHAPE_ROUND;
 		}
-		//TODO: continue
+		
 		private Path generateBound(float width_in_cmil, Path.Direction dir, float dpi){
 			Path path = new Path();
 			float aXdpi,aYdpi,raddpi;
