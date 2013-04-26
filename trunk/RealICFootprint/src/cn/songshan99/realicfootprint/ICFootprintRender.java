@@ -3,11 +3,12 @@ package cn.songshan99.realicfootprint;
 import java.util.ArrayList;
 import static java.lang.Math.*;
 
-import cn.songshan99.realicfootprint.ICFootprint.ElementArc;
-import cn.songshan99.realicfootprint.ICFootprint.ElementLine;
-import cn.songshan99.realicfootprint.ICFootprint.Pad;
-import cn.songshan99.realicfootprint.ICFootprint.Pin;
-import cn.songshan99.realicfootprint.ICFootprint.PinOrPadOrDraftLine;
+import cn.songshan99.FootprintParser.ICFootprint;
+import cn.songshan99.FootprintParser.ICFootprint.ElementArc;
+import cn.songshan99.FootprintParser.ICFootprint.ElementLine;
+import cn.songshan99.FootprintParser.ICFootprint.Pad;
+import cn.songshan99.FootprintParser.ICFootprint.Pin;
+import cn.songshan99.FootprintParser.ICFootprint.PinOrPadOrDraftLine;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;

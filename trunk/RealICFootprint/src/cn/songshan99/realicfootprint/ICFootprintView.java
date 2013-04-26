@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.tree.*;
 import cn.songshan99.FootprintParser.FootprintParserLexer;
 import cn.songshan99.FootprintParser.FootprintParserParser;
 import cn.songshan99.FootprintParser.FootprintParserParser.ElementContext;
+import cn.songshan99.FootprintParser.ICFootprint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;

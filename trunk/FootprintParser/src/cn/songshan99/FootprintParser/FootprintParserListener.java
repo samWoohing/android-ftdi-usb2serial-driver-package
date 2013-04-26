@@ -2,8 +2,8 @@
 
 package cn.songshan99.FootprintParser;
 
-import cn.songshan99.realicfootprint.ICFootprint;
-import cn.songshan99.realicfootprint.ICFootprint.*;
+import cn.songshan99.FootprintParser.ICFootprint;
+import cn.songshan99.FootprintParser.ICFootprint.*;
 
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.Token;
@@ -23,6 +23,9 @@ public interface FootprintParserListener extends ParseTreeListener {
 
 	void enterMeasure(FootprintParserParser.MeasureContext ctx);
 	void exitMeasure(FootprintParserParser.MeasureContext ctx);
+
+	void enterInteger(FootprintParserParser.IntegerContext ctx);
+	void exitInteger(FootprintParserParser.IntegerContext ctx);
 
 	void enterPin_hi_format(FootprintParserParser.Pin_hi_formatContext ctx);
 	void exitPin_hi_format(FootprintParserParser.Pin_hi_formatContext ctx);

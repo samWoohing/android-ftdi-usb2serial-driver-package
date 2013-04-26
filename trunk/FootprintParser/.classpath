@@ -5,6 +5,5 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="libs/antlr-4.0-complete.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/RealICFootprint"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

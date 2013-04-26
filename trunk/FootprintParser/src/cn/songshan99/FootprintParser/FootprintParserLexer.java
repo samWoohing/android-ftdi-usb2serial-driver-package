@@ -2,8 +2,8 @@
 
 package cn.songshan99.FootprintParser;
 
-import cn.songshan99.realicfootprint.ICFootprint;
-import cn.songshan99.realicfootprint.ICFootprint.*;
+import cn.songshan99.FootprintParser.ICFootprint;
+import cn.songshan99.FootprintParser.ICFootprint.*;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
