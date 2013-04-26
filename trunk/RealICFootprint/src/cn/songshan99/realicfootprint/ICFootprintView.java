@@ -1,5 +1,8 @@
 package cn.songshan99.realicfootprint;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
@@ -17,6 +20,10 @@ public class ICFootprintView extends View {
 	private ICFootprint mICFootprint;
 	private ICFootprintRender mICFootprintRender;
 	
+	public void setmICFootprintRender(ICFootprintRender mICFootprintRender) {
+		this.mICFootprintRender = mICFootprintRender;
+	}
+
 	public ICFootprintView(Context context) {
 		super(context);
 		if(isInEditMode()) return;
@@ -52,9 +59,9 @@ public class ICFootprintView extends View {
 		mICFootprint = footprint;
 	}
 	
-	public static ICFootprint parseFootprintFile(String str){
+	public static ICFootprint parseFootprintFile(InputStream stream) throws IOException{
 		//TODO: change input to file stream?? catch exceptions and let upper level know
-		ANTLRInputStream instream = new ANTLRInputStream(str);
+		ANTLRInputStream instream = new ANTLRInputStream(stream);
 		FootprintParserLexer lexer = new FootprintParserLexer(instream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		FootprintParserParser parser = new FootprintParserParser(tokens);
