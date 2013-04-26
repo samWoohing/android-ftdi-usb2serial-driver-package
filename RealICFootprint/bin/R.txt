@@ -285,10 +285,11 @@ int id abs__textButton 0x7f060013
 int id abs__title 0x7f06001b
 int id abs__titleDivider 0x7f06001c
 int id abs__up 0x7f06000b
-int id action_settings 0x7f060033
+int id action_settings 0x7f060034
 int id disableHome 0x7f060009
 int id edit_query 0x7f060027
 int id homeAsUp 0x7f060006
+int id icfootprintview 0x7f060033
 int id listMode 0x7f060002
 int id normal 0x7f060001
 int id showCustom 0x7f060008

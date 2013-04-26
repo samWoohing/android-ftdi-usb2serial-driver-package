@@ -1,8 +1,13 @@
 package cn.songshan99.realicfootprint;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
+
+import cn.songshan99.FootprintParser.ICFootprint;
 import cn.songshan99.realicfootprint.R;
 
 import android.os.Bundle;
@@ -20,8 +25,9 @@ public class MainActivity extends SherlockActivity {
 		ICFootprint footprint;
 		ICFootprintRender render;
 		try {
-			footprint = ICFootprintView.parseFootprintFile(getAssets().open(str));
-			getAssets().close();
+			InputStream stream = getAssets().open(str);
+			footprint = ICFootprintView.parseFootprintFile(stream);
+			stream.close();
 			render =ICFootprintView.createFootprintRender(footprint, 120.0f);
 			
 		} catch (IOException e) {
@@ -34,15 +40,18 @@ public class MainActivity extends SherlockActivity {
 		v.setICFootprint(footprint);
 		v.setmICFootprintRender(render);
 		
-		//ICFootprintView.
-		//v.setICFootprint(footprint);
+		
+		
+		//TODO: use above code as debuging start, and finish ICFootprintView.
+		//set the visibility of each layer, and make sure they are shown correctly.
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		// TODO Auto-generated method stub
-		//getMenuInflater().inflate(R.menu.main, (Menu) menu);
+		menu.add(2, 1, 1, "About");
 		return super.onCreateOptionsMenu(menu);
 	}
+
+
 	
 }
