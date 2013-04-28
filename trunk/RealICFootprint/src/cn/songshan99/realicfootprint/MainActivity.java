@@ -23,7 +23,7 @@ public class MainActivity extends SherlockActivity {
 		setTheme(R.style.Theme_Sherlock_Light);
 		setContentView(R.layout.activity_main);
 		
-		String str="DIP16.fp";
+		String str="TQFP208_28.fp";
 		ICFootprint footprint;
 		ICFootprintRender render;
 		ICFootprintView v = (ICFootprintView)findViewById(R.id.icfootprintview);

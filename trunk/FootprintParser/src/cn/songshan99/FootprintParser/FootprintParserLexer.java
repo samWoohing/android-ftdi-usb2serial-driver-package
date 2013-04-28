@@ -1,4 +1,4 @@
-// Generated from D:\ShanSong\android\android-ftdi-usb2serial-driver-package\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
+// Generated from D:\ShanSong\Android-FTDI-usb2serial\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
 
 package cn.songshan99.FootprintParser;
 
