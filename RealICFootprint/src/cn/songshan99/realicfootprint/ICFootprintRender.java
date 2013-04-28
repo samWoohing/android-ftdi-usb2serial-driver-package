@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.util.DisplayMetrics;
 import static android.util.FloatMath.*;
 
 /**
@@ -81,12 +82,25 @@ public class ICFootprintRender {
 		}
 	}
 	
-	private static void drawOctal(float dpiX, float dpiY, float dpiR, Path.Direction dir, Path path){
+	/**
+	 * Draw octal.
+	 *
+	 * @param dpiX the center x
+	 * @param dpiY the center y
+	 * @param dpiRX x direction radius
+	 * @param dpiRY y direction radius
+	 * @param dir the dir
+	 * @param path the path
+	 */
+	private static void drawOctal(float dpiX, float dpiY, float dpiRX, float dpiRY, Path.Direction dir, Path path){
 		float delta=(45f/180f*(float)java.lang.Math.PI);
 		if(dir == Path.Direction.CW) delta *=-1;
-		float x=0.0f,y=0.0f,theta=0.0f;
+		float x=0.0f,y=0.0f,theta=0.0f,dpiR,xcos,ysin;
 		for(int i=0; i<=7; i++){
 			theta= (i*delta+22.5f/180f*(float)java.lang.Math.PI);
+			xcos = dpiRX * cos(theta);
+			ysin = dpiRY * sin(theta);
+			dpiR = dpiRX * dpiRY / sqrt(xcos*xcos+ysin*ysin);
 			x=-cos(theta)*dpiR+dpiX;
 			y=sin(theta)*dpiR+dpiY;
 			if(i==0)path.moveTo(x, y);
@@ -104,59 +118,72 @@ public class ICFootprintRender {
 	 * @param dpi: pixel per inch for the current display
 	 * @param path: the path into which the lines are added to
 	 */
-	private static void PinToPath(Pin pin, int layer, float dpi, Path path){
+	private static void PinToPath(Pin pin, int layer, float xdpi, float ydpi, Path path){
 		//directly add the drawing into path
-		float dpiX,dpiY,dpiR_outer,dpiR_inner;
-		dpiX=ICFootprint.CentiMil.CentiMilToPixel(pin.aX, dpi);
-		dpiY=ICFootprint.CentiMil.CentiMilToPixel(pin.aY, dpi);
+		float dpiX,dpiY,dpiR_outer_x,dpiR_inner_x,dpiR_outer_y,dpiR_inner_y;
+		dpiX=ICFootprint.CentiMil.CentiMilToPixel(pin.aX, xdpi);
+		dpiY=ICFootprint.CentiMil.CentiMilToPixel(pin.aY, ydpi);
 		
 		switch(layer){
 		case LAYER_COPPER:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,dpi)/2;
-			dpiR_inner = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,dpi)/2;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,xdpi)/2;
+			dpiR_inner_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,xdpi)/2;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,ydpi)/2;
+			dpiR_inner_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,ydpi)/2;
 			break;
 			
 		case LAYER_DRILL:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,dpi)/2;
-			dpiR_inner = 0;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,xdpi)/2;
+			dpiR_inner_x = 0;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,ydpi)/2;
+			dpiR_inner_y = 0;
 			break;
 			
 		case LAYER_CLEARANCE:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness+pin.Clearance,dpi)/2;
-			dpiR_inner = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,dpi)/2;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness+pin.Clearance,xdpi)/2;
+			dpiR_inner_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,xdpi)/2;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness+pin.Clearance,ydpi)/2;
+			dpiR_inner_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Thickness,ydpi)/2;
 			break;
 			
 		case LAYER_MASK:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pin.Mask,dpi)/2;
-			dpiR_inner = 0;//TODO: verify if mask's inner is drill or is 0...
-			//dpiR_inner = ICFootprint.CentiMil.CentiMilToPixel(pin.Drill,dpi)/2;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pin.Mask,xdpi)/2;
+			dpiR_inner_x = 0;//TODO: verify if mask's inner is drill or is 0...
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pin.Mask,ydpi)/2;
+			dpiR_inner_y = 0;//TODO: verify if mask's inner is drill or is 0...
 			break;
 			
 		default:
 			return;//no need to perform later drawing actions
 		}
 		
+		RectF outerRect=null,innerRect=null;
+		if(dpiR_outer_x!=0 && dpiR_outer_y!=0)
+			outerRect = new RectF(dpiX-dpiR_outer_x, dpiY-dpiR_outer_y, dpiX+dpiR_outer_x, dpiY+dpiR_outer_y);
+		if(dpiR_inner_x!=0 && dpiR_inner_y!=0)
+			innerRect = new RectF(dpiX-dpiR_inner_x, dpiY-dpiR_inner_y, dpiX+dpiR_inner_x, dpiY+dpiR_inner_y);
+		
 		switch(pin.getShape()){
 		case ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:
-			if(dpiR_outer!=0)
-				path.addCircle(dpiX, dpiY, dpiR_outer, Path.Direction.CCW);
-			if(dpiR_inner!=0)
-				path.addCircle(dpiX, dpiY, dpiR_inner, Path.Direction.CW);
+			if(outerRect!=null)
+				path.addOval(outerRect,  Path.Direction.CCW);//path.addCircle(dpiX, dpiY, dpiR_outer, Path.Direction.CCW);
+			if(innerRect!=null)
+				path.addOval(innerRect,  Path.Direction.CW);//path.addCircle(dpiX, dpiY, dpiR_inner, Path.Direction.CW);
 			return;
 			
 		case ICFootprint.PinOrPadOrDraftLine.SHAPE_RECT:
-			if(dpiR_outer!=0)
-				path.addRect(dpiX-dpiR_outer, dpiY-dpiR_outer, dpiX+dpiR_outer, dpiY+dpiR_outer, Path.Direction.CCW);
-			if(dpiR_inner!=0)
-				path.addRect(dpiX-dpiR_inner, dpiY-dpiR_inner, dpiX+dpiR_inner, dpiY+dpiR_inner, Path.Direction.CW);
+			if(outerRect!=null)
+				path.addRect(outerRect, Path.Direction.CCW);
+			if(innerRect!=null)
+				path.addRect(innerRect, Path.Direction.CW);
 			return;
 
 		case ICFootprint.PinOrPadOrDraftLine.SHAPE_OCT:
-			if(dpiR_outer!=0){
-				drawOctal(dpiX,dpiY,dpiR_outer,Path.Direction.CCW,path);
+			if(outerRect!=null){
+				drawOctal(dpiX,dpiY,dpiR_outer_x,dpiR_outer_y,Path.Direction.CCW,path);
 			}
-			if(dpiR_inner!=0){
-				drawOctal(dpiX,dpiY,dpiR_inner,Path.Direction.CW,path);
+			if(innerRect!=null){
+				drawOctal(dpiX,dpiY,dpiR_inner_x,dpiR_inner_x,Path.Direction.CW,path);
 			}
 			return;
 			
@@ -173,27 +200,31 @@ public class ICFootprintRender {
 	 * @param dpi: pixel per inch for the current display
 	 * @param path: the path into which the lines are added to
 	 */
-	private static void PadToPath(Pad pad, int layer, float dpi, Path path){
-		float leftX,rightX,topY,bottomY,dpiR_outer,dpiR_inner;
-		leftX	=min(pad.aX1,pad.aX2);
-		rightX	=max(pad.aX1,pad.aX2);
-		topY	=min(pad.aY1,pad.aY2);
-		bottomY	=max(pad.aY1,pad.aY2);
+	private static void PadToPath(Pad pad, int layer, float xdpi,float ydpi, Path path){
+		float leftX,rightX,topY,bottomY,dpiR_outer_x,dpiR_outer_y,dpiR_inner_x,dpiR_inner_y;
+		leftX	=ICFootprint.CentiMil.CentiMilToPixel(min(pad.aX1,pad.aX2),xdpi);
+		rightX	=ICFootprint.CentiMil.CentiMilToPixel(max(pad.aX1,pad.aX2),xdpi);
+		topY	=ICFootprint.CentiMil.CentiMilToPixel(min(pad.aY1,pad.aY2),ydpi);
+		bottomY	=ICFootprint.CentiMil.CentiMilToPixel(max(pad.aY1,pad.aY2),ydpi);
 		
 		switch(layer){
 		case LAYER_COPPER:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,dpi)/2;
-			dpiR_inner = 0;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,xdpi)/2;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,ydpi)/2;
+			dpiR_inner_x = 0;dpiR_inner_y = 0;
 			break;
 			
 		case LAYER_CLEARANCE:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness+pad.Clearance,dpi)/2;
-			dpiR_inner = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,dpi)/2;
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness+pad.Clearance,xdpi)/2;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness+pad.Clearance,ydpi)/2;
+			dpiR_inner_x = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,xdpi)/2;
+			dpiR_inner_y = ICFootprint.CentiMil.CentiMilToPixel(pad.Thickness,ydpi)/2;
 			break;
 			
 		case LAYER_MASK:
-			dpiR_outer = ICFootprint.CentiMil.CentiMilToPixel(pad.Mask,dpi)/2;
-			dpiR_inner = 0;//TODO: verify if mask's inner is drill or is 0...
+			dpiR_outer_x = ICFootprint.CentiMil.CentiMilToPixel(pad.Mask,xdpi)/2;
+			dpiR_outer_y = ICFootprint.CentiMil.CentiMilToPixel(pad.Mask,ydpi)/2;
+			dpiR_inner_x = 0;dpiR_inner_y = 0;//TODO: verify if mask's inner is drill or is 0...
 			//dpiR_inner = ICFootprint.CentiMil.CentiMilToPixel(pad.Drill,dpi)/2;
 			break;
 			
@@ -202,17 +233,17 @@ public class ICFootprintRender {
 		}
 		
 		RectF outerRect=null,innerRect=null;
-		if(dpiR_outer!=0)
-			outerRect = new RectF(leftX-dpiR_outer, topY-dpiR_outer, rightX+dpiR_outer, bottomY+dpiR_outer);
-		if(dpiR_inner!=0)
-			innerRect = new RectF(leftX-dpiR_inner, topY-dpiR_inner, rightX+dpiR_inner, bottomY+dpiR_inner);
+		if(dpiR_outer_x!=0 && dpiR_outer_y!=0)
+			outerRect = new RectF(leftX-dpiR_outer_x, topY-dpiR_outer_y, rightX+dpiR_outer_x, bottomY+dpiR_outer_y);
+		if(dpiR_inner_x!=0 && dpiR_inner_y!=0)
+			innerRect = new RectF(leftX-dpiR_inner_x, topY-dpiR_inner_y, rightX+dpiR_inner_x, bottomY+dpiR_inner_y);
 		
 		switch(pad.getShape()){
 		case ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:
-			if(dpiR_outer!=0)
-				path.addRoundRect(outerRect, dpiR_outer, dpiR_outer, Path.Direction.CCW);
-			if(dpiR_inner!=0)
-				path.addRoundRect(innerRect, dpiR_inner, dpiR_inner, Path.Direction.CW);
+			if(outerRect!=null)
+				path.addRoundRect(outerRect, dpiR_outer_x, dpiR_outer_y, Path.Direction.CCW);
+			if(innerRect!=null)
+				path.addRoundRect(innerRect, dpiR_inner_x, dpiR_inner_y, Path.Direction.CW);
 			return;
 		case ICFootprint.PinOrPadOrDraftLine.SHAPE_RECT:
 			if(outerRect!=null)
@@ -225,25 +256,25 @@ public class ICFootprintRender {
 		}
 	}
 	
-	private static void lineToPath(ElementLine line, float dpi, Path path){
+	private static void lineToPath(ElementLine line, float xdpi,float ydpi, Path path){
 		float dpiX1,dpiY1,dpiX2,dpiY2;
-		dpiX1=ICFootprint.CentiMil.CentiMilToPixel(line.aX1, dpi);
-		dpiY1=ICFootprint.CentiMil.CentiMilToPixel(line.aY1, dpi);
-		dpiX2=ICFootprint.CentiMil.CentiMilToPixel(line.aX2, dpi);
-		dpiY2=ICFootprint.CentiMil.CentiMilToPixel(line.aY2, dpi);
+		dpiX1=ICFootprint.CentiMil.CentiMilToPixel(line.aX1, xdpi);
+		dpiY1=ICFootprint.CentiMil.CentiMilToPixel(line.aY1, ydpi);
+		dpiX2=ICFootprint.CentiMil.CentiMilToPixel(line.aX2, xdpi);
+		dpiY2=ICFootprint.CentiMil.CentiMilToPixel(line.aY2, ydpi);
 		path.moveTo(dpiX1, dpiY1);
 		path.lineTo(dpiX2, dpiY2);
 	}
 	
-	private static void arcToPath(ElementArc arc, float dpi, Path path){
+	private static void arcToPath(ElementArc arc, float xdpi,float ydpi, Path path){
 		//convert gEda convention to Android convention
 		//note that gEDA use CCW as positive, while angle zero points left
 		//and Android uses CW as positive, while angle zero points right.
 		RectF rect = new RectF();
-		rect.left 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX-arc.Width, dpi);
-		rect.right 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX+arc.Width, dpi);
-		rect.top 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aY-arc.Height, dpi);
-		rect.bottom = ICFootprint.CentiMil.CentiMilToPixel(arc.aY+arc.Height, dpi);
+		rect.left 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX-arc.Width, xdpi);
+		rect.right 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aX+arc.Width, xdpi);
+		rect.top 	= ICFootprint.CentiMil.CentiMilToPixel(arc.aY-arc.Height, ydpi);
+		rect.bottom = ICFootprint.CentiMil.CentiMilToPixel(arc.aY+arc.Height, ydpi);
 		path.addArc(rect, 180.0f-arc.StartAngle, -arc.DeltaAngle);
 	}
 
@@ -255,7 +286,7 @@ public class ICFootprintRender {
 	 * @param dpi: the dpi of current display
 	 * @return the ICDisplayLayer instance for the given layer
 	 */
-	public static ICDisplayLayer calculateLayer(ICFootprint footprint, int layer, float dpi){
+	public static ICDisplayLayer calculateLayer(ICFootprint footprint, int layer, DisplayMetrics displayMetrics){
 		ArrayList<PinOrPadOrDraftLine> pinorpadlist = footprint.getmListPinOrPad();
 		ArrayList<PinOrPadOrDraftLine> draftlinelist = footprint.getmListDraftLine();
 		
@@ -273,9 +304,9 @@ public class ICFootprintRender {
 			icpath = new Path();
 			for(PinOrPadOrDraftLine pinpad:pinorpadlist){
 				if(pinpad.getType()==PinOrPadOrDraftLine.TYPE_PAD)
-					PadToPath((Pad) pinpad, layer, dpi, icpath);
+					PadToPath((Pad) pinpad, layer, displayMetrics.xdpi,displayMetrics.ydpi, icpath);
 				else if(pinpad.getType()==PinOrPadOrDraftLine.TYPE_PIN)
-					PinToPath((Pin) pinpad, layer, dpi, icpath);
+					PinToPath((Pin) pinpad, layer, displayMetrics.xdpi,displayMetrics.ydpi, icpath);
 				else return null;
 			}
 			//add the new pathpaint to displayLayer, note that unlike draftline, we can only get one pathpaint...
@@ -295,7 +326,7 @@ public class ICFootprintRender {
 					return null;
 				
 				//convert thickness from centimil to pixel
-				thickness = ICFootprint.CentiMil.CentiMilToPixel(thickness, dpi);
+				thickness = ICFootprint.CentiMil.CentiMilToPixel(thickness, displayMetrics.densityDpi);
 				
 				//find if a given width already exists,
 				PathPaint pp = null;
@@ -312,9 +343,9 @@ public class ICFootprintRender {
 				//pp is the PathPaint object for the given draftline.
 				//convert the line, arc to dpi based paths
 				if(draftline.getType()==PinOrPadOrDraftLine.TYPE_ARC)
-					arcToPath((ElementArc)draftline,dpi,pp.mPath);
+					arcToPath((ElementArc)draftline, displayMetrics.xdpi, displayMetrics.ydpi, pp.mPath);
 				else if(draftline.getType()==PinOrPadOrDraftLine.TYPE_LINE)
-					lineToPath((ElementLine)draftline,dpi,pp.mPath);
+					lineToPath((ElementLine)draftline, displayMetrics.xdpi,displayMetrics.ydpi, pp.mPath);
 				else
 					return null;
 				
@@ -333,11 +364,20 @@ public class ICFootprintRender {
 	 * @param footprint the footprint
 	 * @param dpi the dpi
 	 */
-	public void calculateAllLayers(ICFootprint footprint, float dpi){
-		mLayerCopper = calculateLayer(footprint, LAYER_COPPER,dpi);
-		mLayerDrill = calculateLayer(footprint, LAYER_DRILL,dpi);
-		mLayerMask = calculateLayer(footprint, LAYER_MASK,dpi);
-		mLayerDraft = calculateLayer(footprint, LAYER_DRAFT,dpi);
+	public void calculateAllLayers(ICFootprint footprint, DisplayMetrics displayMetrics){
+		mLayerCopper = calculateLayer(footprint, LAYER_COPPER,displayMetrics);
+		mLayerDrill = calculateLayer(footprint, LAYER_DRILL,displayMetrics);
+		mLayerMask = calculateLayer(footprint, LAYER_MASK,displayMetrics);
+		mLayerDraft = calculateLayer(footprint, LAYER_DRAFT,displayMetrics);
+	}
+	
+	public void recalculateAllLayers(ICFootprint footprint, DisplayMetrics displayMetrics){
+		//calculate all layers without new operations
+		//TODO: implementation
+	}
+	
+	private void recalculateLayer(int layer){
+		
 	}
 	
 	private static Paint createPaintFromThickness(float thickness){
@@ -406,12 +446,14 @@ public class ICFootprintRender {
 				mLayerDraft.setColor(color);
 			else
 				return;
+			break;
 			
 		case LAYER_MASK:
 			if(mLayerMask!=null)
 				mLayerMask.setColor(color);
 			else
 				return;
+			break;
 			
 		case LAYER_CLEARANCE:
 				return;
@@ -421,15 +463,61 @@ public class ICFootprintRender {
 				mLayerDrill.setColor(color);
 			else
 				return;
+			break;
 			
 		case LAYER_COPPER:
 			if(mLayerCopper!=null)
 				mLayerCopper.setColor(color);
 			else
 				return;
+			break;
 			
 		default:
 			break;
+		}
+	}
+	
+	public boolean isLayerVisible(int layer){
+		switch(layer){
+		case LAYER_DRAFT:
+			return mLayerDraft.isVisible();
+			
+		case LAYER_MASK:
+			return mLayerMask.isVisible();
+			
+		case LAYER_CLEARANCE:
+				return false;
+			
+		case LAYER_DRILL:
+			return mLayerDrill.isVisible();
+			
+		case LAYER_COPPER:
+			return mLayerCopper.isVisible();
+			
+		default:
+			return false;
+		}
+	}
+	
+	public void setLayerVisible(int layer, boolean isVisible){
+		switch(layer){
+		case LAYER_DRAFT:
+			mLayerDraft.setVisible(isVisible);
+			return;
+		case LAYER_MASK:
+			mLayerMask.setVisible(isVisible);
+			return;
+		case LAYER_CLEARANCE:
+				return;
+			
+		case LAYER_DRILL:
+			mLayerDrill.setVisible(isVisible);
+			return;
+		case LAYER_COPPER:
+			mLayerCopper.setVisible(isVisible);
+			return;
+		default:
+			return;
 		}
 	}
 	
