@@ -1,4 +1,4 @@
-// Generated from D:\ShanSong\android\android-ftdi-usb2serial-driver-package\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
+// Generated from D:\ShanSong\Android-FTDI-usb2serial\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
 
 package cn.songshan99.FootprintParser;
 
@@ -657,13 +657,13 @@ public class FootprintParserParser extends Parser {
 				ictext.aY=((Element_hi_formatContext)_localctx).ty.value;
 				ictext.dir = ((Element_hi_formatContext)_localctx).tdir.value;
 				ictext.scale = ((Element_hi_formatContext)_localctx).tscale.value;
-				ictext.flags = Integer.valueOf((((Element_hi_formatContext)_localctx).tflag!=null?_input.getText(((Element_hi_formatContext)_localctx).tflag.start,((Element_hi_formatContext)_localctx).tflag.stop):null));
+				ictext.flags = ((Element_hi_formatContext)_localctx).tflag.value;
 			    
 			        Mark mark = new Mark(((Element_hi_formatContext)_localctx).mx.value, ((Element_hi_formatContext)_localctx).my.value);
 			    
 			        _localctx.footprint.setmICText(ictext);
 			        _localctx.footprint.setmMark(mark);
-			        _localctx.footprint.setFlags(Integer.valueOf((((Element_hi_formatContext)_localctx).flag!=null?_input.getText(((Element_hi_formatContext)_localctx).flag.start,((Element_hi_formatContext)_localctx).flag.stop):null)));
+			        _localctx.footprint.setFlags(((Element_hi_formatContext)_localctx).flag.value);
 			        _localctx.footprint.setmDesc(dc);
 			        _localctx.footprint.setmName(nm);
 			        _localctx.footprint.setmValue(vl);
@@ -777,34 +777,34 @@ public class FootprintParserParser extends Parser {
 		public PadContext pad() {
 			return getRuleContext(PadContext.class,0);
 		}
-		public List<MeasureContext> measure() {
-			return getRuleContexts(MeasureContext.class);
-		}
 		public NumberContext number(int i) {
 			return getRuleContext(NumberContext.class,i);
 		}
+		public List<MeasureContext> measure() {
+			return getRuleContexts(MeasureContext.class);
+		}
+		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
 		public AttributeContext attribute() {
 			return getRuleContext(AttributeContext.class,0);
 		}
 		public List<NumberContext> number() {
 			return getRuleContexts(NumberContext.class);
 		}
-		public Pin_1_6_3_formatContext pin_1_6_3_format() {
-			return getRuleContext(Pin_1_6_3_formatContext.class,0);
-		}
+		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
 		public Pin_newformatContext pin_newformat() {
 			return getRuleContext(Pin_newformatContext.class,0);
+		}
+		public Pin_1_6_3_formatContext pin_1_6_3_format() {
+			return getRuleContext(Pin_1_6_3_formatContext.class,0);
 		}
 		public MeasureContext measure(int i) {
 			return getRuleContext(MeasureContext.class,i);
 		}
-		public Pin_oldformatContext pin_oldformat() {
-			return getRuleContext(Pin_oldformatContext.class,0);
-		}
-		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
-		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
 		public Pad_newformatContext pad_newformat() {
 			return getRuleContext(Pad_newformatContext.class,0);
+		}
+		public Pin_oldformatContext pin_oldformat() {
+			return getRuleContext(Pin_oldformatContext.class,0);
 		}
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState, ICFootprint footprint) {

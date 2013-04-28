@@ -231,13 +231,13 @@ element_hi_format[ICFootprint footprint]
 	ictext.aY=$ty.value;
 	ictext.dir = $tdir.value;
 	ictext.scale = $tscale.value;
-	ictext.flags = Integer.valueOf($tflag.text);
+	ictext.flags = $tflag.value;
     
         Mark mark = new Mark($mx.value, $my.value);
     
         $footprint.setmICText(ictext);
         $footprint.setmMark(mark);
-        $footprint.setFlags(Integer.valueOf($flag.text));
+        $footprint.setFlags($flag.value);
         $footprint.setmDesc(dc);
         $footprint.setmName(nm);
         $footprint.setmValue(vl);
