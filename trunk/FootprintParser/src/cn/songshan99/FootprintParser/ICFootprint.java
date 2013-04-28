@@ -201,6 +201,16 @@ public class ICFootprint {
 		if(mTextLoc!=null) mTextLoc.offset(-ctX, -ctY);
 	}
 	
+	public void offsetTheFootprint(float dx, float dy){
+		if(dx== 0 && dy == 0) return;
+		for(PinOrPadOrDraftLine pin_pad: mListPinOrPad){
+			pin_pad.offset(dx, dy);
+		}
+		
+		for (PinOrPadOrDraftLine draftline : mListDraftLine) {
+			draftline.offset(dx, dy);
+		}
+	}
 	/**
 	 * String to flags. Convert the given string to flags according to gEDA document.
 	 *
@@ -284,8 +294,8 @@ public class ICFootprint {
 		}
 		
 		public int getShape(){
-			if((Flags | SHAPE_RECT)!=0) return SHAPE_RECT;
-			if((Flags | SHAPE_OCT)!=0) return SHAPE_OCT;
+			if((Flags & SHAPE_RECT)!=0) return SHAPE_RECT;
+			if((Flags & SHAPE_OCT)!=0) return SHAPE_OCT;
 			return SHAPE_ROUND;
 		}
 		
@@ -378,8 +388,8 @@ public class ICFootprint {
 		}
 		
 		public int getShape(){
-			if((Flags | SHAPE_RECT)!=0) return SHAPE_RECT;
-			if((Flags | SHAPE_OCT)!=0) return SHAPE_OCT;
+			if((Flags & SHAPE_RECT)!=0) return SHAPE_RECT;
+			if((Flags & SHAPE_OCT)!=0) return SHAPE_OCT;
 			return SHAPE_ROUND;
 		}
 //		@Override
@@ -650,7 +660,10 @@ public class ICFootprint {
 		public static final float CentiMilToPixel(float CentiMil, float dpi){
 			return CentiMil/HowMuchCmilPerType(UNIT_INCH)*dpi;
 		}
-
+		
+		public static final float PixelToCentiMil(float pixel, float dpi){
+			return pixel/dpi*HowMuchCmilPerType(UNIT_INCH);
+		}
 //		public float getValue() {
 //			return mValue;
 //		}
