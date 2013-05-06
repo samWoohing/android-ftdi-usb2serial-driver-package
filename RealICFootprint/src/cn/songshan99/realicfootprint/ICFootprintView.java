@@ -20,12 +20,16 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
+
 public class ICFootprintView extends View {
 
-	private ICFootprint mICFootprint;
+	//private ICFootprint mICFootprint;
 	private ICFootprintRender mICFootprintRender;
+	private float mLastTouchX=0,mLastTouchY=0;
 	
 	public DisplayMetrics mDisplayMetrics;//TODO: change to private later
+	
+	private int mActivePointerId = MotionEvent.INVALID_POINTER_ID;
 	
 	private void setmICFootprintRender(ICFootprintRender mICFootprintRender) {
 		this.mICFootprintRender = mICFootprintRender;
@@ -81,8 +85,7 @@ public class ICFootprintView extends View {
 		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth(), mDisplayMetrics.densityDpi);
 		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight(), mDisplayMetrics.densityDpi);
 		footprint.offsetTheFootprint(dx, dy);
-		mICFootprint = footprint;
-		mICFootprintRender = ICFootprintView.createFootprintRender(mICFootprint, mDisplayMetrics);
+		mICFootprintRender = new ICFootprintRender(footprint, mDisplayMetrics);
 	}
 	
 	public static ICFootprint parseFootprintFile(InputStream stream) throws IOException{
@@ -95,51 +98,82 @@ public class ICFootprintView extends View {
 		return element.footprint;
 	}
 	
-	private static ICFootprintRender createFootprintRender(ICFootprint footprint, DisplayMetrics displayMetrics){
-		ICFootprintRender render = new ICFootprintRender();
-		render.calculateAllLayers(footprint, displayMetrics);
-		return render;
-	}
-
 	@Override
-	public boolean onTouchEvent(MotionEvent event){     // Let the ScaleGestureDetector inspect all events.
-             
-    final int action = MotionEventCompat.getActionMasked(event); 
-        
-    switch (action) { 
-    case MotionEvent.ACTION_DOWN:
-    	break;
-            
-    case MotionEvent.ACTION_MOVE:{
-    	// Find the index of the active pointer and fetch its position
-        final int pointerIndex = 
-                MotionEventCompat.findPointerIndex(event, 0);  
-        RectF rect = mICFootprint.calculateFootprintOverallBoundRectangle();
-        float dx = ICFootprint.CentiMil.PixelToCentiMil(MotionEventCompat.getX(event, pointerIndex),mDisplayMetrics.xdpi)-rect.centerX();
-        float dy = ICFootprint.CentiMil.PixelToCentiMil(MotionEventCompat.getY(event, pointerIndex),mDisplayMetrics.ydpi)-rect.centerY();
-        
-        mICFootprint.offsetTheFootprint(dx, dy);
-        mICFootprintRender = createFootprintRender(mICFootprint, mDisplayMetrics);
-        mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
-        mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
-        mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
-        mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
-		//render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
-        mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources().getColor(R.color.Black));
-        mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_DRAFT,  getResources().getColor(R.color.Green));
-        mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_DRILL,  getResources().getColor(R.color.Red));
-        mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_MASK,  getResources().getColor(R.color.Red));
-        this.invalidate();
-    }
-    	
-            
-    case MotionEvent.ACTION_UP: 
-            
-    case MotionEvent.ACTION_CANCEL:
-        
-    case MotionEvent.ACTION_POINTER_UP:
+	public boolean onTouchEvent(MotionEvent event) { // Let the
+														// ScaleGestureDetector
+														// inspect all events.
+		//The onTouchEvent shall perform following behaviors:
+		//1. when there is a finger move, the footprint shall be moved with the finger movement.
+		//2. when the footprint is about to move "out of" the window, the move action shall be ignored.
+		//3. when multi-finger touch, only track the movement of the first finger.
+		final int action = MotionEventCompat.getActionMasked(event);
+		final int pointerIndex;
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:{
+			mActivePointerId = MotionEventCompat.getPointerId(event, 0);//always track the first finger
+			pointerIndex = MotionEventCompat.findPointerIndex(event,
+					mActivePointerId);
+			mLastTouchX=MotionEventCompat.getX(event, pointerIndex);
+			mLastTouchY=MotionEventCompat.getY(event, pointerIndex);
+			break;
+		}
 
-    }       
-    return true;
-}
+		case MotionEvent.ACTION_MOVE: {
+			// Find the index of the active pointer and fetch its position
+			pointerIndex = MotionEventCompat.findPointerIndex(event,
+					mActivePointerId);
+			ICFootprint footprint = mICFootprintRender.getmICFootprint();
+			RectF rect = footprint.calculateFootprintOverallBoundRectangle();
+			
+			float x,y,dx,dy;
+			x=MotionEventCompat.getX(event, pointerIndex);
+			y=MotionEventCompat.getY(event, pointerIndex);
+			
+			dx =  x- mLastTouchX;
+	        dy =  y- mLastTouchY; 
+	        
+	        mLastTouchX=x;mLastTouchY=y;
+	        
+	        mICFootprintRender.offsetFootprintAndRecalculateRender(dx,dy,mDisplayMetrics);
+			//dx and dy are the offset needed in centiMil.
+//			float dx = ICFootprint.CentiMil.PixelToCentiMil(
+//					MotionEventCompat.getX(event, pointerIndex),
+//					mDisplayMetrics.xdpi) - rect.centerX();
+//			float dy = ICFootprint.CentiMil.PixelToCentiMil(
+//					MotionEventCompat.getY(event, pointerIndex),
+//					mDisplayMetrics.ydpi) - rect.centerY();
+//
+//			footprint.offsetTheFootprint(dx, dy);
+			
+//			mICFootprintRender = createFootprintRender(mICFootprint,
+//					mDisplayMetrics);
+//			mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_COPPER,
+//					true);
+//			mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_DRAFT,
+//					true);
+//			mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_DRILL,
+//					true);
+//			mICFootprintRender.setLayerVisible(ICFootprintRender.LAYER_MASK,
+//					false);
+//			// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
+//			mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_COPPER,
+//					getResources().getColor(R.color.Black));
+//			mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_DRAFT,
+//					getResources().getColor(R.color.Green));
+//			mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_DRILL,
+//					getResources().getColor(R.color.Red));
+//			mICFootprintRender.setLayerColor(ICFootprintRender.LAYER_MASK,
+//					getResources().getColor(R.color.Red));
+			this.invalidate();
+		}
+
+		case MotionEvent.ACTION_UP:
+
+		case MotionEvent.ACTION_CANCEL:
+
+		case MotionEvent.ACTION_POINTER_UP:
+
+		}
+		return true;
+	}
 }
