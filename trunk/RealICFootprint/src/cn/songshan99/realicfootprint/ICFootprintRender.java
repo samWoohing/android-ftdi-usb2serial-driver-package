@@ -31,7 +31,21 @@ public class ICFootprintRender {
 	private ICDisplayLayer mLayerDraft, mLayerMask, mLayerDrill, mLayerCopper;
 	//private PathPaint mCopper,mDrill, mClearance, mDraftLine;
 	//private Color mCopperColor,mDrillColor,mClearanceColor,mDraftLineColor;
+	private ICFootprint mICFootprint;
 	
+	public ICFootprint getmICFootprint() {
+		return mICFootprint;
+	}
+	
+	
+	public ICFootprintRender(ICFootprint footprint, DisplayMetrics displayMetrics) {
+		if(footprint != null) mICFootprint = footprint;
+		else return;
+		
+		calculateAllLayers(mICFootprint, displayMetrics);
+	}
+
+
 	public static class PathPaint{
 		
 		public Path mPath;
@@ -364,20 +378,112 @@ public class ICFootprintRender {
 	 * @param footprint the footprint
 	 * @param dpi the dpi
 	 */
-	public void calculateAllLayers(ICFootprint footprint, DisplayMetrics displayMetrics){
+	private void calculateAllLayers(ICFootprint footprint, DisplayMetrics displayMetrics){
 		mLayerCopper = calculateLayer(footprint, LAYER_COPPER,displayMetrics);
 		mLayerDrill = calculateLayer(footprint, LAYER_DRILL,displayMetrics);
 		mLayerMask = calculateLayer(footprint, LAYER_MASK,displayMetrics);
 		mLayerDraft = calculateLayer(footprint, LAYER_DRAFT,displayMetrics);
 	}
 	
-	public void recalculateAllLayers(ICFootprint footprint, DisplayMetrics displayMetrics){
-		//calculate all layers without new operations
+	protected void recalculateAllLayers(DisplayMetrics displayMetrics){
+		//calculate all layers without 'new' operations
 		//TODO: implementation
+		if(this.mICFootprint==null)return;
+		recalculateLayer(LAYER_COPPER, displayMetrics);
+		recalculateLayer(LAYER_DRILL, displayMetrics);
+		recalculateLayer(LAYER_MASK, displayMetrics);
+		recalculateLayer(LAYER_DRAFT, displayMetrics);
 	}
 	
-	private void recalculateLayer(int layer){
+	private void cleanLayerPath(ICDisplayLayer layer){
+		if(layer == null) return;
+		if(layer.mListPathPaint==null) return;
+		for(PathPaint pp:layer.mListPathPaint){
+			pp.mPath.reset();
+		}
+	}
+	
+	private void recalculateLayer(int layer, DisplayMetrics displayMetrics){
+		ArrayList<PinOrPadOrDraftLine> pinorpadlist = mICFootprint.getmListPinOrPad();
+		ArrayList<PinOrPadOrDraftLine> draftlinelist = mICFootprint.getmListDraftLine();
+		ArrayList<PathPaint> pinpadListPathPaint=null, draftListPathPaint=null;
 		
+		switch(layer){
+		case LAYER_COPPER:
+			cleanLayerPath(mLayerCopper);
+			pinpadListPathPaint = mLayerCopper.mListPathPaint;
+			break;
+			
+		case LAYER_DRILL:
+			//cleanLayerPath(mLayerDrill);
+			pinpadListPathPaint = mLayerDrill.mListPathPaint;
+			break;
+			
+		case LAYER_MASK:
+			cleanLayerPath(mLayerMask);
+			pinpadListPathPaint = mLayerMask.mListPathPaint;
+			break;
+			
+		case LAYER_CLEARANCE:
+			return;//do nothing for clearance layer
+			
+		case LAYER_DRAFT:
+			cleanLayerPath(mLayerDraft);
+			draftListPathPaint = mLayerDraft.mListPathPaint;
+			break;
+			
+		default:
+			break;
+		}
+		
+		if(pinpadListPathPaint!=null){
+			if(pinorpadlist == null)return;
+			Path icpath = pinpadListPathPaint.get(0).mPath;
+			for(PinOrPadOrDraftLine pinpad:pinorpadlist){
+				if(pinpad.getType()==PinOrPadOrDraftLine.TYPE_PAD)
+					PadToPath((Pad) pinpad, layer, displayMetrics.xdpi,displayMetrics.ydpi, icpath);
+				else if(pinpad.getType()==PinOrPadOrDraftLine.TYPE_PIN)
+					PinToPath((Pin) pinpad, layer, displayMetrics.xdpi,displayMetrics.ydpi, icpath);
+				else return;
+			}
+		}
+		if(draftListPathPaint!=null){
+			if(draftlinelist == null)return;
+			
+			for(PinOrPadOrDraftLine draftline:draftlinelist){
+				float thickness;
+				if(draftline.getType()== PinOrPadOrDraftLine.TYPE_ARC)
+					thickness=((ElementArc)draftline).Thickness;
+				else if(draftline.getType()== PinOrPadOrDraftLine.TYPE_LINE)
+					thickness=((ElementLine)draftline).Thickness;
+				else
+					return;
+				
+				//convert thickness from centimil to pixel
+				thickness = ICFootprint.CentiMil.CentiMilToPixel(thickness, displayMetrics.densityDpi);
+				
+				//find if a given width already exists,
+				PathPaint pp = null;
+				for(PathPaint onepp: draftListPathPaint){
+					if(onepp.mPaint.getStrokeWidth()==thickness)
+						pp=onepp;
+				}
+				
+				if(pp==null)
+					//of no create new PathPaint and begin to add line
+					pp = new PathPaint(new Path(), createPaintFromThickness(thickness));		
+
+				//if yes,(found existing width) continue adding lines to path
+				//pp is the PathPaint object for the given draftline.
+				//convert the line, arc to dpi based paths
+				if(draftline.getType()==PinOrPadOrDraftLine.TYPE_ARC)
+					arcToPath((ElementArc)draftline, displayMetrics.xdpi, displayMetrics.ydpi, pp.mPath);
+				else if(draftline.getType()==PinOrPadOrDraftLine.TYPE_LINE)
+					lineToPath((ElementLine)draftline, displayMetrics.xdpi,displayMetrics.ydpi, pp.mPath);
+				else
+					return;
+			}
+		}
 	}
 	
 	private static Paint createPaintFromThickness(float thickness){
@@ -529,11 +635,29 @@ public class ICFootprintRender {
 		}
 	}
 	
-	public static void offsetFootprintRender(ICFootprintRender icfprd, float dx, float dy){
+	private static void offsetFootprintRender(ICFootprintRender icfprd, float dx, float dy){
 		offsetOneLayer(icfprd.mLayerCopper,dx,dy);
 		offsetOneLayer(icfprd.mLayerDrill,dx,dy);
 		offsetOneLayer(icfprd.mLayerMask,dx,dy);
 		offsetOneLayer(icfprd.mLayerDraft,dx,dy);
+	}
+	
+	public void offsetFootprintAndRecalculateRender(float dx_in_px, float dy_in_px, DisplayMetrics displayMetrics){
+		//dx_in_px and dy_in_px are in pixel, and should be converted to centi_mil
+		float dx,dy;
+		dx=ICFootprint.CentiMil.PixelToCentiMil(dx_in_px, displayMetrics.xdpi);
+		dy=ICFootprint.CentiMil.PixelToCentiMil(dy_in_px, displayMetrics.ydpi);
+		//offset the footprint
+		mICFootprint.offsetTheFootprint(dx, dy);
+		//recalculate the render
+		recalculateAllLayers(displayMetrics);
+	}
+	
+	public void setFootprintPositionAndRecalculateRender(float x_in_px, float y_in_px, DisplayMetrics displayMetrics){
+		RectF rect = mICFootprint.calculateFootprintOverallBoundRectangle();
+		float old_x_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerX(), displayMetrics.xdpi);
+		float old_y_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerY(), displayMetrics.ydpi);
+		offsetFootprintAndRecalculateRender(x_in_px-old_x_px,y_in_px-old_y_px,displayMetrics);
 	}
 	
 	private static void drawOneLayer(ICDisplayLayer layer, Canvas canvas){
