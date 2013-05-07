@@ -6,6 +6,7 @@ import java.io.InputStream;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.widget.SearchView;
 
 import cn.songshan99.FootprintParser.ICFootprint;
 import cn.songshan99.realicfootprint.R;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 public class MainActivity extends SherlockActivity {
 
@@ -57,10 +59,37 @@ public class MainActivity extends SherlockActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		menu.add(2, 1, 1, "About");
-		return super.onCreateOptionsMenu(menu);
+		
+		//Used to put dark icons on light action bar
+
+        //Create the search view
+        SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
+        searchView.setQueryHint("Search for countries…");
+
+        menu.add(1,1,1,"Search")
+            .setIcon(R.drawable.ic_search_inverse)
+            .setActionView(searchView)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        
+        searchView.setOnQueryTextListener(mQueryTextListener);
+        menu.add(2, 2, 2, "About");
+        return true;
 	}
 
+	private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener(){
 
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean onQueryTextChange(String newText) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	
+	};
 	
 }
