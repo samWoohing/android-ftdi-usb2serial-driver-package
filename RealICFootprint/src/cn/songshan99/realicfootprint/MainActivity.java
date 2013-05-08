@@ -11,6 +11,9 @@ import com.actionbarsherlock.widget.SearchView;
 import cn.songshan99.FootprintParser.ICFootprint;
 import cn.songshan99.realicfootprint.R;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
@@ -71,11 +74,25 @@ public class MainActivity extends SherlockActivity {
             .setActionView(searchView)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
         
-        searchView.setOnQueryTextListener(mQueryTextListener);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        //searchView.setIconifiedByDefault(false);
+        
+        //searchView.setOnQueryTextListener(mQueryTextListener);
         menu.add(2, 2, 2, "About");
         return true;
 	}
 
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO: perform the actual search job
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+		      String query = intent.getStringExtra(SearchManager.QUERY);
+		      //call the search function
+		    }
+	}
+	
+	
 	private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener(){
 
 		@Override
