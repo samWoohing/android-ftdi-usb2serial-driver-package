@@ -4,5 +4,10 @@
     <string name="app_name">RealICFootprint</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    
+    <!-- The label for use as a searchable item -->
+    <string name="search_label">Footprint description</string>
 
+    <!-- The hint text that appears in the search box. -->
+    <string name="search_hint">Search footprint description</string>
 </resources>
