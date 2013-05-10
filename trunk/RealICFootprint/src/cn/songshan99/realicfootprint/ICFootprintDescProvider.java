@@ -2,6 +2,7 @@ package cn.songshan99.realicfootprint;
 
 import android.app.SearchManager;
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -13,10 +14,16 @@ public class ICFootprintDescProvider extends ContentProvider {
 	private ICFootprintDescDatabase mICFootprintDescDatabase;
 	
 
-	public static String AUTHORITY = "cn.songshan99.realicfootprint.ICFootprintDescPrivider";
+	public static String AUTHORITY = "cn.songshan99.realicfootprint.ICFootprintDescProvider";
 	public static String PATH = "description";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/"+PATH);
 	
+	// MIME types used for searching words or looking up a single definition
+    public static final String WORDS_MIME_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
+                                                  "/vnd.example.android.searchablefootprint";
+    public static final String DEFINITION_MIME_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE +
+                                                       "/vnd.example.android.searchablefootprint";
+    
 	private static final int SEARCH_DESCS = 0;
     private static final int GET_DESC_BY_ROWID = 1;
     private static final int SEARCH_SUGGEST = 2;
@@ -50,8 +57,18 @@ public class ICFootprintDescProvider extends ContentProvider {
     
 	@Override
 	public String getType(Uri uri) {
-		// TODO: implement
-		return null;
+        switch (sURIMatcher.match(uri)) {
+        case SEARCH_DESCS:
+            return WORDS_MIME_TYPE;
+        case GET_DESC_BY_ROWID:
+            return DEFINITION_MIME_TYPE;
+        case SEARCH_SUGGEST:
+            return SearchManager.SUGGEST_MIME_TYPE;
+        case REFRESH_SHORTCUT:
+            return SearchManager.SHORTCUT_MIME_TYPE;
+        default:
+            throw new IllegalArgumentException("Unknown URL " + uri);
+        }
 	}
 
 	@Override
@@ -96,8 +113,8 @@ public class ICFootprintDescProvider extends ContentProvider {
         query = query.toLowerCase();
         String[] columns = new String[] {
             BaseColumns._ID,
-            ICFootprintDescDatabase.KEY_DESCRIPTION,
             ICFootprintDescDatabase.KEY_FILENAME,
+            ICFootprintDescDatabase.KEY_DESCRIPTION,
          /* SearchManager.SUGGEST_COLUMN_SHORTCUT_ID,
                           (only if you want to refresh shortcuts) */
             SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
@@ -108,7 +125,8 @@ public class ICFootprintDescProvider extends ContentProvider {
 	private Cursor searchAllMatching(String query) {
 		query = query.toLowerCase();
 		String[] columns = new String[] { BaseColumns._ID,
-				ICFootprintDescDatabase.KEY_DESCRIPTION, ICFootprintDescDatabase.KEY_FILENAME };
+				ICFootprintDescDatabase.KEY_FILENAME,
+	            ICFootprintDescDatabase.KEY_DESCRIPTION };
 
 		return mICFootprintDescDatabase.getICFootprintMatches(query, columns);
 	}
@@ -116,7 +134,8 @@ public class ICFootprintDescProvider extends ContentProvider {
     private Cursor getICFootprint(Uri uri) {
         String rowId = uri.getLastPathSegment();
         String[] columns = new String[] {
-        	ICFootprintDescDatabase.KEY_DESCRIPTION, ICFootprintDescDatabase.KEY_FILENAME};
+        		ICFootprintDescDatabase.KEY_FILENAME,
+                ICFootprintDescDatabase.KEY_DESCRIPTION};
 
         return mICFootprintDescDatabase.getICFootprintByRowId(rowId, columns);
     }
@@ -132,8 +151,8 @@ public class ICFootprintDescProvider extends ContentProvider {
         String rowId = uri.getLastPathSegment();
         String[] columns = new String[] {
             BaseColumns._ID,
-            ICFootprintDescDatabase.KEY_DESCRIPTION, 
             ICFootprintDescDatabase.KEY_FILENAME,
+            ICFootprintDescDatabase.KEY_DESCRIPTION,
             SearchManager.SUGGEST_COLUMN_SHORTCUT_ID,
             SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID};
 

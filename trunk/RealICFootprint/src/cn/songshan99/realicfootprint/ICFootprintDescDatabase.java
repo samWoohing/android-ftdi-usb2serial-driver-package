@@ -180,7 +180,7 @@ public class ICFootprintDescDatabase {
                 while ((line = reader.readLine()) != null) {
                     String[] strings = TextUtils.split(line, ";");
                     if (strings.length < 2) continue;
-                    long id = addOneICFootprint(strings[0].trim(), strings[1].trim());
+                    long id = addOneICFootprint(strings[1].trim(), strings[0].trim());
                     if (id < 0) {
                         Log.e(TAG, "unable to add footprint: " + strings[0].trim());
                     }
