@@ -1,0 +1,702 @@
+Comment,Footprint Name
+DIP6, Dual in-line package, narrow (300 mil);DIP6.fp
+DIP8, Dual in-line package, narrow (300 mil);DIP8.fp
+DIP14, Dual in-line package, narrow (300 mil);DIP14.fp
+DIP16, Dual in-line package, narrow (300 mil);DIP16.fp
+DIP18, Dual in-line package, narrow (300 mil);DIP18.fp
+DIP20, Dual in-line package, narrow (300 mil);DIP20.fp
+DIP22, Dual in-line package, narrow (300 mil);DIP22.fp
+DIP24N, Dual in-line package, narrow (300 mil);DIP24N.fp
+DIP28N, Dual in-line package, narrow (300 mil);DIP28N.fp
+DIP8M, Dual in-line package, medium wide (400 mil);DIP8M.fp
+DIP14M, Dual in-line package, medium wide (400 mil);DIP14M.fp
+DIP16M, Dual in-line package, medium wide (400 mil);DIP16M.fp
+DIP18M, Dual in-line package, medium wide (400 mil);DIP18M.fp
+DIP20M, Dual in-line package, medium wide (400 mil);DIP20M.fp
+DIP22M, Dual in-line package, medium wide (400 mil);DIP22M.fp
+DIP24M, Dual in-line package, medium wide (400 mil);DIP24M.fp
+DIP28M, Dual in-line package, medium wide (400 mil);DIP28M.fp
+DIP24, Dual in-line package, wide (600 mil);DIP24.fp
+DIP28, Dual in-line package, wide (600 mil);DIP28.fp
+DIP32, Dual in-line package, wide (600 mil);DIP32.fp
+DIP36, Dual in-line package, wide (600 mil);DIP36.fp
+DIP40, Dual in-line package, wide (600 mil);DIP40.fp
+DIP42, Dual in-line package, wide (600 mil);DIP42.fp
+DIP44, Dual in-line package, wide (600 mil);DIP44.fp
+DIP48, Dual in-line package, wide (600 mil);DIP48.fp
+DIP64, Dual in-line package, wide (900 mil);DIP64.fp
+SDIP18, Shrink dual in-line package, wide (300 mil);SDIP18.fp
+SDIP20, Shrink dual in-line package, wide (300 mil);SDIP20.fp
+SDIP22, Shrink dual in-line package, wide (300 mil);SDIP22.fp
+SDIP24, Shrink dual in-line package, wide (300 mil);SDIP24.fp
+SDIP30, Shrink dual in-line package, wide (400 mil);SDIP30.fp
+SDIP32, Shrink dual in-line package, wide (400 mil);SDIP32.fp
+SDIP42, Shrink dual in-line package, wide (600 mil);SDIP42.fp
+SIP1, Single in line package;SIP1.fp
+SIP2, Single in line package;SIP2.fp
+SIP3, Single in line package;SIP3.fp
+SIP4, Single in line package;SIP4.fp
+SIP5, Single in line package;SIP5.fp
+SIP6, Single in line package;SIP6.fp
+SIP7, Single in line package;SIP7.fp
+SIP8, Single in line package;SIP8.fp
+SIP9, Single in line package;SIP9.fp
+SIP10, Single in line package;SIP10.fp
+SIP11, Single in line package;SIP11.fp
+SIP12, Single in line package;SIP12.fp
+SIP13, Single in line package;SIP13.fp
+US8, Ultra (Micro?) Small outline package;US8.fp
+US14, Ultra (Micro?) Small outline package;US14.fp
+US16, Ultra (Micro?) Small outline package;US16.fp
+SO8, Small outline package, narrow (150mil);SO8.fp
+SO14, Small outline package, narrow (150mil);SO14.fp
+SO16, Small outline package, narrow (150mil);SO16.fp
+SO18N, Small outline package, narrow (150mil);SO18N.fp
+SO20N, Small outline package, narrow (150mil);SO20N.fp
+SO8M, Small outline package, medium (200mil);SO8M.fp
+SO18M, Small outline package, medium (200mil);SO18M.fp
+SO20M, Small outline package, medium (200mil);SO20M.fp
+SO22M, Small outline package, medium (200mil);SO22M.fp
+SO24M, Small outline package, medium (200mil);SO24M.fp
+SO8W, Small outline package, wide (300mil);SO8W.fp
+SO14W, Small outline package, wide (300mil);SO14W.fp
+SO16W, Small outline package, wide (300mil);SO16W.fp
+SO18W, Small outline package, wide (300mil);SO18W.fp
+SO20W, Small outline package, wide (300mil);SO20W.fp
+SO24W, Small outline package, wide (300mil);SO24W.fp
+SO28, Small outline package, wide (300mil);SO28.fp
+SO32, Small outline package, wide (300mil);SO32.fp
+SO28W, Small outline package, wider (325mil);SO28W.fp
+SO32W, Small outline package, wider (450mil);SO32W.fp
+SO44, Small outline package, wide (525mil);SO44.fp
+SOJ14_300, Small outline J-leaded package (300 mil);SOJ14_300.fp
+SOJ16_300, Small outline J-leaded package (300 mil);SOJ16_300.fp
+SOJ18_300, Small outline J-leaded package (300 mil);SOJ18_300.fp
+SOJ20_300, Small outline J-leaded package (300 mil);SOJ20_300.fp
+SOJ22_300, Small outline J-leaded package (300 mil);SOJ22_300.fp
+SOJ24_300, Small outline J-leaded package (300 mil);SOJ24_300.fp
+SOJ26_300, Small outline J-leaded package (300 mil);SOJ26_300.fp
+SOJ28_300, Small outline J-leaded package (300 mil);SOJ28_300.fp
+SOJ30_300, Small outline J-leaded package (300 mil);SOJ30_300.fp
+SOJ32_300, Small outline J-leaded package (300 mil);SOJ32_300.fp
+SOJ34_300, Small outline J-leaded package (300 mil);SOJ34_300.fp
+SOJ36_300, Small outline J-leaded package (300 mil);SOJ36_300.fp
+SOJ38_300, Small outline J-leaded package (300 mil);SOJ38_300.fp
+SOJ40_300, Small outline J-leaded package (300 mil);SOJ40_300.fp
+SOJ42_300, Small outline J-leaded package (300 mil);SOJ42_300.fp
+SOJ44_300, Small outline J-leaded package (300 mil);SOJ44_300.fp
+SOJ14_350, Small outline J-leaded package (350 mil);SOJ14_350.fp
+SOJ16_350, Small outline J-leaded package (350 mil);SOJ16_350.fp
+SOJ18_350, Small outline J-leaded package (350 mil);SOJ18_350.fp
+SOJ20_350, Small outline J-leaded package (350 mil);SOJ20_350.fp
+SOJ22_350, Small outline J-leaded package (350 mil);SOJ22_350.fp
+SOJ24_350, Small outline J-leaded package (350 mil);SOJ24_350.fp
+SOJ26_350, Small outline J-leaded package (350 mil);SOJ26_350.fp
+SOJ28_350, Small outline J-leaded package (350 mil);SOJ28_350.fp
+SOJ30_350, Small outline J-leaded package (350 mil);SOJ30_350.fp
+SOJ32_350, Small outline J-leaded package (350 mil);SOJ32_350.fp
+SOJ34_350, Small outline J-leaded package (350 mil);SOJ34_350.fp
+SOJ36_350, Small outline J-leaded package (350 mil);SOJ36_350.fp
+SOJ38_350, Small outline J-leaded package (350 mil);SOJ38_350.fp
+SOJ40_350, Small outline J-leaded package (350 mil);SOJ40_350.fp
+SOJ42_350, Small outline J-leaded package (350 mil);SOJ42_350.fp
+SOJ44_350, Small outline J-leaded package (350 mil);SOJ44_350.fp
+SOJ14_400, Small outline J-leaded package (400 mil);SOJ14_400.fp
+SOJ16_400, Small outline J-leaded package (400 mil);SOJ16_400.fp
+SOJ18_400, Small outline J-leaded package (400 mil);SOJ18_400.fp
+SOJ20_400, Small outline J-leaded package (400 mil);SOJ20_400.fp
+SOJ22_400, Small outline J-leaded package (400 mil);SOJ22_400.fp
+SOJ24_400, Small outline J-leaded package (400 mil);SOJ24_400.fp
+SOJ26_400, Small outline J-leaded package (400 mil);SOJ26_400.fp
+SOJ28_400, Small outline J-leaded package (400 mil);SOJ28_400.fp
+SOJ30_400, Small outline J-leaded package (400 mil);SOJ30_400.fp
+SOJ32_400, Small outline J-leaded package (400 mil);SOJ32_400.fp
+SOJ34_400, Small outline J-leaded package (400 mil);SOJ34_400.fp
+SOJ36_400, Small outline J-leaded package (400 mil);SOJ36_400.fp
+SOJ38_400, Small outline J-leaded package (400 mil);SOJ38_400.fp
+SOJ40_400, Small outline J-leaded package (400 mil);SOJ40_400.fp
+SOJ42_400, Small outline J-leaded package (400 mil);SOJ42_400.fp
+SOJ44_400, Small outline J-leaded package (400 mil);SOJ44_400.fp
+SOJ14_450, Small outline J-leaded package (450 mil);SOJ14_450.fp
+SOJ16_450, Small outline J-leaded package (450 mil);SOJ16_450.fp
+SOJ18_450, Small outline J-leaded package (450 mil);SOJ18_450.fp
+SOJ20_450, Small outline J-leaded package (450 mil);SOJ20_450.fp
+SOJ22_450, Small outline J-leaded package (450 mil);SOJ22_450.fp
+SOJ24_450, Small outline J-leaded package (450 mil);SOJ24_450.fp
+SOJ26_450, Small outline J-leaded package (450 mil);SOJ26_450.fp
+SOJ28_450, Small outline J-leaded package (450 mil);SOJ28_450.fp
+SOJ30_450, Small outline J-leaded package (450 mil);SOJ30_450.fp
+SOJ32_450, Small outline J-leaded package (450 mil);SOJ32_450.fp
+SOJ34_450, Small outline J-leaded package (450 mil);SOJ34_450.fp
+SOJ36_450, Small outline J-leaded package (450 mil);SOJ36_450.fp
+SOJ38_450, Small outline J-leaded package (450 mil);SOJ38_450.fp
+SOJ40_450, Small outline J-leaded package (450 mil);SOJ40_450.fp
+SOJ42_450, Small outline J-leaded package (450 mil);SOJ42_450.fp
+SOJ44_450, Small outline J-leaded package (450 mil);SOJ44_450.fp
+SSOP8, Shrink small outline package, .65mm, narrow;SSOP8.fp
+SSOP14, Shrink small outline package, .65mm, narrow;SSOP14.fp
+SSOP16, Shrink small outline package, .65mm, narrow;SSOP16.fp
+SSOP20, Shrink small outline package, .65mm, narrow;SSOP20.fp
+SSOP24, Shrink small outline package, .65mm, narrow;SSOP24.fp
+SSOP28, Shrink small outline package, .65mm, narrow;SSOP28.fp
+SSOP48W, Shrink small outline package, 25mil, wide;SSOP48W.fp
+SSOP56W, Shrink small outline package, 25mil, wide;SSOP56W.fp
+SSOP64W, Shrink small outline package, .80mm, wider;SSOP64W.fp
+MSOP8, Mini small outline package, .65mm;MSOP8.fp
+MSOP10, Mini small outline package, .5mm;MSOP10.fp
+QSOP16, Quarter size small outline package;QSOP16.fp
+QSOP20, Quarter size small outline package;QSOP20.fp
+QSOP24, Quarter size small outline package;QSOP24.fp
+QSOP28, Quarter size small outline package;QSOP28.fp
+TSOP28, Thin small outline package;TSOP28.fp
+TSOP32A, Thin small outline package;TSOP32A.fp
+TSOP32B, Thin small outline package;TSOP32B.fp
+TSSOP8, Thin shrink small outline package, narrow (3mm);TSSOP8.fp
+TSSOP10, Thin shrink small outline package, narrow (3mm);TSSOP10.fp
+TSSOP8W, Thin shrink small outline package, standard (4.4mm);TSSOP8W.fp
+TSSOP14, Thin shrink small outline package, standard (4.4mm);TSSOP14.fp
+TSSOP16, Thin shrink small outline package, standard (4.4mm);TSSOP16.fp
+TSSOP20, Thin shrink small outline package, standard (4.4mm);TSSOP20.fp
+TSSOP24, Thin shrink small outline package, standard (4.4mm);TSSOP24.fp
+TSSOP28, Thin shrink small outline package, standard (4.4mm);TSSOP28.fp
+TSSOP38N, Thin shrink small outline package, standard (4.4mm);TSSOP38N.fp
+TSSOP48N, Thin shrink small outline package, standard (4.4mm);TSSOP48N.fp
+TSSOP56N, Thin shrink small outline package, standard (4.4mm);TSSOP56N.fp
+TSSOP32, Thin shrink small outline package, wide (6.1mm);TSSOP32.fp
+TSSOP48, Thin shrink small outline package, wide (6.1mm);TSSOP48.fp
+TSSOP56, Thin shrink small outline package, wide (6.1mm);TSSOP56.fp
+TSSOP64, Thin shrink small outline package, wide (6.1mm);TSSOP64.fp
+TSSOP80, Thin shrink small outline package, wide (6.1mm);TSSOP80.fp
+PLCC20, Plastic leadless chip carrier;PLCC20.fp
+PLCC28, Plastic leadless chip carrier;PLCC28.fp
+PLCC32, Plastic leadless chip carrier;PLCC32.fp
+PLCC44, Plastic leadless chip carrier;PLCC44.fp
+PLCC52, Plastic leadless chip carrier;PLCC52.fp
+PLCC68, Plastic leadless chip carrier;PLCC68.fp
+PLCC84, Plastic leadless chip carrier;PLCC84.fp
+PLCC20X, Plastic leadless chip carrier with pin socket;PLCC20X.fp
+PLCC28X, Plastic leadless chip carrier with pin socket;PLCC28X.fp
+PLCC32X, Plastic leadless chip carrier with pin socket;PLCC32X.fp
+PLCC44X, Plastic leadless chip carrier with pin socket;PLCC44X.fp
+PLCC52X, Plastic leadless chip carrier with pin socket;PLCC52X.fp
+PLCC68X, Plastic leadless chip carrier with pin socket;PLCC68X.fp
+PLCC84X, Plastic leadless chip carrier with pin socket;PLCC84X.fp
+QFN16_3, Square Quad Flat Nolead (QFN) package;QFN16_3.fp
+TQFN16_3, Square Quad Flat Nolead (QFN) package;TQFN16_3.fp
+QFN16_3_EP, Square Quad Flat Nolead (QFN) package;QFN16_3_EP.fp
+TQFN16_3_EP, Square Quad Flat Nolead (QFN) package;TQFN16_3_EP.fp
+QFN12_4, Square Quad Flat Nolead (QFN) package;QFN12_4.fp
+TQFN12_4, Square Quad Flat Nolead (QFN) package;TQFN12_4.fp
+QFN12_4_EP, Square Quad Flat Nolead (QFN) package;QFN12_4_EP.fp
+TQFN12_4_EP, Square Quad Flat Nolead (QFN) package;TQFN12_4_EP.fp
+QFN16_4, Square Quad Flat Nolead (QFN) package;QFN16_4.fp
+TQFN16_4, Square Quad Flat Nolead (QFN) package;TQFN16_4.fp
+QFN16_4_EP, Square Quad Flat Nolead (QFN) package;QFN16_4_EP.fp
+TQFN16_4_EP, Square Quad Flat Nolead (QFN) package;TQFN16_4_EP.fp
+QFN20_4, Square Quad Flat Nolead (QFN) package;QFN20_4.fp
+TQFN20_4, Square Quad Flat Nolead (QFN) package;TQFN20_4.fp
+QFN20_4_EP, Square Quad Flat Nolead (QFN) package;QFN20_4_EP.fp
+TQFN20_4_EP, Square Quad Flat Nolead (QFN) package;TQFN20_4_EP.fp
+QFN24_4, Square Quad Flat Nolead (QFN) package;QFN24_4.fp
+TQFN24_4, Square Quad Flat Nolead (QFN) package;TQFN24_4.fp
+QFN24_4_EP, Square Quad Flat Nolead (QFN) package;QFN24_4_EP.fp
+TQFN24_4_EP, Square Quad Flat Nolead (QFN) package;TQFN24_4_EP.fp
+QFN16_5, Square Quad Flat Nolead (QFN) package;QFN16_5.fp
+TQFN16_5, Square Quad Flat Nolead (QFN) package;TQFN16_5.fp
+QFN16_5_EP, Square Quad Flat Nolead (QFN) package;QFN16_5_EP.fp
+TQFN16_5_EP, Square Quad Flat Nolead (QFN) package;TQFN16_5_EP.fp
+QFN20_5, Square Quad Flat Nolead (QFN) package;QFN20_5.fp
+TQFN20_5, Square Quad Flat Nolead (QFN) package;TQFN20_5.fp
+QFN20_5_EP, Square Quad Flat Nolead (QFN) package;QFN20_5_EP.fp
+TQFN20_5_EP, Square Quad Flat Nolead (QFN) package;TQFN20_5_EP.fp
+QFN28_5, Square Quad Flat Nolead (QFN) package;QFN28_5.fp
+TQFN28_5, Square Quad Flat Nolead (QFN) package;TQFN28_5.fp
+QFN28_5_EP, Square Quad Flat Nolead (QFN) package;QFN28_5_EP.fp
+TQFN28_5_EP, Square Quad Flat Nolead (QFN) package;TQFN28_5_EP.fp
+QFN32_5, Square Quad Flat Nolead (QFN) package;QFN32_5.fp
+TQFN32_5, Square Quad Flat Nolead (QFN) package;TQFN32_5.fp
+QFN32_5_EP, Square Quad Flat Nolead (QFN) package;QFN32_5_EP.fp
+TQFN32_5_EP, Square Quad Flat Nolead (QFN) package;TQFN32_5_EP.fp
+QFN36_6, Square Quad Flat Nolead (QFN) package;QFN36_6.fp
+TQFN36_6, Square Quad Flat Nolead (QFN) package;TQFN36_6.fp
+QFN36_6_EP, Square Quad Flat Nolead (QFN) package;QFN36_6_EP.fp
+TQFN36_6_EP, Square Quad Flat Nolead (QFN) package;TQFN36_6_EP.fp
+QFN40_6, Square Quad Flat Nolead (QFN) package;QFN40_6.fp
+TQFN40_6, Square Quad Flat Nolead (QFN) package;TQFN40_6.fp
+QFN40_6_EP, Square Quad Flat Nolead (QFN) package;QFN40_6_EP.fp
+TQFN40_6_EP, Square Quad Flat Nolead (QFN) package;TQFN40_6_EP.fp
+QFN32_7, Square Quad Flat Nolead (QFN) package;QFN32_7.fp
+TQFN32_7, Square Quad Flat Nolead (QFN) package;TQFN32_7.fp
+QFN32_7_EP, Square Quad Flat Nolead (QFN) package;QFN32_7_EP.fp
+TQFN32_7_EP, Square Quad Flat Nolead (QFN) package;TQFN32_7_EP.fp
+QFN44_7, Square Quad Flat Nolead (QFN) package;QFN44_7.fp
+TQFN44_7, Square Quad Flat Nolead (QFN) package;TQFN44_7.fp
+QFN44_7_EP, Square Quad Flat Nolead (QFN) package;QFN44_7_EP.fp
+TQFN44_7_EP, Square Quad Flat Nolead (QFN) package;TQFN44_7_EP.fp
+QFN48_7, Square Quad Flat Nolead (QFN) package;QFN48_7.fp
+TQFN48_7, Square Quad Flat Nolead (QFN) package;TQFN48_7.fp
+QFN48_7_EP, Square Quad Flat Nolead (QFN) package;QFN48_7_EP.fp
+TQFN48_7_EP, Square Quad Flat Nolead (QFN) package;TQFN48_7_EP.fp
+QFN56_8, Square Quad Flat Nolead (QFN) package;QFN56_8.fp
+TQFN56_8, Square Quad Flat Nolead (QFN) package;TQFN56_8.fp
+QFN56_8_EP, Square Quad Flat Nolead (QFN) package;QFN56_8_EP.fp
+TQFN56_8_EP, Square Quad Flat Nolead (QFN) package;TQFN56_8_EP.fp
+QFN68_10, Square Quad Flat Nolead (QFN) package;QFN68_10.fp
+TQFN68_10, Square Quad Flat Nolead (QFN) package;TQFN68_10.fp
+QFN68_10_EP, Square Quad Flat Nolead (QFN) package;QFN68_10_EP.fp
+TQFN68_10_EP, Square Quad Flat Nolead (QFN) package;TQFN68_10_EP.fp
+LQFP24_4, Square Quad-side flat pack;LQFP24_4.fp
+LQFP32_5, Square Quad-side flat pack;LQFP32_5.fp
+LQFP32_7, Square Quad-side flat pack;LQFP32_7.fp
+LQFP44_10, Square Quad-side flat pack;LQFP44_10.fp
+LQFP48_7, Square Quad-side flat pack;LQFP48_7.fp
+LQFP48_12, Square Quad-side flat pack;LQFP48_12.fp
+LQFP52_10, Square Quad-side flat pack;LQFP52_10.fp
+LQFP64_7, Square Quad-side flat pack;LQFP64_7.fp
+LQFP64_10, Square Quad-side flat pack;LQFP64_10.fp
+LQFP64_14, Square Quad-side flat pack;LQFP64_14.fp
+LQFP72_10, Square Quad-side flat pack;LQFP72_10.fp
+LQFP80_12, Square Quad-side flat pack;LQFP80_12.fp
+LQFP80_14, Square Quad-side flat pack;LQFP80_14.fp
+LQFP100_10, Square Quad-side flat pack;LQFP100_10.fp
+LQFP100_14, Square Quad-side flat pack;LQFP100_14.fp
+LQFP112_20, Square Quad-side flat pack;LQFP112_20.fp
+LQFP120_16, Square Quad-side flat pack;LQFP120_16.fp
+LQFP128_14, Square Quad-side flat pack;LQFP128_14.fp
+LQFP128_14_EP, Square Quad-side flat pack;LQFP128_14_EP.fp
+LQFP144_20, Square Quad-side flat pack;LQFP144_20.fp
+LQFP160_24, Square Quad-side flat pack;LQFP160_24.fp
+LQFP176_24, Square Quad-side flat pack;LQFP176_24.fp
+QFP32_7, Square Quad-side flat pack;QFP32_7.fp
+QFP44_10, Square Quad-side flat pack;QFP44_10.fp
+QFP52_10, Square Quad-side flat pack;QFP52_10.fp
+QFP64_14, Square Quad-side flat pack;QFP64_14.fp
+QFP80_14, Square Quad-side flat pack;QFP80_14.fp
+QFP100_14, Square Quad-side flat pack;QFP100_14.fp
+QFP120_28, Square Quad-side flat pack;QFP120_28.fp
+QFP128_28, Square Quad-side flat pack;QFP128_28.fp
+QFP144_28, Square Quad-side flat pack;QFP144_28.fp
+QFP160_28, Square Quad-side flat pack;QFP160_28.fp
+QFP208_28, Square Quad-side flat pack;QFP208_28.fp
+QFP160_28, Square Quad-side flat pack;QFP160_28.fp
+QFP240_32, Square Quad-side flat pack;QFP240_32.fp
+QFP304_40, Square Quad-side flat pack;QFP304_40.fp
+TQFP32_7, Square Quad-side flat pack;TQFP32_7.fp
+TQFP44_10, Square Quad-side flat pack;TQFP44_10.fp
+TQFP52_10, Square Quad-side flat pack;TQFP52_10.fp
+TQFP64_10, Square Quad-side flat pack;TQFP64_10.fp
+TQFP64_14, Square Quad-side flat pack;TQFP64_14.fp
+TQFP80_12, Square Quad-side flat pack;TQFP80_12.fp
+TQFP80_14, Square Quad-side flat pack;TQFP80_14.fp
+TQFP100_12, Square Quad-side flat pack;TQFP100_12.fp
+TQFP100_14, Square Quad-side flat pack;TQFP100_14.fp
+TQFP120_28, Square Quad-side flat pack;TQFP120_28.fp
+TQFP128_14, Square Quad-side flat pack;TQFP128_14.fp
+TQFP128_14_EP, Square Quad-side flat pack;TQFP128_14_EP.fp
+TQFP128_28, Square Quad-side flat pack;TQFP128_28.fp
+TQFP144_28, Square Quad-side flat pack;TQFP144_28.fp
+TQFP160_28, Square Quad-side flat pack;TQFP160_28.fp
+TQFP208_28, Square Quad-side flat pack;TQFP208_28.fp
+TQFP160_28, Square Quad-side flat pack;TQFP160_28.fp
+TQFP240_32, Square Quad-side flat pack;TQFP240_32.fp
+TQFP304_40, Square Quad-side flat pack;TQFP304_40.fp
+QFP64_R, Rectangular Quad-side flat pack;QFP64_R.fp
+QFP80_R, Rectangular Quad-side flat pack;QFP80_R.fp
+QFP100_R, Rectangular Quad-side flat pack;QFP100_R.fp
+QFP128_R, Rectangular Quad-side flat pack;QFP128_R.fp
+LQFP128_R, Rectangular Quad-side flat pack;LQFP128_R.fp
+ZIP9, Zig-zag in-line package;ZIP9.fp
+ZIP12, Zig-zag in-line package;ZIP12.fp
+ZIP16, Zig-zag in-line package;ZIP16.fp
+ZIP18, Zig-zag in-line package;ZIP18.fp
+ZIP20, Zig-zag in-line package;ZIP20.fp
+ZIP24, Zig-zag in-line package;ZIP24.fp
+ZIP28, Zig-zag in-line package;ZIP28.fp
+ZIP40, Zig-zag in-line package;ZIP40.fp
+ACY100, Axial non-polar component (typically resistor or capacitor),;ACY100.fp
+ACY150, Axial non-polar component (typically resistor or capacitor),;ACY150.fp
+ACY200, Axial non-polar component (typically resistor or capacitor),;ACY200.fp
+ACY300, Axial non-polar component (typically resistor or capacitor),;ACY300.fp
+ACY400, Axial non-polar component (typically resistor or capacitor),;ACY400.fp
+ACY500, Axial non-polar component (typically resistor or capacitor),;ACY500.fp
+ACY600, Axial non-polar component (typically resistor or capacitor),;ACY600.fp
+ACY700, Axial non-polar component (typically resistor or capacitor),;ACY700.fp
+ACY800, Axial non-polar component (typically resistor or capacitor),;ACY800.fp
+ACY900, Axial non-polar component (typically resistor or capacitor),;ACY900.fp
+ACY1000, Axial non-polar component (typically resistor or capacitor),;ACY1000.fp
+ACY1100, Axial non-polar component (typically resistor or capacitor),;ACY1100.fp
+ACY1200, Axial non-polar component (typically resistor or capacitor),;ACY1200.fp
+ACY1300, Axial non-polar component (typically resistor or capacitor),;ACY1300.fp
+ACY1400, Axial non-polar component (typically resistor or capacitor),;ACY1400.fp
+ACY1500, Axial non-polar component (typically resistor or capacitor),;ACY1500.fp
+ACY1600, Axial non-polar component (typically resistor or capacitor),;ACY1600.fp
+ACY100P, Axial polar component (typically capacitor),;ACY100P.fp
+ACY150P, Axial polar component (typically capacitor),;ACY150P.fp
+ACY200P, Axial polar component (typically capacitor),;ACY200P.fp
+ACY300P, Axial polar component (typically capacitor),;ACY300P.fp
+ACY400P, Axial polar component (typically capacitor),;ACY400P.fp
+ACY500P, Axial polar component (typically capacitor),;ACY500P.fp
+ACY600P, Axial polar component (typically capacitor),;ACY600P.fp
+ACY700P, Axial polar component (typically capacitor),;ACY700P.fp
+ACY800P, Axial polar component (typically capacitor),;ACY800P.fp
+ACY900P, Axial polar component (typically capacitor),;ACY900P.fp
+ACY1000P, Axial polar component (typically capacitor),;ACY1000P.fp
+ACY1100P, Axial polar component (typically capacitor),;ACY1100P.fp
+ACY1200P, Axial polar component (typically capacitor),;ACY1200P.fp
+ACY1300P, Axial polar component (typically capacitor),;ACY1300P.fp
+ACY1400P, Axial polar component (typically capacitor),;ACY1400P.fp
+ACY1500P, Axial polar component (typically capacitor),;ACY1500P.fp
+ACY1600P, Axial polar component (typically capacitor),;ACY1600P.fp
+ALF300, Axial diode (pin 1 is cathode);ALF300.fp
+ALF400, Axial diode (pin 1 is cathode);ALF400.fp
+ALF500, Axial diode (pin 1 is cathode);ALF500.fp
+ALF600, Axial diode (pin 1 is cathode);ALF600.fp
+ALF700, Axial diode (pin 1 is cathode);ALF700.fp
+ALF800, Axial diode (pin 1 is cathode);ALF800.fp
+ALF900, Axial diode (pin 1 is cathode);ALF900.fp
+ALF1000, Axial diode (pin 1 is cathode);ALF1000.fp
+RCY100, Bottom lead non-polar circular component (typically capacitor);RCY100.fp
+RCY150, Bottom lead non-polar circular component (typically capacitor);RCY150.fp
+RCY200, Bottom lead non-polar circular component (typically capacitor);RCY200.fp
+RCY250, Bottom lead non-polar circular component (typically capacitor);RCY250.fp
+RCY300, Bottom lead non-polar circular component (typically capacitor);RCY300.fp
+RCY350, Bottom lead non-polar circular component (typically capacitor);RCY350.fp
+RCY400, Bottom lead non-polar circular component (typically capacitor);RCY400.fp
+RCY500, Bottom lead non-polar circular component (typically capacitor);RCY500.fp
+RCY600, Bottom lead non-polar circular component (typically capacitor);RCY600.fp
+RCY700, Bottom lead non-polar circular component (typically capacitor);RCY700.fp
+RCY800, Bottom lead non-polar circular component (typically capacitor);RCY800.fp
+RCY900, Bottom lead non-polar circular component (typically capacitor);RCY900.fp
+RCY1000, Bottom lead non-polar circular component (typically capacitor);RCY1000.fp
+RCY1100, Bottom lead non-polar circular component (typically capacitor);RCY1100.fp
+RCY1200, Bottom lead non-polar circular component (typically capacitor);RCY1200.fp
+RCY100P, Bottom lead polar circular component (typically capacitor);RCY100P.fp
+RCY150P, Bottom lead polar circular component (typically capacitor);RCY150P.fp
+RCY200P, Bottom lead polar circular component (typically capacitor);RCY200P.fp
+RCY250P, Bottom lead polar circular component (typically capacitor);RCY250P.fp
+RCY300P, Bottom lead polar circular component (typically capacitor);RCY300P.fp
+RCY350P, Bottom lead polar circular component (typically capacitor);RCY350P.fp
+RCY400P, Bottom lead polar circular component (typically capacitor);RCY400P.fp
+RCY500P, Bottom lead polar circular component (typically capacitor);RCY500P.fp
+RCY600P, Bottom lead polar circular component (typically capacitor);RCY600P.fp
+RCY700P, Bottom lead polar circular component (typically capacitor);RCY700P.fp
+RCY800P, Bottom lead polar circular component (typically capacitor);RCY800P.fp
+RCY900P, Bottom lead polar circular component (typically capacitor);RCY900P.fp
+RCY1000P, Bottom lead polar circular component (typically capacitor);RCY1000P.fp
+RCY1100P, Bottom lead polar circular component (typically capacitor);RCY1100P.fp
+RCY1200P, Bottom lead polar circular component (typically capacitor);RCY1200P.fp
+HC49U, Crystals;HC49U.fp
+HC49UH, Crystals;HC49UH.fp
+HC49U_3, Crystals;HC49U_3.fp
+HC49U_3H, Crystals;HC49U_3H.fp
+HC51U, Crystals;HC51U.fp
+HC51UH, Crystals;HC51UH.fp
+UM1, Crystals;UM1.fp
+UM1H, Crystals;UM1H.fp
+UM1_3, Crystals;UM1_3.fp
+UM1_3H, Crystals;UM1_3H.fp
+HC49, Crystals;HC49.fp
+OSC14, Crystal oscillator;OSC14.fp
+LED3, LED, size in mm (pin 1 is +, 2 is -);LED3.fp
+LED5, LED, size in mm (pin 1 is +, 2 is -);LED5.fp
+TO126, Transistor;TO126.fp
+TO126S, Transistor;TO126S.fp
+TO126W, Transistor;TO126W.fp
+TO126SW, Transistor;TO126SW.fp
+TO220, Transistor;TO220.fp
+TO220S, Transistor;TO220S.fp
+TO220W, Transistor;TO220W.fp
+TO220SW, Transistor;TO220SW.fp
+TO18, Transistor;TO18.fp
+TO39, Transistor;TO39.fp
+TO92, Transistor;TO92.fp
+TO220ACS, diode in TO220;TO220ACS.fp
+TO218, diode in TO220;TO218.fp
+TO247, diode in TO220;TO247.fp
+TO247_2, diode in TO220;TO247_2.fp
+TO264, diode in TO220;TO264.fp
+TO251, diode in TO220;TO251.fp
+TO220ACSTAND, diode in TO220;TO220ACSTAND.fp
+PENTAWATT, Power IC, as in MULTIWATT15;PENTAWATT.fp
+HEPTAWATT, Power IC, as in MULTIWATT15;HEPTAWATT.fp
+MULTIWATT8, Power IC, as in MULTIWATT15;MULTIWATT8.fp
+MULTIWATT11, Power IC, as in MULTIWATT15;MULTIWATT11.fp
+MULTIWATT15, Power IC, as in MULTIWATT15;MULTIWATT15.fp
+JUMPER1, Jumper, i.e. single row headers;JUMPER1.fp
+JUMPER2, Jumper, i.e. single row headers;JUMPER2.fp
+JUMPER3, Jumper, i.e. single row headers;JUMPER3.fp
+JUMPER4, Jumper, i.e. single row headers;JUMPER4.fp
+JUMPER5, Jumper, i.e. single row headers;JUMPER5.fp
+JUMPER6, Jumper, i.e. single row headers;JUMPER6.fp
+JUMPER7, Jumper, i.e. single row headers;JUMPER7.fp
+JUMPER8, Jumper, i.e. single row headers;JUMPER8.fp
+JUMPER9, Jumper, i.e. single row headers;JUMPER9.fp
+JUMPER10, Jumper, i.e. single row headers;JUMPER10.fp
+JUMPER11, Jumper, i.e. single row headers;JUMPER11.fp
+JUMPER12, Jumper, i.e. single row headers;JUMPER12.fp
+JUMPER13, Jumper, i.e. single row headers;JUMPER13.fp
+JUMPER14, Jumper, i.e. single row headers;JUMPER14.fp
+JUMPER15, Jumper, i.e. single row headers;JUMPER15.fp
+JUMPER16, Jumper, i.e. single row headers;JUMPER16.fp
+JUMPER17, Jumper, i.e. single row headers;JUMPER17.fp
+JUMPER18, Jumper, i.e. single row headers;JUMPER18.fp
+JUMPER19, Jumper, i.e. single row headers;JUMPER19.fp
+JUMPER20, Jumper, i.e. single row headers;JUMPER20.fp
+JUMPER21, Jumper, i.e. single row headers;JUMPER21.fp
+JUMPER22, Jumper, i.e. single row headers;JUMPER22.fp
+JUMPER23, Jumper, i.e. single row headers;JUMPER23.fp
+JUMPER24, Jumper, i.e. single row headers;JUMPER24.fp
+JUMPER25, Jumper, i.e. single row headers;JUMPER25.fp
+JUMPER26, Jumper, i.e. single row headers;JUMPER26.fp
+MTA100_2, MTA Connector, (0.100 inch pitch);MTA100_2.fp
+MTA100_3, MTA Connector, (0.100 inch pitch);MTA100_3.fp
+MTA100_4, MTA Connector, (0.100 inch pitch);MTA100_4.fp
+MTA100_5, MTA Connector, (0.100 inch pitch);MTA100_5.fp
+MTA100_6, MTA Connector, (0.100 inch pitch);MTA100_6.fp
+MTA100_7, MTA Connector, (0.100 inch pitch);MTA100_7.fp
+MTA100_8, MTA Connector, (0.100 inch pitch);MTA100_8.fp
+MTA100_9, MTA Connector, (0.100 inch pitch);MTA100_9.fp
+MTA100_10, MTA Connector, (0.100 inch pitch);MTA100_10.fp
+MTA100_11, MTA Connector, (0.100 inch pitch);MTA100_11.fp
+MTA100_12, MTA Connector, (0.100 inch pitch);MTA100_12.fp
+MTA100_13, MTA Connector, (0.100 inch pitch);MTA100_13.fp
+MTA100_14, MTA Connector, (0.100 inch pitch);MTA100_14.fp
+MTA100_15, MTA Connector, (0.100 inch pitch);MTA100_15.fp
+HEADER2_1, Header connector, DIP pin numbering;HEADER2_1.fp
+HEADER4_1, Header connector, DIP pin numbering;HEADER4_1.fp
+HEADER6_1, Header connector, DIP pin numbering;HEADER6_1.fp
+HEADER8_1, Header connector, DIP pin numbering;HEADER8_1.fp
+HEADER10_1, Header connector, DIP pin numbering;HEADER10_1.fp
+HEADER12_1, Header connector, DIP pin numbering;HEADER12_1.fp
+HEADER14_1, Header connector, DIP pin numbering;HEADER14_1.fp
+HEADER16_1, Header connector, DIP pin numbering;HEADER16_1.fp
+HEADER18_1, Header connector, DIP pin numbering;HEADER18_1.fp
+HEADER20_1, Header connector, DIP pin numbering;HEADER20_1.fp
+HEADER22_1, Header connector, DIP pin numbering;HEADER22_1.fp
+HEADER24_1, Header connector, DIP pin numbering;HEADER24_1.fp
+HEADER26_1, Header connector, DIP pin numbering;HEADER26_1.fp
+HEADER28_1, Header connector, DIP pin numbering;HEADER28_1.fp
+HEADER30_1, Header connector, DIP pin numbering;HEADER30_1.fp
+HEADER32_1, Header connector, DIP pin numbering;HEADER32_1.fp
+HEADER34_1, Header connector, DIP pin numbering;HEADER34_1.fp
+HEADER36_1, Header connector, DIP pin numbering;HEADER36_1.fp
+HEADER38_1, Header connector, DIP pin numbering;HEADER38_1.fp
+HEADER40_1, Header connector, DIP pin numbering;HEADER40_1.fp
+HEADER42_1, Header connector, DIP pin numbering;HEADER42_1.fp
+HEADER44_1, Header connector, DIP pin numbering;HEADER44_1.fp
+HEADER46_1, Header connector, DIP pin numbering;HEADER46_1.fp
+HEADER48_1, Header connector, DIP pin numbering;HEADER48_1.fp
+HEADER50_1, Header connector, DIP pin numbering;HEADER50_1.fp
+HEADER52_1, Header connector, DIP pin numbering;HEADER52_1.fp
+HEADER54_1, Header connector, DIP pin numbering;HEADER54_1.fp
+HEADER56_1, Header connector, DIP pin numbering;HEADER56_1.fp
+HEADER58_1, Header connector, DIP pin numbering;HEADER58_1.fp
+HEADER60_1, Header connector, DIP pin numbering;HEADER60_1.fp
+HEADER62_1, Header connector, DIP pin numbering;HEADER62_1.fp
+HEADER64_1, Header connector, DIP pin numbering;HEADER64_1.fp
+HEADER80_1, Header connector, DIP pin numbering;HEADER80_1.fp
+HEADER2_2, Header connector, ribbon cable numbering;HEADER2_2.fp
+HEADER4_2, Header connector, ribbon cable numbering;HEADER4_2.fp
+HEADER6_2, Header connector, ribbon cable numbering;HEADER6_2.fp
+HEADER8_2, Header connector, ribbon cable numbering;HEADER8_2.fp
+HEADER10_2, Header connector, ribbon cable numbering;HEADER10_2.fp
+HEADER12_2, Header connector, ribbon cable numbering;HEADER12_2.fp
+HEADER14_2, Header connector, ribbon cable numbering;HEADER14_2.fp
+HEADER16_2, Header connector, ribbon cable numbering;HEADER16_2.fp
+HEADER18_2, Header connector, ribbon cable numbering;HEADER18_2.fp
+HEADER20_2, Header connector, ribbon cable numbering;HEADER20_2.fp
+HEADER22_2, Header connector, ribbon cable numbering;HEADER22_2.fp
+HEADER24_2, Header connector, ribbon cable numbering;HEADER24_2.fp
+HEADER26_2, Header connector, ribbon cable numbering;HEADER26_2.fp
+HEADER28_2, Header connector, ribbon cable numbering;HEADER28_2.fp
+HEADER30_2, Header connector, ribbon cable numbering;HEADER30_2.fp
+HEADER32_2, Header connector, ribbon cable numbering;HEADER32_2.fp
+HEADER34_2, Header connector, ribbon cable numbering;HEADER34_2.fp
+HEADER36_2, Header connector, ribbon cable numbering;HEADER36_2.fp
+HEADER38_2, Header connector, ribbon cable numbering;HEADER38_2.fp
+HEADER40_2, Header connector, ribbon cable numbering;HEADER40_2.fp
+HEADER42_2, Header connector, ribbon cable numbering;HEADER42_2.fp
+HEADER44_2, Header connector, ribbon cable numbering;HEADER44_2.fp
+HEADER46_2, Header connector, ribbon cable numbering;HEADER46_2.fp
+HEADER48_2, Header connector, ribbon cable numbering;HEADER48_2.fp
+HEADER50_2, Header connector, ribbon cable numbering;HEADER50_2.fp
+HEADER52_2, Header connector, ribbon cable numbering;HEADER52_2.fp
+HEADER54_2, Header connector, ribbon cable numbering;HEADER54_2.fp
+HEADER56_2, Header connector, ribbon cable numbering;HEADER56_2.fp
+HEADER58_2, Header connector, ribbon cable numbering;HEADER58_2.fp
+HEADER60_2, Header connector, ribbon cable numbering;HEADER60_2.fp
+HEADER62_2, Header connector, ribbon cable numbering;HEADER62_2.fp
+HEADER64_2, Header connector, ribbon cable numbering;HEADER64_2.fp
+HEADER80_2, Header connector, ribbon cable numbering;HEADER80_2.fp
+DIN41651_10, Header connector with latches;DIN41651_10.fp
+DIN41651_14, Header connector with latches;DIN41651_14.fp
+DIN41651_16, Header connector with latches;DIN41651_16.fp
+DIN41651_20, Header connector with latches;DIN41651_20.fp
+DIN41651_26, Header connector with latches;DIN41651_26.fp
+DIN41651_34, Header connector with latches;DIN41651_34.fp
+DIN41651_40, Header connector with latches;DIN41651_40.fp
+DIN41651_50, Header connector with latches;DIN41651_50.fp
+DIN41651_60, Header connector with latches;DIN41651_60.fp
+DIN41651_64, Header connector with latches;DIN41651_64.fp
+DIN41651_10S, Header connector with latches;DIN41651_10S.fp
+DIN41651_14S, Header connector with latches;DIN41651_14S.fp
+DIN41651_16S, Header connector with latches;DIN41651_16S.fp
+DIN41651_20S, Header connector with latches;DIN41651_20S.fp
+DIN41651_26S, Header connector with latches;DIN41651_26S.fp
+DIN41651_34S, Header connector with latches;DIN41651_34S.fp
+DIN41651_40S, Header connector with latches;DIN41651_40S.fp
+DIN41651_50S, Header connector with latches;DIN41651_50S.fp
+DIN41651_60S, Header connector with latches;DIN41651_60S.fp
+DIN41651_64S, Header connector with latches;DIN41651_64S.fp
+DB9F, DSUB connector, female/male;DB9F.fp
+DB15F, DSUB connector, female/male;DB15F.fp
+DB25F, DSUB connector, female/male;DB25F.fp
+DB37F, DSUB connector, female/male;DB37F.fp
+DB9M, DSUB connector, female/male;DB9M.fp
+DB15M, DSUB connector, female/male;DB15M.fp
+DB25M, DSUB connector, female/male;DB25M.fp
+DB37M, DSUB connector, female/male;DB37M.fp
+DIN41612C96F, DIN connector, 96 pin housing;DIN41612C96F.fp
+DIN41612C96M, DIN connector, 96 pin housing;DIN41612C96M.fp
+DIN41612C64F, DIN connector, 96 pin housing;DIN41612C64F.fp
+DIN41612C64M, DIN connector, 96 pin housing;DIN41612C64M.fp
+DIN41612C96FS, DIN connector, 96 pin housing;DIN41612C96FS.fp
+DIN41612C96MS, DIN connector, 96 pin housing;DIN41612C96MS.fp
+DIN41612C64FS, DIN connector, 96 pin housing;DIN41612C64FS.fp
+DIN41612C64MS, DIN connector, 96 pin housing;DIN41612C64MS.fp
+2706, Standard SMT resistor, capacitor etc;2706.fp
+CAPC0402L, Standard SMT resistor, capacitor etc;CAPC0402L.fp
+CAPC0402N, Standard SMT resistor, capacitor etc;CAPC0402N.fp
+CAPC0402M, Standard SMT resistor, capacitor etc;CAPC0402M.fp
+INDC0402L, Standard SMT resistor, capacitor etc;INDC0402L.fp
+INDC0402N, Standard SMT resistor, capacitor etc;INDC0402N.fp
+INDC0402M, Standard SMT resistor, capacitor etc;INDC0402M.fp
+RESC0402L, Standard SMT resistor, capacitor etc;RESC0402L.fp
+RESC0402N, Standard SMT resistor, capacitor etc;RESC0402N.fp
+RESC0402M, Standard SMT resistor, capacitor etc;RESC0402M.fp
+01005, Standard SMT resistor, capacitor etc;01005.fp
+CAPC0603L, Standard SMT resistor, capacitor etc;CAPC0603L.fp
+CAPC0603N, Standard SMT resistor, capacitor etc;CAPC0603N.fp
+CAPC0603M, Standard SMT resistor, capacitor etc;CAPC0603M.fp
+RESC0603L, Standard SMT resistor, capacitor etc;RESC0603L.fp
+RESC0603N, Standard SMT resistor, capacitor etc;RESC0603N.fp
+RESC0603M, Standard SMT resistor, capacitor etc;RESC0603M.fp
+0201, Standard SMT resistor, capacitor etc;0201.fp
+CAPC1005L, Standard SMT resistor, capacitor etc;CAPC1005L.fp
+CAPC1005N, Standard SMT resistor, capacitor etc;CAPC1005N.fp
+CAPC1005M, Standard SMT resistor, capacitor etc;CAPC1005M.fp
+INDC1005L, Standard SMT resistor, capacitor etc;INDC1005L.fp
+INDC1005N, Standard SMT resistor, capacitor etc;INDC1005N.fp
+INDC1005M, Standard SMT resistor, capacitor etc;INDC1005M.fp
+RESC1005L, Standard SMT resistor, capacitor etc;RESC1005L.fp
+RESC1005N, Standard SMT resistor, capacitor etc;RESC1005N.fp
+RESC1005M, Standard SMT resistor, capacitor etc;RESC1005M.fp
+0402, Standard SMT resistor, capacitor etc;0402.fp
+CAPC1608L, Standard SMT resistor, capacitor etc;CAPC1608L.fp
+CAPC1608N, Standard SMT resistor, capacitor etc;CAPC1608N.fp
+CAPC1608M, Standard SMT resistor, capacitor etc;CAPC1608M.fp
+INDC1608L, Standard SMT resistor, capacitor etc;INDC1608L.fp
+INDC1608N, Standard SMT resistor, capacitor etc;INDC1608N.fp
+INDC1608M, Standard SMT resistor, capacitor etc;INDC1608M.fp
+RESC1608L, Standard SMT resistor, capacitor etc;RESC1608L.fp
+RESC1608N, Standard SMT resistor, capacitor etc;RESC1608N.fp
+RESC1608M, Standard SMT resistor, capacitor etc;RESC1608M.fp
+0603, Standard SMT resistor, capacitor etc;0603.fp
+CAPC2012L, Standard SMT resistor, capacitor etc;CAPC2012L.fp
+CAPC2012N, Standard SMT resistor, capacitor etc;CAPC2012N.fp
+CAPC2012M, Standard SMT resistor, capacitor etc;CAPC2012M.fp
+INDC2012L, Standard SMT resistor, capacitor etc;INDC2012L.fp
+INDC2012N, Standard SMT resistor, capacitor etc;INDC2012N.fp
+INDC2012M, Standard SMT resistor, capacitor etc;INDC2012M.fp
+RESC2012L, Standard SMT resistor, capacitor etc;RESC2012L.fp
+RESC2012N, Standard SMT resistor, capacitor etc;RESC2012N.fp
+RESC2012M, Standard SMT resistor, capacitor etc;RESC2012M.fp
+0805, Standard SMT resistor, capacitor etc;0805.fp
+INDC2520L, Standard SMT resistor, capacitor etc;INDC2520L.fp
+INDC2520N, Standard SMT resistor, capacitor etc;INDC2520N.fp
+INDC2520M, Standard SMT resistor, capacitor etc;INDC2520M.fp
+1008, Standard SMT resistor, capacitor etc;1008.fp
+CAPC3216L, Standard SMT resistor, capacitor etc;CAPC3216L.fp
+CAPC3216N, Standard SMT resistor, capacitor etc;CAPC3216N.fp
+CAPC3216M, Standard SMT resistor, capacitor etc;CAPC3216M.fp
+INDC3216L, Standard SMT resistor, capacitor etc;INDC3216L.fp
+INDC3216N, Standard SMT resistor, capacitor etc;INDC3216N.fp
+INDC3216M, Standard SMT resistor, capacitor etc;INDC3216M.fp
+RESC3216L, Standard SMT resistor, capacitor etc;RESC3216L.fp
+RESC3216N, Standard SMT resistor, capacitor etc;RESC3216N.fp
+RESC3216M, Standard SMT resistor, capacitor etc;RESC3216M.fp
+1206, Standard SMT resistor, capacitor etc;1206.fp
+CAPC3225L, Standard SMT resistor, capacitor etc;CAPC3225L.fp
+CAPC3225N, Standard SMT resistor, capacitor etc;CAPC3225N.fp
+CAPC3225M, Standard SMT resistor, capacitor etc;CAPC3225M.fp
+INDC3225L, Standard SMT resistor, capacitor etc;INDC3225L.fp
+INDC3225N, Standard SMT resistor, capacitor etc;INDC3225N.fp
+INDC3225M, Standard SMT resistor, capacitor etc;INDC3225M.fp
+RESC3225L, Standard SMT resistor, capacitor etc;RESC3225L.fp
+RESC3225N, Standard SMT resistor, capacitor etc;RESC3225N.fp
+RESC3225M, Standard SMT resistor, capacitor etc;RESC3225M.fp
+1210, Standard SMT resistor, capacitor etc;1210.fp
+INDC4509L, Standard SMT resistor, capacitor etc;INDC4509L.fp
+INDC4509N, Standard SMT resistor, capacitor etc;INDC4509N.fp
+INDC4509M, Standard SMT resistor, capacitor etc;INDC4509M.fp
+1806, Standard SMT resistor, capacitor etc;1806.fp
+CAPC4532L, Standard SMT resistor, capacitor etc;CAPC4532L.fp
+CAPC4532N, Standard SMT resistor, capacitor etc;CAPC4532N.fp
+CAPC4532M, Standard SMT resistor, capacitor etc;CAPC4532M.fp
+INDC4532L, Standard SMT resistor, capacitor etc;INDC4532L.fp
+INDC4532N, Standard SMT resistor, capacitor etc;INDC4532N.fp
+INDC4532M, Standard SMT resistor, capacitor etc;INDC4532M.fp
+RESC4532L, Standard SMT resistor, capacitor etc;RESC4532L.fp
+RESC4532N, Standard SMT resistor, capacitor etc;RESC4532N.fp
+RESC4532M, Standard SMT resistor, capacitor etc;RESC4532M.fp
+1806, Standard SMT resistor, capacitor etc;1806.fp
+CAPC4564L, Standard SMT resistor, capacitor etc;CAPC4564L.fp
+CAPC4564N, Standard SMT resistor, capacitor etc;CAPC4564N.fp
+CAPC4564M, Standard SMT resistor, capacitor etc;CAPC4564M.fp
+RESC4564L, Standard SMT resistor, capacitor etc;RESC4564L.fp
+RESC4564N, Standard SMT resistor, capacitor etc;RESC4564N.fp
+RESC4564M, Standard SMT resistor, capacitor etc;RESC4564M.fp
+1825, Standard SMT resistor, capacitor etc;1825.fp
+EMI0603, 3-Pin SMT EMI Filter based on standard SMT sizes;EMI0603.fp
+EMI0805, 3-Pin SMT EMI Filter based on standard SMT sizes;EMI0805.fp
+EMI1206, 3-Pin SMT EMI Filter based on standard SMT sizes;EMI1206.fp
+EMI1806, 3-Pin SMT EMI Filter based on standard SMT sizes;EMI1806.fp
+EIA3216, Tantalum SMT capacitor (pin 1 is +);EIA3216.fp
+EIA3528, Tantalum SMT capacitor (pin 1 is +);EIA3528.fp
+EIA6032, Tantalum SMT capacitor (pin 1 is +);EIA6032.fp
+EIA7343, Tantalum SMT capacitor (pin 1 is +);EIA7343.fp
+TANT_A, Tantalum SMT capacitor (pin 1 is +);TANT_A.fp
+TANT_B, Tantalum SMT capacitor (pin 1 is +);TANT_B.fp
+TANT_C, Tantalum SMT capacitor (pin 1 is +);TANT_C.fp
+TANT_D, Tantalum SMT capacitor (pin 1 is +);TANT_D.fp
+SME3, Surface mount electrolytic capacitor, number is dia in mm;SME3.fp
+SME4, Surface mount electrolytic capacitor, number is dia in mm;SME4.fp
+SME5, Surface mount electrolytic capacitor, number is dia in mm;SME5.fp
+SME6, Surface mount electrolytic capacitor, number is dia in mm;SME6.fp
+SME8, Surface mount electrolytic capacitor, number is dia in mm;SME8.fp
+SME10, Surface mount electrolytic capacitor, number is dia in mm;SME10.fp
+SOD80, SMT diode (pin 1 is cathode);SOD80.fp
+SOD87, SMT diode (pin 1 is cathode);SOD87.fp
+SOD106A, SMT diode (pin 1 is cathode);SOD106A.fp
+SOD110, SMT diode (pin 1 is cathode);SOD110.fp
+SOD123, SMT diode (pin 1 is cathode);SOD123.fp
+SOD323, SMT diode (pin 1 is cathode);SOD323.fp
+DO214, SMT diode (pin 1 is cathode);DO214.fp
+DO214AB, SMT diode (pin 1 is cathode);DO214AB.fp
+SOT23D, SMT diode (pin 1 is cathode);SOT23D.fp
+SOT323D, SMT diode (pin 1 is cathode);SOT323D.fp
+SOT23, SMT transistor, 3 pins;SOT23.fp
+SOT323, SMT transistor, 3 pins;SOT323.fp
+SC90, SMT transistor, 3 pins;SC90.fp
+SC70_3, SMT transistor, 3 pins;SC70_3.fp
+SOT89, SMT transistor, 4 pins;SOT89.fp
+SOT143, SMT transistor, 4 pins;SOT143.fp
+SOT223, SMT transistor, 4 pins;SOT223.fp
+SC70_4, SMT transistor, 4 pins;SC70_4.fp
+SOT25, SMT transistor, 5 pins;SOT25.fp
+SOT325, SMT transistor, 5 pins;SOT325.fp
+SC70_5, SMT transistor, 5 pins;SC70_5.fp
+SOT26, SMT transistor, 6 pins;SOT26.fp
+SOT326, SMT transistor, 6 pins;SOT326.fp
+SC70_6, SMT transistor, 6 pins;SC70_6.fp
+MPAK, Pressure transducer;MPAK.fp

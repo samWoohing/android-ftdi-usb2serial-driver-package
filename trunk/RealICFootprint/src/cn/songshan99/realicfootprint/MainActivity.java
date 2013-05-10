@@ -14,11 +14,16 @@ import cn.songshan99.realicfootprint.R;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class MainActivity extends SherlockActivity {
 
@@ -56,7 +61,6 @@ public class MainActivity extends SherlockActivity {
 		render.setLayerColor(ICFootprintRender.LAYER_DRILL,  getResources().getColor(R.color.Red));
 		render.setLayerColor(ICFootprintRender.LAYER_MASK,  getResources().getColor(R.color.Red));
 
-		//TODO: use above code as debuging start, and finish ICFootprintView.
 		//set the visibility of each layer, and make sure they are shown correctly.
 	}
 
@@ -67,7 +71,7 @@ public class MainActivity extends SherlockActivity {
 
         //Create the search view
         SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
-        searchView.setQueryHint("Search for countries…");
+        searchView.setQueryHint("Search for footprint");
 
         menu.add(1,1,1,"Search")
             .setIcon(R.drawable.ic_search_inverse)
@@ -86,13 +90,35 @@ public class MainActivity extends SherlockActivity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO: perform the actual search job
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-		      String query = intent.getStringExtra(SearchManager.QUERY);
-		      //call the search function
-		    }
+		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            // handles a click on a search suggestion; launches activity to show word
+            Intent wordIntent = new Intent(this, MainActivity.class);
+            wordIntent.setData(intent.getData());
+            startActivity(wordIntent);
+        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // handles a search query
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            showResults(query);
+        }
 	}
 	
-	
+    /**
+     * Searches the dictionary and displays results for the given query.
+     * @param query The search query
+     */
+    private void showResults(String query) {
+
+        Cursor cursor = managedQuery(ICFootprintDescProvider.CONTENT_URI, null, null,
+                                new String[] {query}, null);
+
+        if (cursor != null){
+            
+            // Specify the columns we want to display in the result
+            String[] from = new String[] { ICFootprintDescDatabase.KEY_DESCRIPTION,
+            		ICFootprintDescDatabase.KEY_FILENAME };
+        }
+    }
+    
 	private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener(){
 
 		@Override

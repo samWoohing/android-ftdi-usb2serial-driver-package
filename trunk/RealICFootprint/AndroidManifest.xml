@@ -33,13 +33,15 @@
             <!-- Points to searchable meta data. -->
             <meta-data android:name="android.app.searchable"
                        android:resource="@xml/searchable" />
-            <!-- Points to searchable activity so the whole app can invoke search. this I think is optional here. -->
-        	<meta-data android:name="android.app.default_searchable"
-                   	android:value=".MainActivity" />
+            
         </activity>
         
-    	
-        
+    	<!-- Provides search suggestions for words and their definitions. -->
+        <provider android:name=".ICFootprintDescProvider"
+                  android:authorities="cn.songshan99.realicfootprint.ICFootprintDescProvider" />
+        <!-- Points to searchable activity so the whole app can invoke search. this I think is optional here. -->
+        <meta-data android:name="android.app.default_searchable"
+                   android:value=".MainActivity" />
     </application>
 
 </manifest>
