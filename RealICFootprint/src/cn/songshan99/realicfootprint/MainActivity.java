@@ -9,7 +9,6 @@ import com.actionbarsherlock.view.SubMenu;
 import com.actionbarsherlock.widget.SearchView;
 
 import cn.songshan99.FootprintParser.ICFootprint;
-import cn.songshan99.realicfootprint.R;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -19,6 +18,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -61,62 +61,62 @@ public class MainActivity extends SherlockActivity {
 		render.setLayerColor(ICFootprintRender.LAYER_DRILL,  getResources().getColor(R.color.Red));
 		render.setLayerColor(ICFootprintRender.LAYER_MASK,  getResources().getColor(R.color.Red));
 
-		//set the visibility of each layer, and make sure they are shown correctly.
+		handleIntent(getIntent());
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		
-		//Used to put dark icons on light action bar
-
-        //Create the search view
-        SearchView searchView = new SearchView(getSupportActionBar().getThemedContext());
-        searchView.setQueryHint("Search for footprint");
-
-        menu.add(1,1,1,"Search")
-            .setIcon(R.drawable.ic_search_inverse)
-            .setActionView(searchView)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		//Note: This helps to get the actionbarsherlock specifit menu inflater.
+		com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.main, menu);
         
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        com.actionbarsherlock.widget.SearchView searchView = (com.actionbarsherlock.widget.SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        //searchView.setIconifiedByDefault(false);
+        searchView.setIconifiedByDefault(false);
         
         //searchView.setOnQueryTextListener(mQueryTextListener);
         menu.add(2, 2, 2, "About");
+        
         return true;
 	}
-
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                onSearchRequested();
+                return true;
+            default:
+                return false;
+        }
+    }
+	
 	@Override
 	protected void onNewIntent(Intent intent) {
-		// TODO: perform the actual search job
-		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // handles a click on a search suggestion; launches activity to show word
-            Intent wordIntent = new Intent(this, MainActivity.class);
-            wordIntent.setData(intent.getData());
-            startActivity(wordIntent);
-        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            // handles a search query
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            showResults(query);
-        }
+		
+		handleIntent(intent);
 	}
 	
+	private void handleIntent(Intent intent) {
+		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+			//TODO: intent.getData() can get the detailed intent URI.
+			//The URI shall contain the rowID information, we will use this to retrieve filename data.
+			
+		} else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			// handles a search query
+			String query = intent.getStringExtra(SearchManager.QUERY);
+			showResults(query);
+		}
+	}
+	 
     /**
      * Searches the dictionary and displays results for the given query.
      * @param query The search query
      */
     private void showResults(String query) {
 
-        Cursor cursor = managedQuery(ICFootprintDescProvider.CONTENT_URI, null, null,
-                                new String[] {query}, null);
-
-        if (cursor != null){
-            
-            // Specify the columns we want to display in the result
-            String[] from = new String[] { ICFootprintDescDatabase.KEY_DESCRIPTION,
-            		ICFootprintDescDatabase.KEY_FILENAME };
-        }
     }
     
 	private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener(){

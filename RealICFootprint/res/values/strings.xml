@@ -7,7 +7,10 @@
     
     <!-- The label for use as a searchable item -->
     <string name="search_label">Footprint description</string>
-
+    
+	<!-- The menu entry that invokes search. -->
+    <string name="menu_search">Search</string>
+    
     <!-- The hint text that appears in the search box. -->
     <string name="search_hint">Search footprint description</string>
 </resources>
