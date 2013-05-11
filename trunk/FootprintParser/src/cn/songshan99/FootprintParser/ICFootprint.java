@@ -222,9 +222,17 @@ public class ICFootprint {
 		//convert to lower characters
 		String lstr = str.toLowerCase();
 		int i=0,ind,flag=0;
-		while((ind=lstr.indexOf(',',i))>=0){
-			flag |= strFlagMap.get(lstr.substring(i, ind-1));
-			i=ind+1;
+		Integer result;
+		if ((ind = lstr.indexOf(',', i)) == -1) {
+			result = strFlagMap.get(lstr);
+			if(result == null) return 0;
+			else flag |= result;
+		} else {
+			while ((ind = lstr.indexOf(',', i)) >= 0) {
+				result = strFlagMap.get(lstr.substring(i, ind - 1));
+				if(result != null) flag |= result;
+				i = ind + 1;
+			}
 		}
 		return flag;
 	}
