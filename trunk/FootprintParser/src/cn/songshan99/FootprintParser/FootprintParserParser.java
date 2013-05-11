@@ -1381,8 +1381,11 @@ public class FootprintParserParser extends Parser {
 			setState(312); ((Pin_hi_formatContext)_localctx).fl = flags();
 			setState(313); match(1);
 
-			        ((Pin_hi_formatContext)_localctx).newpin =  new Pin(  ((Pin_hi_formatContext)_localctx).x.value,
-			                            ((Pin_hi_formatContext)_localctx).y.value,
+			        float mx,my;
+			        mx=_localctx.footprint.getmMark().getaX();
+			        my=_localctx.footprint.getmMark().getaY();
+			        ((Pin_hi_formatContext)_localctx).newpin =  new Pin(  ((Pin_hi_formatContext)_localctx).x.value+mx,
+			                            ((Pin_hi_formatContext)_localctx).y.value+my,
 			                            ((Pin_hi_formatContext)_localctx).th.value,
 			                            ((Pin_hi_formatContext)_localctx).cl.value,
 			                            ((Pin_hi_formatContext)_localctx).mk.value,
@@ -1465,8 +1468,11 @@ public class FootprintParserParser extends Parser {
 			setState(326); ((Pin_1_7_formatContext)_localctx).fl = integer();
 			setState(327); match(2);
 
-			        ((Pin_1_7_formatContext)_localctx).newpin =  new Pin(  ((Pin_1_7_formatContext)_localctx).x.value*100,
-			                            ((Pin_1_7_formatContext)_localctx).y.value*100,
+			        float mx,my;
+			        mx=_localctx.footprint.getmMark().getaX();
+			        my=_localctx.footprint.getmMark().getaY();
+			        ((Pin_1_7_formatContext)_localctx).newpin =  new Pin(  ((Pin_1_7_formatContext)_localctx).x.value*100+mx,
+			                            ((Pin_1_7_formatContext)_localctx).y.value*100+my,
 			                            ((Pin_1_7_formatContext)_localctx).th.value*100,
 			                            ((Pin_1_7_formatContext)_localctx).cl.value*100,
 			                            ((Pin_1_7_formatContext)_localctx).mk.value*100,
@@ -1779,8 +1785,11 @@ public class FootprintParserParser extends Parser {
 			setState(374); ((Pad_hi_formatContext)_localctx).fl = flags();
 			setState(375); match(1);
 
-			        ((Pad_hi_formatContext)_localctx).newpad =  new Pad(  ((Pad_hi_formatContext)_localctx).x1.value,
-			                            ((Pad_hi_formatContext)_localctx).y1.value,
+			        float mx,my;
+			        mx=_localctx.footprint.getmMark().getaX();
+			        my=_localctx.footprint.getmMark().getaY();
+			        ((Pad_hi_formatContext)_localctx).newpad =  new Pad(  ((Pad_hi_formatContext)_localctx).x1.value+mx,
+			                            ((Pad_hi_formatContext)_localctx).y1.value+my,
 			                            ((Pad_hi_formatContext)_localctx).x2.value,
 			                            ((Pad_hi_formatContext)_localctx).y2.value,
 			                            ((Pad_hi_formatContext)_localctx).th.value,
@@ -1866,8 +1875,11 @@ public class FootprintParserParser extends Parser {
 			setState(389); ((Pad_1_7_formatContext)_localctx).fl = integer();
 			setState(390); match(2);
 
-			        ((Pad_1_7_formatContext)_localctx).newpad =  new Pad(  ((Pad_1_7_formatContext)_localctx).x1.value*100,
-			                            ((Pad_1_7_formatContext)_localctx).y1.value*100,
+			        float mx,my;
+			        mx=_localctx.footprint.getmMark().getaX();
+			        my=_localctx.footprint.getmMark().getaY();
+			        ((Pad_1_7_formatContext)_localctx).newpad =  new Pad(  ((Pad_1_7_formatContext)_localctx).x1.value*100+mx,
+			                            ((Pad_1_7_formatContext)_localctx).y1.value*100+my,
 			                            ((Pad_1_7_formatContext)_localctx).x2.value*100,
 			                            ((Pad_1_7_formatContext)_localctx).y2.value*100,
 			                            ((Pad_1_7_formatContext)_localctx).th.value*100,

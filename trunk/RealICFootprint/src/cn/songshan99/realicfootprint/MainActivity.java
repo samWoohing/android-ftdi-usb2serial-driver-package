@@ -9,8 +9,10 @@ import com.actionbarsherlock.view.SubMenu;
 
 import cn.songshan99.FootprintParser.ICFootprint;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -32,9 +34,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends SherlockActivity {
-	
+	//TODO: TO18, TO39, TO92 display may have problems.(solved, parser problem)
+	//TODO: the color display
+	//TODO: the ListPopupWindow selection of search results (done)
+	//TODO: revise the search method to support " " (blank) in search string
+	//TODO: prevent screen rotating. Portrait only.
+	//TODO: freeze button?
+	//TODO: about dialog
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
+	private com.actionbarsherlock.view.Menu mMenu;
+	
+	private static String[] LISTVIEW_FROM = new String[]{ICFootprintDescDatabase.KEY_FILENAME,ICFootprintDescDatabase.KEY_DESCRIPTION};
+	private static int[] LISTVIEW_TO = new int[]{R.id.textViewFPName, R.id.textViewFPDesc};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +67,6 @@ public class MainActivity extends SherlockActivity {
 			mICFootprintView.setICFootprint(footprint);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -80,6 +91,7 @@ public class MainActivity extends SherlockActivity {
 	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
 		
 		//Note: This helps to get the actionbarsherlock specifit menu inflater.
+		
 		com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.main, menu);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
@@ -90,7 +102,7 @@ public class MainActivity extends SherlockActivity {
 	        //searchView.setOnQueryTextListener(mQueryTextListener);
         }
         //menu.add(2, 2, 2, "About");
-        
+        mMenu = menu;
         return true;
 	}
 	
@@ -98,7 +110,10 @@ public class MainActivity extends SherlockActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                onSearchRequested();
+            	if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)onSearchRequested();
+            	//NOTE: seems we DON'T need to explicitely call above line on SDK>11,
+            	//since the system can show the searchview automatically by default
+            	//So do this for compatibility purpose
                 return true;
             default:
                 return false;
@@ -113,7 +128,6 @@ public class MainActivity extends SherlockActivity {
 	
 	private void handleIntent(Intent intent) {
 		if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-			//TODO: intent.getData() can get the detailed intent URI.
 			//The URI shall contain the rowID information, we will use this to retrieve filename data.
 			Cursor cursor = getContentResolver().query(intent.getData(), null, null, null, null);
 			
@@ -129,19 +143,35 @@ public class MainActivity extends SherlockActivity {
 		} else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
 			// handles a search query
 			String query = intent.getStringExtra(SearchManager.QUERY);
-			showResults(query);
+			final Cursor cursor = getContentResolver().query(ICFootprintDescProvider.CONTENT_URI, null, null,
+                    new String[] {query}, null);
+			if(cursor!=null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.icfootprint_info, cursor, LISTVIEW_FROM, LISTVIEW_TO,0);
+				
+				builder.setAdapter(adapter, new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						cursor.moveToPosition(which);
+						Integer rowid = cursor.getInt(0);
+						if(rowid!=null)mSpinnerICFootprint.setSelection(rowid-1);//Note: rowid is 1-based but spinner selection is 0-based.
+						else Toast.makeText(getApplicationContext(), "Cannot find footprint!", Toast.LENGTH_SHORT).show();
+						//Note: below is for compatibility purpose. Only do when SDK>11
+						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+					        SearchView searchView = (SearchView) mMenu.findItem(R.id.search).getActionView();
+					        searchView.clearFocus();
+				        }
+						dialog.dismiss();
+					}
+					});
+				
+				builder.setTitle("Select a footprint: ");
+				//builder.setOnItemSelectedListener(mOnICFootprintSelectedListener);
+				builder.create().show();
+			}
 		}
 	}
-	 
-    /**
-     * Searches the dictionary and displays results for the given query.
-     * @param query The search query
-     */
-    private void showResults(String query) {
-
-    }
-    
-    @SuppressWarnings("deprecation")
+	    
 	private void setSpinnerContent(Spinner spinner){
     	//.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder)
 		Cursor cursor;
@@ -152,9 +182,7 @@ public class MainActivity extends SherlockActivity {
 		// query all information from database
     	
     	//create cursor adapter and set it as the spinner's adapter
-    	String[] from = new String[]{ICFootprintDescDatabase.KEY_FILENAME,ICFootprintDescDatabase.KEY_DESCRIPTION};
-    	int[] to = new int[]{R.id.textViewFPName, R.id.textViewFPDesc};
-    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.icfootprint_info, cursor, from, to,0);
+    	SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.icfootprint_info, cursor, LISTVIEW_FROM, LISTVIEW_TO,0);
     	spinner.setAdapter(adapter);
     	spinner.setOnItemSelectedListener(mOnICFootprintSelectedListener);
     }
@@ -165,7 +193,7 @@ public class MainActivity extends SherlockActivity {
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
 			TextView tv = (TextView)view.findViewById(R.id.textViewFPName);
 			//TODO: use tv.getText(); to update the footprint choice
-			setICFootprint(tv.getText().toString()+".fp");
+			if(tv!=null) setICFootprint(tv.getText().toString()+".fp");
 		}
 
 		@Override
