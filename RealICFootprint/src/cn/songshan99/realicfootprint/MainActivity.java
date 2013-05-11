@@ -165,7 +165,7 @@ public class MainActivity extends SherlockActivity {
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
 			TextView tv = (TextView)view.findViewById(R.id.textViewFPName);
 			//TODO: use tv.getText(); to update the footprint choice
-			setICFootprint(tv.getText().toString());
+			setICFootprint(tv.getText().toString()+".fp");
 		}
 
 		@Override
