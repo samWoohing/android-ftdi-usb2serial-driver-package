@@ -489,8 +489,11 @@ pin_hi_format [ICFootprint footprint] returns [Pin newpin]
     : T_PIN '[' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=flags ']'
       //unit is 1/100 mil. new format
       {
-        $newpin = new Pin(  $x.value,
-                            $y.value,
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $newpin = new Pin(  $x.value+mx,
+                            $y.value+my,
                             $th.value,
                             $cl.value,
                             $mk.value,
@@ -506,8 +509,11 @@ pin_1_7_format [ICFootprint footprint] returns [Pin newpin]
     : T_PIN '(' x=measure y=measure th=measure cl=measure mk=measure dr=measure nm=STRING pn=STRING fl=integer ')'
       //unit is mil. old format
       {
-        $newpin = new Pin(  $x.value*100,
-                            $y.value*100,
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $newpin = new Pin(  $x.value*100+mx,
+                            $y.value*100+my,
                             $th.value*100,
                             $cl.value*100,
                             $mk.value*100,
@@ -613,8 +619,11 @@ pad_hi_format [ICFootprint footprint] returns [Pad newpad]
     : T_PAD '[' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=flags ']'
       //unit is 1/100 mil. new format
       {
-        $newpad = new Pad(  $x1.value,
-                            $y1.value,
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $newpad = new Pad(  $x1.value+mx,
+                            $y1.value+my,
                             $x2.value,
                             $y2.value,
                             $th.value,
@@ -631,8 +640,11 @@ pad_1_7_format [ICFootprint footprint] returns [Pad newpad]
     : T_PAD '(' x1=measure y1=measure x2=measure y2=measure th=measure cl=measure mk=measure nm=STRING pn=STRING fl=integer ')'
       //unit is mil. old format
       {
-        $newpad = new Pad(  $x1.value*100,
-                            $y1.value*100,
+        float mx,my;
+        mx=$footprint.getmMark().getaX();
+        my=$footprint.getmMark().getaY();
+        $newpad = new Pad(  $x1.value*100+mx,
+                            $y1.value*100+my,
                             $x2.value*100,
                             $y2.value*100,
                             $th.value*100,

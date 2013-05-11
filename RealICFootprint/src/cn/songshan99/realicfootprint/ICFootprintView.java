@@ -120,6 +120,7 @@ public class ICFootprintView extends View {
 
 		case MotionEvent.ACTION_MOVE: {
 			// Find the index of the active pointer and fetch its position
+			mActivePointerId = MotionEventCompat.getPointerId(event, 0);//always track the first finger
 			pointerIndex = MotionEventCompat.findPointerIndex(event,
 					mActivePointerId);
 			ICFootprint footprint = mICFootprintRender.getmICFootprint();
@@ -134,7 +135,7 @@ public class ICFootprintView extends View {
 	        
 	        mLastTouchX=x;mLastTouchY=y;
 	        
-	        mICFootprintRender.offsetFootprintAndRecalculateRender(dx,dy,mDisplayMetrics);
+	        mICFootprintRender.offsetFootprintAndRecalculateRender(dx,dy,this.getWidth(),this.getHeight(),15,mDisplayMetrics);
 			//dx and dy are the offset needed in centiMil.
 //			float dx = ICFootprint.CentiMil.PixelToCentiMil(
 //					MotionEventCompat.getX(event, pointerIndex),

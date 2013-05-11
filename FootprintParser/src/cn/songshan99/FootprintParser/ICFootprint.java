@@ -521,10 +521,10 @@ public class ICFootprint {
 			strtR = calculateR(strt_ang);
 			endR = calculateR(end_ang);
 			//use sine/cosine to calculate start end XYs
-			strtX = -strtR*cos(strt_ang);
-			strtY = strtR*sin(strt_ang);
-			endX = -endR*cos(end_ang);
-			endY = endR*sin(end_ang);
+			strtX = -strtR*cos((float)(strt_ang*PI)/180.0f);
+			strtY = strtR*sin((float)(strt_ang*PI)/180.0f);
+			endX = -endR*cos((float)(end_ang*PI)/180.0f);
+			endY = endR*sin((float)(end_ang*PI)/180.0f);
 			RectF rect = new RectF();
 			if(!included[0])rect.left = min(strtX,endX);
 			else rect.left = -Width;

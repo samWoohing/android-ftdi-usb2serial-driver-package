@@ -177,32 +177,46 @@ public class ICFootprintRender {
 		if(dpiR_inner_x!=0 && dpiR_inner_y!=0)
 			innerRect = new RectF(dpiX-dpiR_inner_x, dpiY-dpiR_inner_y, dpiX+dpiR_inner_x, dpiY+dpiR_inner_y);
 		
-		switch(pin.getShape()){
-		case ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:
-			if(outerRect!=null)
-				path.addOval(outerRect,  Path.Direction.CCW);//path.addCircle(dpiX, dpiY, dpiR_outer, Path.Direction.CCW);
-			if(innerRect!=null)
-				path.addOval(innerRect,  Path.Direction.CW);//path.addCircle(dpiX, dpiY, dpiR_inner, Path.Direction.CW);
-			return;
-			
-		case ICFootprint.PinOrPadOrDraftLine.SHAPE_RECT:
-			if(outerRect!=null)
-				path.addRect(outerRect, Path.Direction.CCW);
-			if(innerRect!=null)
-				path.addRect(innerRect, Path.Direction.CW);
-			return;
+		int outershape = (layer==LAYER_DRILL)?ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:pin.getShape();//drill is always round shape.
+		int innershape = (layer==LAYER_COPPER)?ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:pin.getShape();
+		if (outerRect != null) {
+			switch (outershape) {
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:
+				path.addOval(outerRect, Path.Direction.CCW);
+				return;
 
-		case ICFootprint.PinOrPadOrDraftLine.SHAPE_OCT:
-			if(outerRect!=null){
-				drawOctal(dpiX,dpiY,dpiR_outer_x,dpiR_outer_y,Path.Direction.CCW,path);
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_RECT:
+				path.addRect(outerRect, Path.Direction.CCW);
+				return;
+
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_OCT:
+				drawOctal(dpiX, dpiY, dpiR_outer_x, dpiR_outer_y,
+						Path.Direction.CCW, path);
+				return;
+
+			default:
+				return;
 			}
-			if(innerRect!=null){
-				drawOctal(dpiX,dpiY,dpiR_inner_x,dpiR_inner_x,Path.Direction.CW,path);
+		}
+		
+		if (innerRect != null) {
+			switch (innershape) {
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_ROUND:
+				path.addOval(innerRect, Path.Direction.CW);
+				return;
+
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_RECT:
+				path.addRect(innerRect, Path.Direction.CW);
+				return;
+
+			case ICFootprint.PinOrPadOrDraftLine.SHAPE_OCT:
+				drawOctal(dpiX, dpiY, dpiR_inner_x, dpiR_inner_x,
+						Path.Direction.CW, path);
+				return;
+
+			default:
+				return;
 			}
-			return;
-			
-		default:
-			return;
 		}
 	}
 	
@@ -642,23 +656,92 @@ public class ICFootprintRender {
 		offsetOneLayer(icfprd.mLayerDraft,dx,dy);
 	}
 	
-	public void offsetFootprintAndRecalculateRender(float dx_in_px, float dy_in_px, DisplayMetrics displayMetrics){
+	/**
+	 * Offset footprint and recalculate render.
+	 *
+	 * @param dx_in_px the desired x direction move in px
+	 * @param dy_in_px the desired y direction move in px
+	 * @param w_in_px the width of the view in px
+	 * @param h_in_px the height of the view in px
+	 * @param borderMargin  the border margin that at least this px of part is shown.
+	 * @param displayMetrics the display metrics
+	 */
+	public void offsetFootprintAndRecalculateRender(float dx_in_px, float dy_in_px, float w_in_px, float h_in_px, float borderMargin, DisplayMetrics displayMetrics){
 		//dx_in_px and dy_in_px are in pixel, and should be converted to centi_mil
-		float dx,dy;
-		dx=ICFootprint.CentiMil.PixelToCentiMil(dx_in_px, displayMetrics.xdpi);
-		dy=ICFootprint.CentiMil.PixelToCentiMil(dy_in_px, displayMetrics.ydpi);
+//		float dx,dy;
+//		dx=ICFootprint.CentiMil.PixelToCentiMil(dx_in_px, displayMetrics.xdpi);
+//		dy=ICFootprint.CentiMil.PixelToCentiMil(dy_in_px, displayMetrics.ydpi);
+		
+		//calculate the current footprint boundbox in px
+		RectF rect = mICFootprint.calculateFootprintOverallBoundRectangle();
+		RectF rect_px = new RectF();
+		rect_px.left =  ICFootprint.CentiMil.CentiMilToPixel(rect.left, displayMetrics.xdpi);
+		rect_px.right =  ICFootprint.CentiMil.CentiMilToPixel(rect.right, displayMetrics.xdpi);
+		rect_px.top =  ICFootprint.CentiMil.CentiMilToPixel(rect.top, displayMetrics.ydpi);
+		rect_px.bottom =  ICFootprint.CentiMil.CentiMilToPixel(rect.bottom, displayMetrics.ydpi);
+		float old_centerX_in_px = rect_px.centerX();
+		float old_centerY_in_px = rect_px.centerY();
+		//try move the rect_px by given offset
+		rect_px.offset(dx_in_px, dy_in_px);
+		float x_in_px=rect_px.centerX();
+		float y_in_px=rect_px.centerY();
+		
+		//calculate the border limit for center point to move
+		float center_left_most 		= 0 - rect_px.width()/2+borderMargin;
+		float center_right_most 	= w_in_px + rect_px.width()/2-borderMargin;
+		float center_top_most 		= 0 - rect_px.height()/2+borderMargin;
+		float center_bottom_most 	= h_in_px + rect_px.height()/2-borderMargin;
+		
+		//saturate the movement, if we are about to move out of the view's extent
+		x_in_px = (x_in_px < center_left_most)?center_left_most:x_in_px;
+		x_in_px = (x_in_px > center_right_most)?center_right_most:x_in_px;
+		y_in_px = (y_in_px < center_top_most)?center_top_most:y_in_px;
+		y_in_px = (y_in_px > center_bottom_most)?center_bottom_most:y_in_px;
+		//now x_in_px and y_in_px are the saturated center point.
+		
+		float dx = ICFootprint.CentiMil.PixelToCentiMil(x_in_px - old_centerX_in_px, displayMetrics.xdpi);
+		float dy = ICFootprint.CentiMil.PixelToCentiMil(y_in_px - old_centerY_in_px, displayMetrics.ydpi);
 		//offset the footprint
 		mICFootprint.offsetTheFootprint(dx, dy);
 		//recalculate the render
 		recalculateAllLayers(displayMetrics);
 	}
 	
-	public void setFootprintPositionAndRecalculateRender(float x_in_px, float y_in_px, DisplayMetrics displayMetrics){
-		RectF rect = mICFootprint.calculateFootprintOverallBoundRectangle();
-		float old_x_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerX(), displayMetrics.xdpi);
-		float old_y_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerY(), displayMetrics.ydpi);
-		offsetFootprintAndRecalculateRender(x_in_px-old_x_px,y_in_px-old_y_px,displayMetrics);
-	}
+	/**
+	 * Sets the footprint position and recalculate render.
+	 *
+	 * @param x_in_px the x_in_px
+	 * @param y_in_px the y_in_px
+	 * @param w_in_px the w_in_px
+	 * @param h_in_px the h_in_px
+	 * @param borderMargin the border margin that at least this px of part is shown.
+	 * @param displayMetrics the display metrics
+	 */
+//	public void setFootprintPositionAndRecalculateRender(float x_in_px, float y_in_px, float w_in_px, float h_in_px, float borderMargin, DisplayMetrics displayMetrics){
+//		RectF rect = mICFootprint.calculateFootprintOverallBoundRectangle();
+//		
+//		//float old_x_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerX(), displayMetrics.xdpi);
+//		//float old_y_px = ICFootprint.CentiMil.CentiMilToPixel(rect.centerY(), displayMetrics.ydpi);
+//		
+//		//calculate the current footprint boundbox in px
+//		RectF rect_px = new RectF();
+//		rect_px.left =  ICFootprint.CentiMil.CentiMilToPixel(rect.left, displayMetrics.xdpi);
+//		rect_px.right =  ICFootprint.CentiMil.CentiMilToPixel(rect.right, displayMetrics.xdpi);
+//		rect_px.top =  ICFootprint.CentiMil.CentiMilToPixel(rect.top, displayMetrics.ydpi);
+//		rect_px.bottom =  ICFootprint.CentiMil.CentiMilToPixel(rect.bottom, displayMetrics.ydpi);
+//		//calculate the border limit for center point to move
+//		float center_left_most 		= 0 - rect_px.width()/2+borderMargin;
+//		float center_right_most 	= w_in_px + rect_px.width()/2-borderMargin;
+//		float center_top_most 		= 0 - rect_px.height()/2+borderMargin;
+//		float center_bottom_most 	= h_in_px - rect_px.height()/2-borderMargin;
+//		//saturate the movement, if we are about to move out of the view's extent
+//		x_in_px = (x_in_px < center_left_most)?center_left_most:x_in_px;
+//		x_in_px = (x_in_px > center_right_most)?center_right_most:x_in_px;
+//		y_in_px = (y_in_px < center_top_most)?center_top_most:y_in_px;
+//		y_in_px = (y_in_px > center_bottom_most)?center_top_most:y_in_px;
+//		
+//		offsetFootprintAndRecalculateRender(x_in_px-rect_px.centerX(),y_in_px-rect_px.centerX(),displayMetrics);
+//	}
 	
 	private static void drawOneLayer(ICDisplayLayer layer, Canvas canvas){
 		if(layer==null)return;
