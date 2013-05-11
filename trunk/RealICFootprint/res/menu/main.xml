@@ -22,5 +22,5 @@
           android:title="@string/menu_search"
           android:icon="@drawable/ic_search_inverse"
           android:showAsAction="collapseActionView|ifRoom"
-          android:actionViewClass="com.actionbarsherlock.widget.SearchView" />
+          android:actionViewClass="android.widget.SearchView" />
 </menu>

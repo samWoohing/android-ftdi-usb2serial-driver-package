@@ -432,12 +432,14 @@ int id homeAsUp 0x7f080006
 int id icfootprintview 0x7f080034
 int id listMode 0x7f080002
 int id normal 0x7f080001
-int id search 0x7f080035
+int id search 0x7f080037
 int id showCustom 0x7f080008
 int id showHome 0x7f080005
 int id showTitle 0x7f080007
 int id spinnerICFootprint 0x7f080033
 int id tabMode 0x7f080003
+int id textViewFPDesc 0x7f080036
+int id textViewFPName 0x7f080035
 int id useLogo 0x7f080004
 int id wrap_content 0x7f080000
 int integer abs__max_action_buttons 0x7f0c0000
@@ -465,8 +467,9 @@ int layout abs__search_dropdown_item_icons_2line 0x7f030014
 int layout abs__search_view 0x7f030015
 int layout abs__simple_dropdown_hint 0x7f030016
 int layout activity_main 0x7f030017
-int layout sherlock_spinner_dropdown_item 0x7f030018
-int layout sherlock_spinner_item 0x7f030019
+int layout icfootprint_info 0x7f030018
+int layout sherlock_spinner_dropdown_item 0x7f030019
+int layout sherlock_spinner_item 0x7f03001a
 int menu main 0x7f0d0000
 int raw footprintlist 0x7f050000
 int string abs__action_bar_home_description 0x7f060001

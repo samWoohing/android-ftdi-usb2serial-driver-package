@@ -58,7 +58,7 @@ public class ICFootprintDescDatabase {
     }
     
 	/**
-     * Returns a Cursor over all words that match the given query
+     * Returns a Cursor over all ICFootprint descriptions that match the given query
      *
      * @param query The string to search for
      * @param columns The columns to include, if null then all are included
@@ -86,6 +86,28 @@ public class ICFootprintDescDatabase {
          */
     }
 	
+    /**
+     * Gets the all rows. mainly used by spinner or listview's adapter
+     *
+     * @param columns the columns
+     * @return the all rows
+     */
+    public Cursor getAllRows(String[] columns){
+    	SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables(FPN_VIRTUAL_TABLE);
+        builder.setProjectionMap(mColumnMap);
+
+        Cursor cursor = builder.query(mDatabaseOpenHelper.getReadableDatabase(),
+                columns, null, null, null, null, "rowid");
+
+        if (cursor == null) {
+            return null;
+        } else if (!cursor.moveToFirst()) {
+            cursor.close();
+            return null;
+        }
+        return cursor;
+    }
 	/**
      * Returns a Cursor positioned at the word specified by rowId
      *
