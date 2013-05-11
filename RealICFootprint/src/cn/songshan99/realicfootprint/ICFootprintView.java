@@ -82,8 +82,8 @@ public class ICFootprintView extends View {
 		if(footprint == null) return;
 		//set the footprint to center of the screen
 		float dx, dy;
-		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth(), mDisplayMetrics.densityDpi);
-		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight(), mDisplayMetrics.densityDpi);
+		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth()/2, mDisplayMetrics.densityDpi);
+		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight()/2, mDisplayMetrics.densityDpi);
 		footprint.offsetTheFootprint(dx, dy);
 		mICFootprintRender = new ICFootprintRender(footprint, mDisplayMetrics);
 	}

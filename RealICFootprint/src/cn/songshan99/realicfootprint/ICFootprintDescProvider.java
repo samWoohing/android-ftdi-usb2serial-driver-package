@@ -17,7 +17,7 @@ public class ICFootprintDescProvider extends ContentProvider {
 	public static String AUTHORITY = "cn.songshan99.realicfootprint.ICFootprintDescProvider";
 	public static String PATH = "description";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/"+PATH);
-	
+	public static final Uri CONTENT_ALL_URI =  Uri.parse("content://" + AUTHORITY + "/"+PATH+"/all");
 	// MIME types used for searching words or looking up a single definition
     public static final String WORDS_MIME_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE +
                                                   "/vnd.example.android.searchablefootprint";
@@ -28,6 +28,7 @@ public class ICFootprintDescProvider extends ContentProvider {
     private static final int GET_DESC_BY_ROWID = 1;
     private static final int SEARCH_SUGGEST = 2;
     private static final int REFRESH_SHORTCUT = 3;
+    private static final int SEARCH_ALL = 4;
     
     private static final UriMatcher sURIMatcher = buildUriMatcher();
     
@@ -40,6 +41,7 @@ public class ICFootprintDescProvider extends ContentProvider {
         // to get definitions...30700
         matcher.addURI(AUTHORITY, PATH, SEARCH_DESCS);
         matcher.addURI(AUTHORITY, PATH+"/#", GET_DESC_BY_ROWID);
+        matcher.addURI(AUTHORITY, PATH+"/all", SEARCH_ALL);
         // to get suggestions...
         matcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, SEARCH_SUGGEST);
         matcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY + "/*", SEARCH_SUGGEST);
@@ -96,12 +98,14 @@ public class ICFootprintDescProvider extends ContentProvider {
 						"selectionArgs must be provided for the Uri: " + uri);
 			}
 			return searchAllMatching(selectionArgs[0]);
-
+		case SEARCH_ALL:
+			return searchAllRows();
+			
 		case GET_DESC_BY_ROWID:
 			return getICFootprint(uri);
 			
 		case REFRESH_SHORTCUT:
-			return refreshShortcut(uri);
+			return refreshShortcut(uri); 
 			
 		default:
 			throw new IllegalArgumentException("Unknown Uri: " + uri);
@@ -131,9 +135,18 @@ public class ICFootprintDescProvider extends ContentProvider {
 		return mICFootprintDescDatabase.getICFootprintMatches(query, columns);
 	}
 	
+	private Cursor searchAllRows(){
+		String[] columns = new String[] {
+				BaseColumns._ID,
+				ICFootprintDescDatabase.KEY_FILENAME,
+	            ICFootprintDescDatabase.KEY_DESCRIPTION };
+		return mICFootprintDescDatabase.getAllRows(columns);
+	}
+	
     private Cursor getICFootprint(Uri uri) {
         String rowId = uri.getLastPathSegment();
         String[] columns = new String[] {
+        		BaseColumns._ID,
         		ICFootprintDescDatabase.KEY_FILENAME,
                 ICFootprintDescDatabase.KEY_DESCRIPTION};
 

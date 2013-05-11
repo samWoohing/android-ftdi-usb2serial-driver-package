@@ -415,7 +415,7 @@ public class ICFootprintRender {
 			break;
 			
 		case LAYER_DRILL:
-			//cleanLayerPath(mLayerDrill);
+			cleanLayerPath(mLayerDrill);
 			pinpadListPathPaint = mLayerDrill.mListPathPaint;
 			break;
 			
