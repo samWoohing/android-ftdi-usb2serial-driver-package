@@ -41,6 +41,8 @@ public class MainActivity extends SherlockActivity {
 	//TODO: prevent screen rotating. Portrait only.
 	//TODO: freeze button?
 	//TODO: about dialog
+	//TODO: DIN41651_40S has display problem, bound box inaccurate.
+	//TODO: DBXX has display problem. Perhaps Because their mark appear at a weirdo location in footprint file. (fixed, this is the absolute/relative coordination problem.)
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
 	private com.actionbarsherlock.view.Menu mMenu;

@@ -26,6 +26,7 @@ public class ICFootprintView extends View {
 	//private ICFootprint mICFootprint;
 	private ICFootprintRender mICFootprintRender;
 	private float mLastTouchX=0,mLastTouchY=0;
+	private boolean mLockICFootprint;
 	
 	public DisplayMetrics mDisplayMetrics;//TODO: change to private later
 	
@@ -107,7 +108,7 @@ public class ICFootprintView extends View {
 		//2. when the footprint is about to move "out of" the window, the move action shall be ignored.
 		//3. when multi-finger touch, only track the movement of the first finger.
 		final int action = MotionEventCompat.getActionMasked(event);
-		final int pointerIndex;
+		int pointerIndex;
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:{
 			mActivePointerId = MotionEventCompat.getPointerId(event, 0);//always track the first finger
@@ -119,10 +120,14 @@ public class ICFootprintView extends View {
 		}
 
 		case MotionEvent.ACTION_MOVE: {
+			if(mLockICFootprint) return true;//Do nothing if the IC is locked.
 			// Find the index of the active pointer and fetch its position
-			mActivePointerId = MotionEventCompat.getPointerId(event, 0);//always track the first finger
+			//mActivePointerId = MotionEventCompat.getPointerId(event, 0);//always track the first finger
 			pointerIndex = MotionEventCompat.findPointerIndex(event,
 					mActivePointerId);
+			if(pointerIndex == -1)pointerIndex = MotionEventCompat.findPointerIndex(event,
+					MotionEventCompat.getPointerId(event, 0));//Note: this is try to fix the exception when getX canoot find the index.
+			
 			ICFootprint footprint = mICFootprintRender.getmICFootprint();
 			RectF rect = footprint.calculateFootprintOverallBoundRectangle();
 			
@@ -176,5 +181,13 @@ public class ICFootprintView extends View {
 
 		}
 		return true;
+	}
+	
+	public void rotateICFootprint(int dir){
+		
+	}
+	
+	public void setLockICFootprint(boolean isLocked){
+		mLockICFootprint = isLocked;
 	}
 }

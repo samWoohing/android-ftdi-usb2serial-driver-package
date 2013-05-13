@@ -10,6 +10,38 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+<ImageButton
+    android:id="@+id/imageButtonLock"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:contentDescription="@string/btn_lock"
+    android:src="@drawable/unlock_icon" />
+
+<ImageButton
+    android:id="@+id/imageButtonRotateCCW"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:contentDescription="@string/btn_ccw"
+    android:src="@drawable/rotate_ccw_icon" />
+
+<ImageButton
+    android:id="@+id/imageButtonRoteRotateCW"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:contentDescription="@string/btn_cw"
+    android:src="@drawable/rotate_cw_icon" />
+
+</LinearLayout>
+
 <cn.songshan99.realicfootprint.ICFootprintView
     android:id="@+id/icfootprintview"
     android:layout_width="match_parent"
