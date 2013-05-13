@@ -158,10 +158,19 @@ public class ICFootprint {
 	
 	private RectF calculateDraftLineOverallBoundRectangle(){
 		// this function returns null of no pin or pad exists
-		RectF result = null;
+		RectF result = null, rect;
 		for (PinOrPadOrDraftLine draftline : mListDraftLine) {
 			if (result != null) {
-				result.union(draftline.calculateBoundRectangle());
+				rect = draftline.calculateBoundRectangle();
+				if(rect.width()==0){
+					result.union(rect.left,rect.top);
+					result.union(rect.left,rect.bottom);
+				}else if(rect.height()==0){
+					result.union(rect.left,rect.top);
+					result.union(rect.right,rect.top);
+				}else{
+					result.union(rect);
+				}
 			} else {
 				result = draftline.calculateBoundRectangle();
 			}

@@ -1,4 +1,4 @@
-// Generated from D:\ShanSong\Android-FTDI-usb2serial\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
+// Generated from D:\ShanSong\android\android-ftdi-usb2serial-driver-package\trunk\FootprintParser\grammar\FootprintParser.g4 by ANTLR 4.0
 
 package cn.songshan99.FootprintParser;
 
@@ -777,34 +777,34 @@ public class FootprintParserParser extends Parser {
 		public PadContext pad() {
 			return getRuleContext(PadContext.class,0);
 		}
-		public NumberContext number(int i) {
-			return getRuleContext(NumberContext.class,i);
-		}
 		public List<MeasureContext> measure() {
 			return getRuleContexts(MeasureContext.class);
 		}
-		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
+		public NumberContext number(int i) {
+			return getRuleContext(NumberContext.class,i);
+		}
 		public AttributeContext attribute() {
 			return getRuleContext(AttributeContext.class,0);
 		}
 		public List<NumberContext> number() {
 			return getRuleContexts(NumberContext.class);
 		}
-		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
-		public Pin_newformatContext pin_newformat() {
-			return getRuleContext(Pin_newformatContext.class,0);
-		}
 		public Pin_1_6_3_formatContext pin_1_6_3_format() {
 			return getRuleContext(Pin_1_6_3_formatContext.class,0);
+		}
+		public Pin_newformatContext pin_newformat() {
+			return getRuleContext(Pin_newformatContext.class,0);
 		}
 		public MeasureContext measure(int i) {
 			return getRuleContext(MeasureContext.class,i);
 		}
-		public Pad_newformatContext pad_newformat() {
-			return getRuleContext(Pad_newformatContext.class,0);
-		}
 		public Pin_oldformatContext pin_oldformat() {
 			return getRuleContext(Pin_oldformatContext.class,0);
+		}
+		public TerminalNode T_ELEMENTARC() { return getToken(FootprintParserParser.T_ELEMENTARC, 0); }
+		public TerminalNode T_ELEMENTLINE() { return getToken(FootprintParserParser.T_ELEMENTLINE, 0); }
+		public Pad_newformatContext pad_newformat() {
+			return getRuleContext(Pad_newformatContext.class,0);
 		}
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }
 		public ElementdefinitionContext(ParserRuleContext parent, int invokingState, ICFootprint footprint) {
@@ -880,10 +880,7 @@ public class FootprintParserParser extends Parser {
 				setState(172); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(173); match(1);
 
-				        float mx,my;
-				        mx=_localctx.footprint.getmMark().getaX();
-				        my=_localctx.footprint.getmMark().getaY();
-				        ((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value+mx, ((ElementdefinitionContext)_localctx).y1.value+my, ((ElementdefinitionContext)_localctx).x2.value+mx, ((ElementdefinitionContext)_localctx).y2.value+my, ((ElementdefinitionContext)_localctx).th.value);
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value, ((ElementdefinitionContext)_localctx).y1.value, ((ElementdefinitionContext)_localctx).x2.value, ((ElementdefinitionContext)_localctx).y2.value, ((ElementdefinitionContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -900,10 +897,7 @@ public class FootprintParserParser extends Parser {
 				setState(182); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(183); match(2);
 
-				        float mx,my;
-				        mx=_localctx.footprint.getmMark().getaX();
-				        my=_localctx.footprint.getmMark().getaY();
-					((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value*100+mx, ((ElementdefinitionContext)_localctx).y1.value*100+my, ((ElementdefinitionContext)_localctx).x2.value*100+mx, ((ElementdefinitionContext)_localctx).y2.value*100+my, ((ElementdefinitionContext)_localctx).th.value*100);
+					((ElementdefinitionContext)_localctx).obj =  new ElementLine(((ElementdefinitionContext)_localctx).x1.value*100, ((ElementdefinitionContext)_localctx).y1.value*100, ((ElementdefinitionContext)_localctx).x2.value*100, ((ElementdefinitionContext)_localctx).y2.value*100, ((ElementdefinitionContext)_localctx).th.value*100);
 				      
 				}
 				break;
@@ -922,10 +916,7 @@ public class FootprintParserParser extends Parser {
 				setState(194); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(195); match(1);
 
-				        float mx,my;
-				        mx=_localctx.footprint.getmMark().getaX();
-				        my=_localctx.footprint.getmMark().getaY();
-				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value+mx, ((ElementdefinitionContext)_localctx).y.value+my, ((ElementdefinitionContext)_localctx).w.value, ((ElementdefinitionContext)_localctx).h.value, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value);
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value, ((ElementdefinitionContext)_localctx).y.value, ((ElementdefinitionContext)_localctx).w.value, ((ElementdefinitionContext)_localctx).h.value, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value);
 				      
 				}
 				break;
@@ -944,10 +935,7 @@ public class FootprintParserParser extends Parser {
 				setState(206); ((ElementdefinitionContext)_localctx).th = measure();
 				setState(207); match(2);
 
-				        float mx,my;
-				        mx=_localctx.footprint.getmMark().getaX();
-				        my=_localctx.footprint.getmMark().getaY();
-				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value*100+mx, ((ElementdefinitionContext)_localctx).y.value*100+my, ((ElementdefinitionContext)_localctx).w.value*100, ((ElementdefinitionContext)_localctx).h.value*100, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value*100);
+				        ((ElementdefinitionContext)_localctx).obj =  new ElementArc(((ElementdefinitionContext)_localctx).x.value*100, ((ElementdefinitionContext)_localctx).y.value*100, ((ElementdefinitionContext)_localctx).w.value*100, ((ElementdefinitionContext)_localctx).h.value*100, ((ElementdefinitionContext)_localctx).strt_ang.value, ((ElementdefinitionContext)_localctx).diff_ang.value, ((ElementdefinitionContext)_localctx).th.value*100);
 				      
 				}
 				break;
