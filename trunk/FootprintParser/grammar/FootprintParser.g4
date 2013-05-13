@@ -334,48 +334,36 @@ elementdefinition [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
     | npad1=pad[$footprint]{$obj = $npad1.newpad;}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
-      //unit is 1/100 mil. new format
+      //unit is 1/100 mil. new format, absolute coordinate
       {
-        float mx,my;
-        mx=$footprint.getmMark().getaX();
-        my=$footprint.getmMark().getaY();
-        $obj = new ElementLine($x1.value+mx, $y1.value+my, $x2.value+mx, $y2.value+my, $th.value);
+        $obj = new ElementLine($x1.value, $y1.value, $x2.value, $y2.value, $th.value);
       }
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
-      //unit is mil. old format. 
+      //unit is mil. old format. , absolute coordinate
       {
-        float mx,my;
-        mx=$footprint.getmMark().getaX();
-        my=$footprint.getmMark().getaY();
-	$obj = new ElementLine($x1.value*100+mx, $y1.value*100+my, $x2.value*100+mx, $y2.value*100+my, $th.value*100);
+	$obj = new ElementLine($x1.value*100, $y1.value*100, $x2.value*100, $y2.value*100, $th.value*100);
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
-      //unit is 1/100 mil. new format
+      //unit is 1/100 mil. new format, absolute coordinate
       {
-        float mx,my;
-        mx=$footprint.getmMark().getaX();
-        my=$footprint.getmMark().getaY();
-        $obj = new ElementArc($x.value+mx, $y.value+my, $w.value, $h.value, $strt_ang.value, $diff_ang.value, $th.value);
+        $obj = new ElementArc($x.value, $y.value, $w.value, $h.value, $strt_ang.value, $diff_ang.value, $th.value);
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
-      //unit is mil. old format
+      //unit is mil. old format, absolute coordinate
       {
-        float mx,my;
-        mx=$footprint.getmMark().getaX();
-        my=$footprint.getmMark().getaY();
-        $obj = new ElementArc($x.value*100+mx, $y.value*100+my, $w.value*100, $h.value*100, $strt_ang.value, $diff_ang.value, $th.value*100);
+        $obj = new ElementArc($x.value*100, $y.value*100, $w.value*100, $h.value*100, $strt_ang.value, $diff_ang.value, $th.value*100);
       }
       /* x, y position */
     | T_MARK '[' x=measure y=measure ']'
-      //unit is 1/100 mil. new format
+      //unit is 1/100 mil. new format, absolute coordinate
       {
         $obj = new Mark($x.value, $y.value);
       }
     | T_MARK '(' x=measure y=measure ')'//this is old unit, need to convert to CentiMil
-      //unit is mil. old format
+      //unit is mil. old format, absolute coordinate
       {
         $obj = new Mark($x.value*100, $y.value*100);
       }
@@ -411,7 +399,7 @@ relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
     | npad1=pad_hi_format[$footprint]{$obj = $npad1.newpad;}
       /* x1, y1, x2, y2, thickness */
     | T_ELEMENTLINE '[' x1=measure y1=measure x2=measure y2=measure th=measure ']'
-      //unit is 1/100 mil. new format
+      //unit is 1/100 mil. new format, relative coordinate
       {
         float mx,my;
         mx=$footprint.getmMark().getaX();
@@ -419,7 +407,7 @@ relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
         $obj = new ElementLine($x1.value+mx, $y1.value+my, $x2.value+mx, $y2.value+my, $th.value);
       }
     | T_ELEMENTLINE '(' x1=measure y1=measure x2=measure y2=measure th=measure ')'
-      //unit is mil. old format
+      //unit is mil. old format, relative coordinate
       {
         float mx,my;
         mx=$footprint.getmMark().getaX();
@@ -428,6 +416,7 @@ relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
       }
       /* x, y, width, height, startangle, anglediff, thickness */
     | T_ELEMENTARC '[' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ']'
+      //unit is 1/100 mil. new format, relative coordinate
       {
         float mx,my;
         mx=$footprint.getmMark().getaX();
@@ -435,7 +424,7 @@ relementdef [ICFootprint footprint] returns [PinOrPadOrDraftLine obj]
         $obj = new ElementArc($x.value+mx, $y.value+my, $w.value, $h.value, $strt_ang.value, $diff_ang.value, $th.value);
       }
     | T_ELEMENTARC '(' x=measure y=measure w=measure h=measure strt_ang=number diff_ang=number th=measure ')'
-      //unit is mil. old format
+      //unit is mil. old format, relative coordinate
       {
         float mx,my;
         mx=$footprint.getmMark().getaX();
