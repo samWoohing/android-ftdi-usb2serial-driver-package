@@ -246,6 +246,30 @@ public class ICFootprint {
 		return flag;
 	}
 	
+	public void rotateICFootprint(int dir){
+		//get the center point
+		RectF rect = calculateFootprintOverallBoundRectangle();
+		float centerX, centerY;
+		centerX=rect.centerX();
+		centerY=rect.centerY();
+		
+		if(mListPinOrPad != null){
+			for(PinOrPadOrDraftLine line:mListPinOrPad){
+				line.rotate(centerX, centerY, dir);
+			}
+		}
+		
+		if(mListDraftLine != null){
+			for(PinOrPadOrDraftLine line:mListDraftLine){
+				line.rotate(centerX, centerY, dir);
+			}
+		}
+		
+		if(mMark != null){
+			mMark.rotate(centerX, centerY, dir);
+		}
+	}
+	
 	public static abstract class PinOrPadOrDraftLine{
 		public static final int TYPE_PIN=1;
 		public static final int TYPE_PAD=2;
@@ -262,6 +286,7 @@ public class ICFootprint {
 		public abstract RectF calculateBoundRectangle();
 		public abstract void offset(float dx, float dy);
 		//public abstract Path toPath(int layer);
+		public abstract void rotate(float centerX, float centerY, int dir);
 		
 		public int getType() {
 			return type;
@@ -269,6 +294,28 @@ public class ICFootprint {
 
 		public void setType(int type) {
 			this.type = type;
+		}
+		//Note that when for screen display the CW and CCW is reversed from normal X,Y axis!!
+		protected static float rotated_CW90_X(float x, float y, float centerX, float centerY){
+			//CW 90 degree rotate matrix is:
+			//[0	-1]
+			//[1	 0]			
+			return -(y-centerY)+centerX;
+		}
+		
+		protected static float rotated_CW90_Y(float x, float y, float centerX, float centerY){
+			return x-centerX+centerY;
+		}
+		
+		protected static float rotated_CCW90_X(float x, float y, float centerX, float centerY){
+			//CCW 90 degree rotate matrix is:
+			//[0	1]
+			//[-1	 0]		
+			return (y-centerY)+centerX;
+		}
+		
+		protected static float rotated_CCW90_Y(float x, float y, float centerX, float centerY){
+			return -(x-centerX)+centerY;
 		}
 	}
 	
@@ -336,6 +383,23 @@ public class ICFootprint {
 				break;
 			}
 			return null;
+		}
+
+		@Override
+		public void rotate(float centerX, float centerY, int dir) {
+			float new_aX, new_aY;
+			if(dir==0)return;
+			if(dir>0){
+				//CCW 90 degree rotate
+				new_aX = rotated_CCW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CCW90_Y(aX, aY, centerX, centerY);
+				aX=new_aX;aY=new_aY;
+			}
+			if(dir<0){
+				new_aX = rotated_CW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CW90_Y(aX, aY, centerX, centerY);
+				aX=new_aX;aY=new_aY;
+			}
 		}
 		
 //		@Override
@@ -427,6 +491,29 @@ public class ICFootprint {
 //			}
 //			return null;
 //		}
+
+		@Override
+		public void rotate(float centerX, float centerY, int dir) {
+			float new_aX1, new_aY1,new_aX2, new_aY2;
+			if(dir==0)return;
+			if(dir>0){
+				//CCW 90 degree rotate
+				new_aX1 = rotated_CCW90_X(aX1, aY1, centerX, centerY);
+				new_aY1 = rotated_CCW90_Y(aX1, aY1, centerX, centerY);
+				new_aX2 = rotated_CCW90_X(aX2, aY2, centerX, centerY);
+				new_aY2 = rotated_CCW90_Y(aX2, aY2, centerX, centerY);
+				aX1=new_aX1;aY1=new_aY1;
+				aX2=new_aX2;aY2=new_aY2;
+			}
+			if(dir<0){
+				new_aX1 = rotated_CW90_X(aX1, aY1, centerX, centerY);
+				new_aY1 = rotated_CW90_Y(aX1, aY1, centerX, centerY);
+				new_aX2 = rotated_CW90_X(aX2, aY2, centerX, centerY);
+				new_aY2 = rotated_CW90_Y(aX2, aY2, centerX, centerY);
+				aX1=new_aX1;aY1=new_aY1;
+				aX2=new_aX2;aY2=new_aY2;
+			}
+		}
 	}
 	
 //	public abstract class DraftLine{
@@ -484,6 +571,28 @@ public class ICFootprint {
 //			}
 //			return null;
 //		}
+		@Override
+		public void rotate(float centerX, float centerY, int dir) {
+			float new_aX1, new_aY1,new_aX2, new_aY2;
+			if(dir==0)return;
+			if(dir>0){
+				//CCW 90 degree rotate
+				new_aX1 = rotated_CCW90_X(aX1, aY1, centerX, centerY);
+				new_aY1 = rotated_CCW90_Y(aX1, aY1, centerX, centerY);
+				new_aX2 = rotated_CCW90_X(aX2, aY2, centerX, centerY);
+				new_aY2 = rotated_CCW90_Y(aX2, aY2, centerX, centerY);
+				aX1=new_aX1;aY1=new_aY1;
+				aX2=new_aX2;aY2=new_aY2;
+			}
+			if(dir<0){
+				new_aX1 = rotated_CW90_X(aX1, aY1, centerX, centerY);
+				new_aY1 = rotated_CW90_Y(aX1, aY1, centerX, centerY);
+				new_aX2 = rotated_CW90_X(aX2, aY2, centerX, centerY);
+				new_aY2 = rotated_CW90_Y(aX2, aY2, centerX, centerY);
+				aX1=new_aX1;aY1=new_aY1;
+				aX2=new_aX2;aY2=new_aY2;
+			}
+		}
 	}
 	
 	public static class ElementArc extends PinOrPadOrDraftLine{
@@ -580,6 +689,31 @@ public class ICFootprint {
 //			}
 //			return null;
 //		}
+		@Override
+		public void rotate(float centerX, float centerY, int dir) {
+			float new_aX, new_aY, temp;
+			if(dir==0)return;
+			if(dir>0){
+				//CCW 90 degree rotate
+				new_aX = rotated_CCW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CCW90_Y(aX, aY, centerX, centerY);
+				//start angle recalculate
+				StartAngle+=90;
+				aX=new_aX;aY=new_aY;
+			}
+			if(dir<0){
+				new_aX = rotated_CW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CW90_Y(aX, aY, centerX, centerY);
+				//start angle recalculate
+				StartAngle-=90;
+				aX=new_aX;aY=new_aY;
+			}
+			//width and height shall be exchanged
+			temp = Width;Width=Height;Height=temp;
+			//"normalize" the start angle
+			StartAngle = StartAngle % 360.0f;//remainder operation, may get negative value.
+			StartAngle = (StartAngle >= 0)?	StartAngle:StartAngle+360.0f;
+		}
 	}
 	
 	public static class Mark extends PinOrPadOrDraftLine{
@@ -612,6 +746,23 @@ public class ICFootprint {
 		public RectF calculateBoundRectangle() {
 			
 			return new RectF(aX,aY,aX,aY);
+		}
+
+		@Override
+		public void rotate(float centerX, float centerY, int dir) {
+			float new_aX, new_aY;
+			if(dir==0)return;
+			if(dir>0){
+				//CCW 90 degree rotate
+				new_aX = rotated_CCW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CCW90_Y(aX, aY, centerX, centerY);
+				aX=new_aX;aY=new_aY;
+			}
+			if(dir<0){
+				new_aX = rotated_CW90_X(aX, aY, centerX, centerY);
+				new_aY = rotated_CW90_Y(aX, aY, centerX, centerY);
+				aX=new_aX;aY=new_aY;
+			}
 		}	
 	}
 	
