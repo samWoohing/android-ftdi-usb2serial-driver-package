@@ -436,7 +436,7 @@ int id homeAsUp 0x7f080006
 int id icfootprintview 0x7f080037
 int id imageButtonLock 0x7f080034
 int id imageButtonRotateCCW 0x7f080035
-int id imageButtonRoteRotateCW 0x7f080036
+int id imageButtonRotateCW 0x7f080036
 int id listMode 0x7f080002
 int id normal 0x7f080001
 int id search 0x7f08003a

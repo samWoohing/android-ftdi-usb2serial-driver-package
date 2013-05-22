@@ -757,4 +757,9 @@ public class ICFootprintRender {
 		drawOneLayer(icfprd.mLayerMask,canvas);
 		drawOneLayer(icfprd.mLayerDraft,canvas);
 	}
+	
+	public void rotateICFootprint(int dir, DisplayMetrics displayMetrics){
+		mICFootprint.rotateICFootprint(dir);
+		recalculateAllLayers(displayMetrics); 
+	}
 }

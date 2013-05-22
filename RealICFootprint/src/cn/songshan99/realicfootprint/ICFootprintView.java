@@ -26,8 +26,21 @@ public class ICFootprintView extends View {
 	//private ICFootprint mICFootprint;
 	private ICFootprintRender mICFootprintRender;
 	private float mLastTouchX=0,mLastTouchY=0;
-	private boolean mLockICFootprint;
+	private boolean mLockICFootprint=false;
+	private static float BORDER_MARGIN=15.0f;
 	
+	public static final int DIR_CW=-1;
+	public static final int DIR_CCW=1;
+	
+	public boolean ismLockICFootprint() {
+		return mLockICFootprint;
+	}
+
+
+	public void setmLockICFootprint(boolean mLockICFootprint) {
+		this.mLockICFootprint = mLockICFootprint;
+	}
+
 	public DisplayMetrics mDisplayMetrics;//TODO: change to private later
 	
 	private int mActivePointerId = MotionEvent.INVALID_POINTER_ID;
@@ -140,7 +153,7 @@ public class ICFootprintView extends View {
 	        
 	        mLastTouchX=x;mLastTouchY=y;
 	        
-	        mICFootprintRender.offsetFootprintAndRecalculateRender(dx,dy,this.getWidth(),this.getHeight(),15,mDisplayMetrics);
+	        mICFootprintRender.offsetFootprintAndRecalculateRender(dx,dy,this.getWidth(),this.getHeight(),BORDER_MARGIN,mDisplayMetrics);
 			//dx and dy are the offset needed in centiMil.
 //			float dx = ICFootprint.CentiMil.PixelToCentiMil(
 //					MotionEventCompat.getX(event, pointerIndex),
@@ -184,7 +197,12 @@ public class ICFootprintView extends View {
 	}
 	
 	public void rotateICFootprint(int dir){
-		
+		//rotate the footprint
+		mICFootprintRender.rotateICFootprint(dir, mDisplayMetrics);
+		//check if it goes out of the screen, if yes, put it back
+		//mICFootprintRender.offsetFootprintAndRecalculateRender(0, 0, this.getWidth(),this.getHeight(),BORDER_MARGIN,mDisplayMetrics);
+		//
+		this.invalidate();
 	}
 	
 	public void setLockICFootprint(boolean isLocked){

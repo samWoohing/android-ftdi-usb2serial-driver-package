@@ -33,7 +33,7 @@
     android:src="@drawable/rotate_ccw_icon" />
 
 <ImageButton
-    android:id="@+id/imageButtonRoteRotateCW"
+    android:id="@+id/imageButtonRotateCW"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
