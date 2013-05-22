@@ -28,6 +28,7 @@ import android.widget.AdapterView;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -41,7 +42,7 @@ public class MainActivity extends SherlockActivity {
 	//TODO: prevent screen rotating. Portrait only.
 	//TODO: freeze button?
 	//TODO: about dialog
-	//TODO: DIN41651_40S has display problem, bound box inaccurate.
+	//TODO: DIN41651_40S has display problem, bound box inaccurate.(solved)
 	//TODO: DBXX has display problem. Perhaps Because their mark appear at a weirdo location in footprint file. (fixed, this is the absolute/relative coordination problem.)
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
@@ -56,10 +57,41 @@ public class MainActivity extends SherlockActivity {
 		setTheme(R.style.Theme_Sherlock_Light);
 		setContentView(R.layout.activity_main);
 		
+		//set the image button onclick listener
+		ImageButton btn = (ImageButton)findViewById(R.id.imageButtonLock);
+		mICFootprintView = (ICFootprintView)findViewById(R.id.icfootprintview);
+		
+		btn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				// Toggle the lock/unlock status
+				mICFootprintView.setmLockICFootprint(!mICFootprintView.ismLockICFootprint());
+				if(mICFootprintView.ismLockICFootprint())((ImageButton)v).setImageResource(R.drawable.lock_icon);
+				else((ImageButton)v).setImageResource(R.drawable.unlock_icon);
+			}
+			
+		});
+		
+		btn = (ImageButton)findViewById(R.id.imageButtonRotateCCW);
+		btn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				rotateICFootprint(ICFootprintView.DIR_CCW);
+			}		
+		});
+		
+		btn = (ImageButton)findViewById(R.id.imageButtonRotateCW);
+		btn.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				rotateICFootprint(ICFootprintView.DIR_CW);
+			}		
+		});
+		
 		String str="TQFP208_28.fp";
 		ICFootprint footprint;
 		ICFootprintRender render;
-		mICFootprintView = (ICFootprintView)findViewById(R.id.icfootprintview);
+		
 		
 		try {
 			InputStream stream = getAssets().open(str);
@@ -87,6 +119,7 @@ public class MainActivity extends SherlockActivity {
 		setSpinnerContent(mSpinnerICFootprint);
 		
 		handleIntent(getIntent());
+		
 	}
 
 	@Override
@@ -235,6 +268,15 @@ public class MainActivity extends SherlockActivity {
 		render.setLayerColor(ICFootprintRender.LAYER_DRILL,  getResources().getColor(R.color.Red));
 		render.setLayerColor(ICFootprintRender.LAYER_MASK,  getResources().getColor(R.color.Red));
 		mICFootprintView.invalidate();
+    }
+    
+    private void rotateICFootprint(int dir){
+    	if(mICFootprintView.ismLockICFootprint()){
+    		//promote user to unlock the screen
+    		Toast.makeText(getApplicationContext(), "Unlock the footprint first...", Toast.LENGTH_SHORT).show();
+    		return;
+    	}
+    	mICFootprintView.rotateICFootprint(dir);
     }
 //	private SearchView.OnQueryTextListener mQueryTextListener = new SearchView.OnQueryTextListener(){
 //
