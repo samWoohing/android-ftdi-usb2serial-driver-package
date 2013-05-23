@@ -1,0 +1,8 @@
+<h1>Real IC Footprint</h1>
+Version 1.0.0<br>
+Copyright &copy; 2013<br>
+Shan Song<br>
+<br>
+Author: Shan Song<br>
+Email: <b>songshan999@gmail.com</b><br>
+Website: Upcomming soon...<br>
