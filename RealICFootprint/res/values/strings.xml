@@ -10,6 +10,7 @@
     
 	<!-- The menu entry that invokes search. -->
     <string name="menu_search">Search</string>
+    <string name="menu_about">About</string>
     
     <!-- The hint text that appears in the search box. -->
     <string name="search_hint">Search footprint description</string>
