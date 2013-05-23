@@ -150,6 +150,10 @@ public class MainActivity extends SherlockActivity {
             	//since the system can show the searchview automatically by default
             	//So do this for compatibility purpose
                 return true;
+            case R.id.about:
+            	AboutDialog dlg = new AboutDialog(this);
+				dlg.show();
+            	return true;
             default:
                 return false;
         }
