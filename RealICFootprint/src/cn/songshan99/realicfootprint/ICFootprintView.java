@@ -74,6 +74,7 @@ public class ICFootprintView extends View {
 	}
 	
 	private void init(){
+		//TODO: change to read local calibrated display metrics
 		mDisplayMetrics = new DisplayMetrics();
 		Activity hostactivity = (Activity) getContext();
 		hostactivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
