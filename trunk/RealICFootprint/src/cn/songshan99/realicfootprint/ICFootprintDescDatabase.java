@@ -181,6 +181,7 @@ public class ICFootprintDescDatabase {
 		}
 
 		private void loadICFootprintTable(){
+			//TODO: async operation is creating problems. Maybe do this in blocking mode?
 			new Thread(new Runnable() {
                 public void run() {
                     try {
