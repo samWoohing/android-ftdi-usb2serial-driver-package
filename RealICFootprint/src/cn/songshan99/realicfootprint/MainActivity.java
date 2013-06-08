@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
@@ -19,6 +20,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.CursorAdapter;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,13 +38,13 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends SherlockActivity {
+public class MainActivity extends SherlockFragmentActivity {
 	//TODO: TO18, TO39, TO92 display may have problems.(solved, parser problem)
 	//TODO: the color display
 	//TODO: the ListPopupWindow selection of search results (done)
 	//TODO: revise the search method to support " " (blank) in search string
 	//TODO: prevent screen rotating. Portrait only.
-	//TODO: freeze button?
+	//TODO: freeze button (done)
 	//TODO: about dialog
 	//TODO: DIN41651_40S has display problem, bound box inaccurate.(solved)
 	//TODO: DBXX has display problem. Perhaps Because their mark appear at a weirdo location in footprint file. (fixed, this is the absolute/relative coordination problem.)
@@ -155,10 +159,31 @@ public class MainActivity extends SherlockActivity {
             	AboutDialog dlg = new AboutDialog(this);
 				dlg.show();
             	return true;
+            
+            case R.id.calibrate:
+            	showCalibrationDialog();
+            	return true;
+            	
             default:
                 return false;
         }
     }
+	
+	private void showCalibrationDialog() {
+	    //FragmentManager fragmentManager = getSupportFragmentManager();
+	    
+	    //TODO: show this as fullscreen. Still ongoing.
+	    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+	    Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+	    if (prev != null) {
+	        ft.remove(prev);
+	    }
+	    ft.addToBackStack(null);
+
+	    // Create and show the dialog.
+	    ScreenCalibrationDialogFragment newFragment = new ScreenCalibrationDialogFragment();
+	    newFragment.show(ft, "dialog");
+	}
 	
 	@Override
 	protected void onNewIntent(Intent intent) {

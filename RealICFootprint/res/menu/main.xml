@@ -23,6 +23,9 @@
           android:icon="@drawable/ic_search_inverse"
           android:showAsAction="collapseActionView|ifRoom"
           android:actionViewClass="android.widget.SearchView" />
+    <item android:id="@+id/calibrate"
+          android:title="@string/menu_calibrate"
+          android:showAsAction="never"/>
     <item android:id="@+id/about"
           android:title="@string/menu_about"
           android:showAsAction="never"/>
