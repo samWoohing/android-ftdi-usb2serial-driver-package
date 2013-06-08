@@ -10,6 +10,7 @@
     
 	<!-- The menu entry that invokes search. -->
     <string name="menu_search">Search</string>
+    <string name="menu_calibrate">Calibrate</string>
     <string name="menu_about">About</string>
     
     <!-- The hint text that appears in the search box. -->
@@ -18,4 +19,5 @@
     <string name="btn_lock">Lock/unlock the footprint on the screen</string>
     <string name="btn_cw">Rotate footprint clockwise</string>
     <string name="btn_ccw">Rotate footprint counter-clockwise</string>
+    
 </resources>

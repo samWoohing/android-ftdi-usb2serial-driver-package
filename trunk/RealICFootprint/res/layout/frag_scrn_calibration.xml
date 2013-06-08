@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.songshan99.realicfootprint.ScreenCalibrationLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayoutScrnCalibration"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+
+</cn.songshan99.realicfootprint.ScreenCalibrationLinearLayout>
