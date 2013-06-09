@@ -23,7 +23,7 @@ public class ScreenCalibrationDialogFragment extends SherlockDialogFragment {
 		View v = inflater.inflate(R.layout.frag_scrn_calibration, container, false);
 		
 		// TODO Auto-generated method stub
-		return super.onCreateView(inflater, container, savedInstanceState);
+		return v;
 	}
 
 

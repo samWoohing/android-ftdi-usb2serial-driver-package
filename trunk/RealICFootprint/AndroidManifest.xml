@@ -35,6 +35,11 @@
             
         </activity>
         
+        <activity 	android:name=".ScreenCalibrationActivity"
+    				android:label="calibration"
+    				android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+		</activity>
+        
     	<!-- Provides search suggestions for words and their definitions. -->
         <provider android:name=".ICFootprintDescProvider"
                   android:authorities="cn.songshan99.realicfootprint.ICFootprintDescProvider" />

@@ -1,18 +1,21 @@
 package cn.songshan99.realicfootprint;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 
-public class ScreenCalibrationLinearLayout extends LinearLayout {
+public class ScreenCalibrationLinearLayout extends RelativeLayout {
 	
 	private Paint mStrokePaint = new Paint(){
 		{
-		setColor(android.graphics.Color.BLACK);//TODO: choose better color?
+		setColor(getResources()
+				.getColor(R.color.RoyalBlue));//TODO: choose better color?
 		setStyle(Paint.Style.STROKE);
-		setStrokeWidth(0);
+		setStrokeWidth(2);
 		setAlpha(255);
 		setAntiAlias(true);
 		}
@@ -100,7 +103,7 @@ public class ScreenCalibrationLinearLayout extends LinearLayout {
 		width = canvas.getWidth();
 		height = canvas.getHeight();
 		
-		arrowX = this.mWidthArrowLocation*width;
+		arrowX = width - this.mWidthArrowLocation*width;
 		headOffset = mArrowSize * width;
 		
 		heightArrow[0]= arrowX;
@@ -119,12 +122,12 @@ public class ScreenCalibrationLinearLayout extends LinearLayout {
 		heightArrow[11]= headOffset;
 		
 		heightArrow[12]= arrowX;
-		heightArrow[13]= height-headOffset;
+		heightArrow[13]= height;
 		heightArrow[14]= arrowX-headOffset;
 		heightArrow[15]= height-headOffset;
 		
 		heightArrow[16]= arrowX;
-		heightArrow[17]= height-headOffset;
+		heightArrow[17]= height;
 		heightArrow[18]= arrowX+headOffset;
 		heightArrow[19]= height-headOffset;
 		
