@@ -10,6 +10,10 @@ public class ScreenCalibrationActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState); 
 		setContentView(R.layout.frag_scrn_calibration);
+		
+		//TODO: prevent rotating the screen
+		//TODO: read the existing configuration and display it on screen
+		
 	}
 
 }

@@ -39,7 +39,7 @@ public class MainActivity extends SherlockActivity {
 	// weirdo location in footprint file. (fixed, this is the absolute/relative
 	// coordination problem.)
 	// TODO: create the dimension calibration function. Preferred method: use
-	// SharedPreference to store data. Write a dialog fragment to pop UI
+	// SharedPreference to store data. Write a activity to pop UI
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
 	private com.actionbarsherlock.view.Menu mMenu;
