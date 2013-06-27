@@ -1,0 +1,3 @@
+<H1>Instructions:</H1>
+If the width and height already close to actual value, no calibration needed.<br><br>
+Measure the screen width and height using a ruler.<br><br>
