@@ -16,7 +16,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +38,8 @@
         
         <activity 	android:name=".ScreenCalibrationActivity"
     				android:label="calibration"
-    				android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+    				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+    				android:screenOrientation="portrait">
 		</activity>
         
     	<!-- Provides search suggestions for words and their definitions. -->
