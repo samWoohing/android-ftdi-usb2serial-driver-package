@@ -51,10 +51,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Unit:"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <Spinner
-                        android:id="@+id/spinner1"
+                        android:id="@+id/spinnerUnit"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </TableRow>
@@ -67,14 +67,14 @@
                         android:id="@+id/textViewHeightTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Height:"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:text="measured height:"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
                         android:id="@+id/editText1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ems="10"
+                        android:ems="6"
                         android:inputType="numberDecimal" >
                     </EditText>
                 </TableRow>
@@ -87,14 +87,14 @@
                         android:id="@+id/textViewWidthTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Width:"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                        android:text="measured width:"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
                         android:id="@+id/editText2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:ems="10"
+                        android:ems="6"
                         android:inputType="numberDecimal" >
                     </EditText>
                 </TableRow>

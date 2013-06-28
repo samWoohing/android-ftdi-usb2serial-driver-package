@@ -1,3 +1,4 @@
+int array scrn_dim_unit 0x7f0d0000
 int attr actionBarDivider 0x7f01000e
 int attr actionBarItemBackground 0x7f01000f
 int attr actionBarSize 0x7f01000d
@@ -459,8 +460,8 @@ int id search 0x7f08004f
 int id showCustom 0x7f080008
 int id showHome 0x7f080005
 int id showTitle 0x7f080007
-int id spinner1 0x7f080044
 int id spinnerICFootprint 0x7f080038
+int id spinnerUnit 0x7f080044
 int id tabMode 0x7f080003
 int id tableLayoutInput 0x7f080042
 int id textViewCalibrateInstruction 0x7f080041
@@ -502,7 +503,7 @@ int layout frag_scrn_calibration 0x7f030019
 int layout icfootprint_info 0x7f03001a
 int layout sherlock_spinner_dropdown_item 0x7f03001b
 int layout sherlock_spinner_item 0x7f03001c
-int menu main 0x7f0d0000
+int menu main 0x7f0e0000
 int raw cali_instruction 0x7f050000
 int raw disclaimer 0x7f050001
 int raw footprintlist 0x7f050002

@@ -20,4 +20,9 @@
     <string name="btn_cw">Rotate footprint clockwise</string>
     <string name="btn_ccw">Rotate footprint counter-clockwise</string>
     
+    <string-array name="scrn_dim_unit">
+        <item>millimeters</item>
+        <item>inches</item>
+    </string-array>
+
 </resources>
