@@ -1,14 +1,13 @@
 package cn.songshan99.realicfootprint;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 
-public class ScreenCalibrationLinearLayout extends RelativeLayout {
+
+public class ScreenCalibrationLinearLayout extends LinearLayout {
 	
 	private Paint mStrokePaint = new Paint(){
 		{
@@ -43,11 +42,14 @@ public class ScreenCalibrationLinearLayout extends RelativeLayout {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		
 		// TODO Auto-generated method stub
 		super.onDraw(canvas);
 		
 		//draw the width and height arrows.
 		drawDimIndications(canvas);
+		
+		
 	}
 	
 	private void drawDimIndications(Canvas canvas){
@@ -63,10 +65,10 @@ public class ScreenCalibrationLinearLayout extends RelativeLayout {
 	private float[] getWidthArrow(Canvas canvas){
 		float width, height, widthArrow[], arrowY, headOffset;
 		widthArrow = new float[20];
-		width = canvas.getWidth();
-		height = canvas.getHeight();
+		width = this.getWidth();
+		height = this.getHeight();
 		
-		arrowY = this.mWidthArrowLocation*height;
+		arrowY = mWidthArrowLocation*height;
 		headOffset = mArrowSize * width;
 				
 		widthArrow[0]= 0;
@@ -100,10 +102,10 @@ public class ScreenCalibrationLinearLayout extends RelativeLayout {
 	private float[] getHeightArrow(Canvas canvas){
 		float width, height, heightArrow[], arrowX, headOffset;
 		heightArrow = new float[20];
-		width = canvas.getWidth();
-		height = canvas.getHeight();
+		width = this.getWidth();
+		height = this.getHeight();
 		
-		arrowX = width - this.mWidthArrowLocation*width;
+		arrowX = mHeightArrowLocation*width;
 		headOffset = mArrowSize * width;
 		
 		heightArrow[0]= arrowX;
