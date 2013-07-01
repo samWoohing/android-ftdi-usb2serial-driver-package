@@ -60,6 +60,10 @@ public class ScreenCalibrationLinearLayout extends LinearLayout {
 		this.invalidate();
 	}
 	
+	public int getmDisplayUnit(){
+		return mDisplayUnit;
+	}
+	
 	public float calculateXDPI(float measured_x, int unit) {
 		// convert the unit to inch
 		if (unit == ScreenCalibrationActivity.UNIT_MM)

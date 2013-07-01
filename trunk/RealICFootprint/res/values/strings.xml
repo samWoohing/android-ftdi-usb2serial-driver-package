@@ -24,5 +24,10 @@
         <item>millimeters</item>
         <item>inches</item>
     </string-array>
-
+	
+    <string name="ok">OK</string>
+    <string name="dlg_title">invalid input</string>
+    <string name="dlg_msg_recognize">Invalid or no input number</string>
+    <string name="dlg_msg_negzero">Width and height should be positive!</string>
+    <string name="dlg_msg_result">Invalid result in dpi calculation!</string>
 </resources>
