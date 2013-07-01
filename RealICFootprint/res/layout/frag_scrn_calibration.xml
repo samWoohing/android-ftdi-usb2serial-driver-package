@@ -71,7 +71,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
-                        android:id="@+id/editText1"
+                        android:id="@+id/editTextHeight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ems="6"
@@ -91,7 +91,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
-                        android:id="@+id/editText2"
+                        android:id="@+id/editTextWidth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ems="6"
@@ -106,25 +106,25 @@
                 android:layout_below="@+id/tableLayoutInput" >
 
                 <Button
-                    android:id="@+id/button1"
+                    android:id="@+id/buttonOK"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="OK" />
 
                 <Button
-                    android:id="@+id/button2"
+                    android:id="@+id/buttonClose"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Close" />
 
                 <Button
-                    android:id="@+id/button3"
+                    android:id="@+id/buttonReset"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Button" />
+                    android:text="Reset" />
             </LinearLayout>
         </RelativeLayout>
 

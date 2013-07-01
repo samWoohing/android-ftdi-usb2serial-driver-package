@@ -96,9 +96,9 @@ public class ICFootprintView extends View {
 	public void setICFootprint(ICFootprint footprint){
 		if(footprint == null) return;
 		//set the footprint to center of the screen
-		float dx, dy;
-		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth()/2, mDisplayMetrics.densityDpi);
-		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight()/2, mDisplayMetrics.densityDpi);
+		float dx, dy;//TODO: separate xdpi and ydpi?
+		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth()/2, mDisplayMetrics.xdpi);
+		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight()/2, mDisplayMetrics.ydpi);
 		footprint.offsetTheFootprint(dx, dy);
 		mICFootprintRender = new ICFootprintRender(footprint, mDisplayMetrics);
 	}
@@ -208,5 +208,11 @@ public class ICFootprintView extends View {
 	
 	public void setLockICFootprint(boolean isLocked){
 		mLockICFootprint = isLocked;
+	}
+	
+	public void updateDisplayMetrics(DisplayMetrics dm){
+		mDisplayMetrics = dm;
+		mICFootprintRender.recalculateAllLayers(mDisplayMetrics);
+		this.invalidate();
 	}
 }

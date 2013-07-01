@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -200,10 +201,22 @@ public class MainActivity extends SherlockActivity {
 //		//tl.setVisibility(View.GONE);
 //	}
 
+	
+	
 	@Override
 	protected void onNewIntent(Intent intent) {
 
 		handleIntent(intent);
+	}
+
+	@Override
+	protected void onResume() {
+		//Update according to the DisplayMetrics retrieved. This is for after user calibrating the screen.
+		//If user did any calibration, the IC display needs to be updated accordingly.
+		DisplayMetrics dm = ScreenCalibrationActivity.getDisplayMetrics(this);
+		mICFootprintView.updateDisplayMetrics(dm);
+		// TODO: Still need to center the display?? Existing code can move to show at least its corner.
+		super.onResume();
 	}
 
 	private void handleIntent(Intent intent) {
