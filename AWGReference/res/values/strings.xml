@@ -17,5 +17,16 @@
     <string name="show_actual_size">Show actual wire size</string>
     <string name="only_copper_real">Note: only copper represents actual size.</string>
     <string name="uncoated_copper">Note: values are for uncoated copper.</string>
-
+	
+    <string-array name="scrn_dim_unit">
+        <item>millimeters</item>
+        <item>inches</item>
+    </string-array>
+	
+    <string name="ok">OK</string>
+    <string name="dlg_title">invalid input</string>
+    <string name="dlg_msg_recognize">Invalid or no input number</string>
+    <string name="dlg_msg_negzero">Width and height should be positive!</string>
+    <string name="dlg_msg_result">Invalid result in dpi calculation!</string>
+    
 </resources>
