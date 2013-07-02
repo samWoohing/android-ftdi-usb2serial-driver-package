@@ -56,9 +56,10 @@ public class AWGDisplayView extends View {
 	private void init(){
 		//mDiameter=0;
 		//get display metrics, dpi and relative dpi
-		mDisplayMetrics = new DisplayMetrics();
-		Activity hostactivity = (Activity) getContext();
-		hostactivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+		updateDisplayMetrics();
+		//mDisplayMetrics = new DisplayMetrics();
+		//Activity hostactivity = (Activity) getContext();
+		//hostactivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 		
 		mStrokePaint = new Paint();
 		mStrokePaint.setColor(android.graphics.Color.BLACK);
@@ -80,7 +81,11 @@ public class AWGDisplayView extends View {
 	    mBackgroundRectangleDrawable = new ShapeDrawable(new RectShape());
 	    mBackgroundRectangleDrawable.getPaint().setColor(getResources().getColor(R.color.White));
 	}
-
+	
+	public void updateDisplayMetrics(){
+		mDisplayMetrics = ScreenCalibrationActivity.getDisplayMetrics((Activity) getContext());
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
