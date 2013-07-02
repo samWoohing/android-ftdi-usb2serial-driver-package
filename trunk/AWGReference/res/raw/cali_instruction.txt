@@ -1,0 +1,6 @@
+<h5>Instructions:</h5>
+(scroll to see all)<br>
+If displayed width and height are close to actual value, no calibration is needed.<br><br>
+Measure width and height between arrow tips using a ruler. Input them into the text boxes.<br><br>
+Press "OK" button to set the values. Press "Close" button to close the window.<br><br>
+If the setting is messed up, press "Reset" button to restore to default value.<br>
