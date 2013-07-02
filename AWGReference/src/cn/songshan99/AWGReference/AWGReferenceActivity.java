@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.support.v4.app.*;
@@ -46,7 +47,8 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 	
 	public static final int UNIT_METRIC=1;
 	private static final int UNIT_IMPERIAL=2;
-	private static final int ABOUT = 3;
+	private static final int CALIBRATE = 3;
+	private static final int ABOUT = 4;
 	private int mCurrentUnit;
 	
 	private MenuItem mSubMenuItem;
@@ -118,7 +120,10 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
         mSubMenuItem = subMenu1.getItem();
         mSubMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
         
-        MenuItem item = menu.add(2, ABOUT, ABOUT, "About");
+        MenuItem item  = menu.add(2, CALIBRATE, CALIBRATE, "screen calibration");
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        
+        item = menu.add(3, ABOUT, ABOUT, "About");
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         return super.onCreateOptionsMenu(menu);
 	}
@@ -145,6 +150,13 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 			item.setChecked(true);
 			toggleUnit(UNIT_IMPERIAL);
 			break;
+			
+		case CALIBRATE:
+			//TODO: copy the ScreenCalibrationActivity to here. 
+			Intent intent = new Intent(this, ScreenCalibrationActivity.class);
+			startActivity(intent);
+			return true;
+			
 		case ABOUT:
 				AboutDialog dlg = new AboutDialog(this);
 				dlg.show();
@@ -282,7 +294,9 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 	}
 	
 	private class ShowAWGRealSizeDialogFragment extends SherlockDialogFragment{
-
+		
+		private AWGDisplayView mAWGDisplayView;
+		
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			// TODO Auto-generated method stub
@@ -308,14 +322,21 @@ public class AWGReferenceActivity extends SherlockFragmentActivity {
 			Button btn = (Button)v.findViewById(R.id.buttonClose);
 			btn.setOnClickListener(mCancelButtonClickListener);
 			
-			AWGDisplayView view = (AWGDisplayView) v.findViewById(R.id.awgDisplayViewInDlg);
-			view.setAWGWire(mAWGWire);
+			mAWGDisplayView = (AWGDisplayView) v.findViewById(R.id.awgDisplayViewInDlg);
+			mAWGDisplayView.setAWGWire(mAWGWire);
 			
 			TextView textview = (TextView)v.findViewById(R.id.textViewAWGInfo);
 			textview.setText("AWG# "+mAWGWire.getAWGSize());
 			return v;    
 		}
 		
+		@Override
+		public void onResume() {
+			mAWGDisplayView.updateDisplayMetrics();
+			// TODO Auto-generated method stub
+			super.onResume();
+		}
+
 		public void showDialog() {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			
