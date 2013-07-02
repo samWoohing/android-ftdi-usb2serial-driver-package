@@ -9,12 +9,12 @@ import android.widget.LinearLayout;
 
 public class ScreenCalibrationLinearLayout extends LinearLayout {
 	
-	private static float mWidthArrowLocation = 0.1f;
+	private static float mWidthArrowLocation = 0.06f;
 	private static float mHeightArrowLocation = 0.9f;
-	private static float mArrowSize = 0.05f;
+	private static float mArrowSize = 0.03f;
 	private static float mWidthTextLocation = 0.3f;
 	private static float mHeightTextLocation = 0.7f;
-	private static float mTextOffset = 0.01f;//How far away the text is from the arrow
+	private static float mTextOffset = 0.01f; //How far away the text is from the arrow
 	
 	private Paint mStrokePaint = new Paint(){
 		{

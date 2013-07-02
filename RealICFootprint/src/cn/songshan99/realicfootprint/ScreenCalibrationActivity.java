@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,6 +45,8 @@ public class ScreenCalibrationActivity extends SherlockActivity {
 		
 		TextView tv = (TextView) findViewById(R.id.textViewCalibrateInstruction);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.cali_instruction)));
+		tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+		
 		//load the unit spinner
 		Spinner spinner = (Spinner) findViewById(R.id.spinnerUnit);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,

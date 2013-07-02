@@ -37,7 +37,7 @@
         </activity>
         
         <activity 	android:name=".ScreenCalibrationActivity"
-    				android:label="calibration"
+    				android:label="screen calibration"
     				android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
     				android:screenOrientation="portrait">
 		</activity>

@@ -8,9 +8,10 @@
 
     <LinearLayout
         android:id="@+id/linearLayout_dummy1"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight=".2"
+        android:layout_weight=".12"
         android:orientation="vertical" >
     </LinearLayout>
 
@@ -18,7 +19,7 @@
         android:id="@+id/linearLayoutContent"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight=".8"
+        android:layout_weight=".88"
         android:orientation="horizontal" >
 
         <RelativeLayout
@@ -29,10 +30,15 @@
 
             <TextView
                 android:id="@+id/textViewCalibrateInstruction"
+                android:background = "@color/LightCyan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
+                android:gravity="top|left"
+                android:scrollbars="vertical"
+                android:singleLine="false" 
+                android:lines="13"
                 android:text="Instructions"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
