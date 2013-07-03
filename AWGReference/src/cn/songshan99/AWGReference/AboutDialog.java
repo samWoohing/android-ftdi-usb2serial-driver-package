@@ -45,7 +45,7 @@ public class AboutDialog extends Dialog {
 		
 		tv = (TextView) findViewById(R.id.disclaimer_txt);
 		tv.setText(Html.fromHtml(readRawTextFile(R.raw.disclaimer)));
-		 
+		this.setTitle("About this software:"); 
 	}
 
 	public static String readRawTextFile(int id) {
