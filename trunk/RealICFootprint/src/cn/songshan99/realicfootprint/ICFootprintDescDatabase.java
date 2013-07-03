@@ -182,6 +182,8 @@ public class ICFootprintDescDatabase {
 
 		private void loadICFootprintTable(){
 			//TODO: async operation is creating problems. Maybe do this in blocking mode?
+			//drawback in blocking mode is user has to wait when this app first starts.
+			//Need to test if this is acceptable.
 			new Thread(new Runnable() {
                 public void run() {
                     try {
