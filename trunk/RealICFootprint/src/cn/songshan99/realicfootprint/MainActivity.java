@@ -30,17 +30,18 @@ import com.actionbarsherlock.view.MenuItem;
 public class MainActivity extends SherlockActivity {
 	// TODO: TO18, TO39, TO92 display may have problems.(solved, parser problem)
 	// TODO: the color display
+	// TODO: clean up the startup code, incorporate with color display setting.
 	// TODO: the ListPopupWindow selection of search results (done)
 	// TODO: revise the search method to support " " (blank) in search string
-	// TODO: prevent screen rotating. Portrait only.
+	// TODO: prevent screen rotating. Portrait only. (done)
 	// TODO: freeze button (done)
-	// TODO: about dialog
+	// TODO: about dialog (done)
 	// TODO: DIN41651_40S has display problem, bound box inaccurate.(solved)
-	// TODO: DBXX has display problem. Perhaps Because their mark appear at a
+	// TODO: DBXX has display problem. Perhaps Because their mark appear at a (solved)
 	// weirdo location in footprint file. (fixed, this is the absolute/relative
 	// coordination problem.)
 	// TODO: create the dimension calibration function. Preferred method: use
-	// SharedPreference to store data. Write a activity to pop UI
+	// SharedPreference to store data. Write a activity to pop UI (Solved)
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
 	private com.actionbarsherlock.view.Menu mMenu;
@@ -91,35 +92,35 @@ public class MainActivity extends SherlockActivity {
 			}
 		});
 
-		String str = "TQFP208_28.fp";
-		ICFootprint footprint;
-		ICFootprintRender render;
+//		String str = "TQFP208_28.fp";
+//		ICFootprint footprint;
+//		ICFootprintRender render;
 
-		try {
-			InputStream stream = getAssets().open(str);
-			footprint = ICFootprintView.parseFootprintFile(stream);
-			// footprint.offsetTheFootprint(30000,40000);
-			stream.close();
-			mICFootprintView.setICFootprint(footprint);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		render = mICFootprintView.getmICFootprintRender();
-		render.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
-		// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
-		render.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources()
-				.getColor(R.color.Black));
-		render.setLayerColor(ICFootprintRender.LAYER_DRAFT, getResources()
-				.getColor(R.color.Green));
-		render.setLayerColor(ICFootprintRender.LAYER_DRILL, getResources()
-				.getColor(R.color.Red));
-		render.setLayerColor(ICFootprintRender.LAYER_MASK, getResources()
-				.getColor(R.color.Red));
+//		try {
+//			InputStream stream = getAssets().open(str);
+//			footprint = ICFootprintView.parseFootprintFile(stream);
+//			// footprint.offsetTheFootprint(30000,40000);
+//			stream.close();
+//			mICFootprintView.setICFootprint(footprint);
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return;
+//		}
+//		render = mICFootprintView.getmICFootprintRender();
+//		render.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
+//		// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
+//		render.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources()
+//				.getColor(R.color.Black));
+//		render.setLayerColor(ICFootprintRender.LAYER_DRAFT, getResources()
+//				.getColor(R.color.Green));
+//		render.setLayerColor(ICFootprintRender.LAYER_DRILL, getResources()
+//				.getColor(R.color.Red));
+//		render.setLayerColor(ICFootprintRender.LAYER_MASK, getResources()
+//				.getColor(R.color.Red));
 
 		mSpinnerICFootprint = (Spinner) findViewById(R.id.spinnerICFootprint);
 		setSpinnerContent(mSpinnerICFootprint);
@@ -213,10 +214,11 @@ public class MainActivity extends SherlockActivity {
 	protected void onResume() {
 		//Update according to the DisplayMetrics retrieved. This is for after user calibrating the screen.
 		//If user did any calibration, the IC display needs to be updated accordingly.
-		DisplayMetrics dm = ScreenCalibrationActivity.getDisplayMetrics(this);
-		mICFootprintView.updateDisplayMetrics(dm);
+//		DisplayMetrics dm = ScreenCalibrationActivity.getDisplayMetrics(this);
+//		mICFootprintView.updateDisplayMetrics(dm);
+		mICFootprintView.updateDisplayMetrics();
 		// TODO: Still need to center the display?? Existing code can move to show at least its corner.
-		super.onResume();
+		super.onResume(); 
 	}
 
 	private void handleIntent(Intent intent) {
@@ -308,7 +310,7 @@ public class MainActivity extends SherlockActivity {
 		public void onItemSelected(AdapterView<?> parent, View view,
 				int position, long id) {
 			TextView tv = (TextView) view.findViewById(R.id.textViewFPName);
-			// TODO: use tv.getText(); to update the footprint choice
+			// TODO: use tv.getText(); to update the footprint choice (done)
 			if (tv != null)
 				setICFootprint(tv.getText().toString() + ".fp");
 		}
@@ -339,22 +341,22 @@ public class MainActivity extends SherlockActivity {
 			return;
 		}
 
-		// TODO: clean the render anc color setup later.
-		render = mICFootprintView.getmICFootprintRender();
-		render.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
-		render.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
-		// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
-		render.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources()
-				.getColor(R.color.Black));
-		render.setLayerColor(ICFootprintRender.LAYER_DRAFT, getResources()
-				.getColor(R.color.Green));
-		render.setLayerColor(ICFootprintRender.LAYER_DRILL, getResources()
-				.getColor(R.color.Red));
-		render.setLayerColor(ICFootprintRender.LAYER_MASK, getResources()
-				.getColor(R.color.Red));
-		mICFootprintView.invalidate();
+		// TODO: clean the render anc color setup later. (done)
+//		render = mICFootprintView.getmICFootprintRender();
+//		render.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
+//		render.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
+//		// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
+//		render.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources()
+//				.getColor(R.color.Black));
+//		render.setLayerColor(ICFootprintRender.LAYER_DRAFT, getResources()
+//				.getColor(R.color.Green));
+//		render.setLayerColor(ICFootprintRender.LAYER_DRILL, getResources()
+//				.getColor(R.color.Red));
+//		render.setLayerColor(ICFootprintRender.LAYER_MASK, getResources()
+//				.getColor(R.color.Red));
+//		mICFootprintView.invalidate();
 	}
 
 	private void rotateICFootprint(int dir) {

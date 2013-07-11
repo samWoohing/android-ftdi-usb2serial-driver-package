@@ -74,10 +74,11 @@ public class ICFootprintView extends View {
 	}
 	
 	private void init(){
-		//TODO: change to read local calibrated display metrics
-		mDisplayMetrics = new DisplayMetrics();
-		Activity hostactivity = (Activity) getContext();
-		hostactivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+		//TODO: change to read local calibrated display metrics (NOT done yet?)
+		//mDisplayMetrics = new DisplayMetrics();
+		//Activity hostactivity = (Activity) getContext();
+		//hostactivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+		mDisplayMetrics = ScreenCalibrationActivity.getDisplayMetrics((Activity)getContext());
 	}
 	
 	@Override
@@ -93,14 +94,44 @@ public class ICFootprintView extends View {
 		
 	}
 	
+	private void setRenderLayerAndColor(ICFootprintRender render){
+		if(render == null) return;
+		//TODO: try different color to find the best user experience
+		render.setLayerVisible(ICFootprintRender.LAYER_COPPER, true);
+		render.setLayerVisible(ICFootprintRender.LAYER_DRAFT, true);
+		render.setLayerVisible(ICFootprintRender.LAYER_DRILL, true);
+		render.setLayerVisible(ICFootprintRender.LAYER_MASK, false);
+		// render.setLayerVisible(ICFootprintRender.LAYER_CLEARANCE, true);
+		render.setLayerColor(ICFootprintRender.LAYER_COPPER, getResources()
+				.getColor(R.color.DimGray));
+		render.setLayerColor(ICFootprintRender.LAYER_DRAFT, getResources()
+				.getColor(R.color.Green));
+		render.setLayerColor(ICFootprintRender.LAYER_DRILL, getResources()
+				.getColor(R.color.Tomato));
+		render.setLayerColor(ICFootprintRender.LAYER_MASK, getResources()
+				.getColor(R.color.Red));
+	}
+	
+	private void centerICFootprint(ICFootprint footprint){
+		//this is a true centering function.
+		if(footprint == null) return;
+		RectF rect = footprint.calculateFootprintOverallBoundRectangle();
+		float dx, dy;//TODO: separate xdpi and ydpi? (done)
+		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth()/2, mDisplayMetrics.xdpi);
+		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight()/2, mDisplayMetrics.ydpi);
+		footprint.offsetTheFootprint(dx-rect.centerX(), dy-rect.centerY());
+	}
+	
 	public void setICFootprint(ICFootprint footprint){
 		if(footprint == null) return;
 		//set the footprint to center of the screen
-		float dx, dy;//TODO: separate xdpi and ydpi?
-		dx = ICFootprint.CentiMil.PixelToCentiMil(getWidth()/2, mDisplayMetrics.xdpi);
-		dy = ICFootprint.CentiMil.PixelToCentiMil(getHeight()/2, mDisplayMetrics.ydpi);
-		footprint.offsetTheFootprint(dx, dy);
+		centerICFootprint(footprint);
+		
 		mICFootprintRender = new ICFootprintRender(footprint, mDisplayMetrics);
+		
+		//setup the render's layer hide/show and color property.
+		setRenderLayerAndColor(mICFootprintRender);
+		invalidate();//trigger a refresh.
 	}
 	
 	public static ICFootprint parseFootprintFile(InputStream stream) throws IOException{
@@ -210,8 +241,30 @@ public class ICFootprintView extends View {
 		mLockICFootprint = isLocked;
 	}
 	
-	public void updateDisplayMetrics(DisplayMetrics dm){
+	private boolean isDisplayMetricsEqual(DisplayMetrics dm1, DisplayMetrics dm2){
+		if(	dm1.xdpi==dm2.xdpi &&
+			dm1.ydpi==dm2.ydpi &&
+			dm1.density == dm2.density &&
+			dm1.densityDpi == dm2.densityDpi &&
+			dm1.heightPixels == dm2.heightPixels &&
+			dm1.widthPixels == dm2.widthPixels &&
+			dm1.scaledDensity == dm2.scaledDensity)
+			return true;
+		return false;
+	}
+	
+	public void updateDisplayMetrics(){
+		if(mDisplayMetrics==null) return;//let the init function perform the initialization job.
+		
+		DisplayMetrics dm = ScreenCalibrationActivity.getDisplayMetrics((Activity)getContext());
+		//if display metrics is not changed, no need to do anything.
+		if(isDisplayMetricsEqual(dm, mDisplayMetrics)) return;
 		mDisplayMetrics = dm;
+		
+		if(mICFootprintRender == null) return;
+		//redo the centering
+		centerICFootprint(mICFootprintRender.getmICFootprint());
+		//redraw the footprint
 		mICFootprintRender.recalculateAllLayers(mDisplayMetrics);
 		this.invalidate();
 	}
