@@ -42,6 +42,7 @@ public class MainActivity extends SherlockActivity {
 	// coordination problem.)
 	// TODO: create the dimension calibration function. Preferred method: use
 	// SharedPreference to store data. Write a activity to pop UI (Solved)
+	//TODO: CRITICAL ISSUE: find the relation between DPI and Density, get the correct dimensions!
 	private Spinner mSpinnerICFootprint;
 	private ICFootprintView mICFootprintView;
 	private com.actionbarsherlock.view.Menu mMenu;
