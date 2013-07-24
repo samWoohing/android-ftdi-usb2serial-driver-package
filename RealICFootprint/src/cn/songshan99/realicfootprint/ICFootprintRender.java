@@ -1,21 +1,24 @@
 package cn.songshan99.realicfootprint;
 
-import java.util.ArrayList;
-import static java.lang.Math.*;
+import static android.util.FloatMath.cos;
+import static android.util.FloatMath.sin;
+import static android.util.FloatMath.sqrt;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
+import java.util.ArrayList;
+
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.util.DisplayMetrics;
 import cn.songshan99.FootprintParser.ICFootprint;
 import cn.songshan99.FootprintParser.ICFootprint.ElementArc;
 import cn.songshan99.FootprintParser.ICFootprint.ElementLine;
 import cn.songshan99.FootprintParser.ICFootprint.Pad;
 import cn.songshan99.FootprintParser.ICFootprint.Pin;
 import cn.songshan99.FootprintParser.ICFootprint.PinOrPadOrDraftLine;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
-import android.util.DisplayMetrics;
-import static android.util.FloatMath.*;
 
 /**
  * The Class ICFootprintRender.

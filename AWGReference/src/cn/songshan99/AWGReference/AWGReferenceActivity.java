@@ -2,14 +2,6 @@ package cn.songshan99.AWGReference;
 
 import java.io.IOException;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.app.SherlockDialogFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
-import com.actionbarsherlock.view.Window;
-
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Context;
@@ -17,16 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
-import android.support.v4.app.*;
-import android.support.v4.widget.*;
-import android.support.v4.view.*;
-import android.support.v4.widget.*;
-import android.support.v4.app.*;
-import android.support.v4.content.*;
-import android.support.v4.os.*;
-import android.support.v4.database.*;
-
-import android.view.Gravity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,13 +20,18 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TableLayout;
-import android.widget.Toast;
 import android.widget.TextView;
-import android.view.ViewGroup.LayoutParams;
+import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
+import com.actionbarsherlock.view.Window;
 
 public class AWGReferenceActivity extends SherlockFragmentActivity { 
 	

@@ -29,4 +29,13 @@
     <string name="dlg_msg_negzero">Width and height should be positive!</string>
     <string name="dlg_msg_result">Invalid result in dpi calculation!</string>
     
+    <!-- The text for calibration screen -->
+    <string name="cali_inst">Instructions</string>
+    <string name="cali_unit">Unit:</string>
+    <string name="cali_height">measured height:</string>
+    <string name="cali_width">measured width:</string>
+    <string name="cali_apply">Apply</string>
+    <string name="cali_close">Close</string>
+    <string name="cali_reset">Reset</string>
+    
 </resources>

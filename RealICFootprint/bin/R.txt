@@ -432,8 +432,8 @@ int id abs__textButton 0x7f080017
 int id abs__title 0x7f08001f
 int id abs__titleDivider 0x7f080020
 int id abs__up 0x7f08000b
+int id buttonApply 0x7f080049
 int id buttonClose 0x7f08004a
-int id buttonOK 0x7f080049
 int id buttonReset 0x7f08004b
 int id calibrate 0x7f080050
 int id disableHome 0x7f080009
@@ -530,6 +530,13 @@ int string app_name 0x7f060000
 int string btn_ccw 0x7f060019
 int string btn_cw 0x7f060018
 int string btn_lock 0x7f060017
+int string cali_apply 0x7f060023
+int string cali_close 0x7f060024
+int string cali_height 0x7f060021
+int string cali_inst 0x7f06001f
+int string cali_reset 0x7f060025
+int string cali_unit 0x7f060020
+int string cali_width 0x7f060022
 int string dlg_msg_negzero 0x7f06001d
 int string dlg_msg_recognize 0x7f06001c
 int string dlg_msg_result 0x7f06001e
