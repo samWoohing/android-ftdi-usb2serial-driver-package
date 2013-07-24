@@ -59,7 +59,7 @@ public class ScreenCalibrationActivity extends SherlockActivity {
 		spinner.setOnItemSelectedListener(mSpinnerItemSelectedListner);
 		
 		//set onclicklistener to button
-		Button btn = (Button) findViewById(R.id.buttonOK);
+		Button btn = (Button) findViewById(R.id.buttonApply);
 		btn.setOnClickListener(mOKBtnOnClickListener);
 		btn = (Button) findViewById(R.id.buttonClose);
 		btn.setOnClickListener(mCloseBtnOnClickListener);

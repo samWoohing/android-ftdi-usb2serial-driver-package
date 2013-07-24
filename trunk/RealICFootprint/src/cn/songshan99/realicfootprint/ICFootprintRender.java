@@ -423,7 +423,7 @@ public class ICFootprintRender {
 		ArrayList<PathPaint> pinpadListPathPaint=null, draftListPathPaint=null;
 		
 		switch(layer){
-		case LAYER_COPPER:
+		case LAYER_COPPER: 
 			cleanLayerPath(mLayerCopper);
 			pinpadListPathPaint = mLayerCopper.mListPathPaint;
 			break;
