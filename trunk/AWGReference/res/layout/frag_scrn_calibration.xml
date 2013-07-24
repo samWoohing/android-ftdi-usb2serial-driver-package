@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight=".88"
+        android:baselineAligned="false"
         android:orientation="horizontal" >
 
         <RelativeLayout
@@ -39,7 +40,7 @@
                 android:scrollbars="vertical"
                 android:singleLine="false" 
                 android:lines="13"
-                android:text="Instructions"
+                android:text="@string/cali_inst"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TableLayout
@@ -56,7 +57,7 @@
                         android:id="@+id/textViewUnitTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Unit:"
+                        android:text="@string/cali_unit"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <Spinner
@@ -73,7 +74,7 @@
                         android:id="@+id/textViewHeightTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="measured height:"
+                        android:text="@string/cali_height"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
@@ -93,7 +94,7 @@
                         android:id="@+id/textViewWidthTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="measured width:"
+                        android:text="@string/cali_width"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <EditText
@@ -112,25 +113,25 @@
                 android:layout_below="@+id/tableLayoutInput" >
 
                 <Button
-                    android:id="@+id/buttonOK"
+                    android:id="@+id/buttonApply"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OK" />
+                    android:text="@string/cali_apply" />
 
                 <Button
                     android:id="@+id/buttonClose"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Close" />
+                    android:text="@string/cali_close" />
 
                 <Button
                     android:id="@+id/buttonReset"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reset" />
+                    android:text="@string/cali_reset" />
             </LinearLayout>
         </RelativeLayout>
 

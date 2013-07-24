@@ -6,16 +6,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
@@ -154,6 +152,9 @@ public class ICFootprintDescDatabase {
         return cursor;
     }
     
+    //The helper helps create a database and store it into application specific folder:
+    // /data/data/package_name/databases.
+    
     private static class ICFootprintOpenHelper extends SQLiteOpenHelper {
     	private final Context mHelperContext;
         private SQLiteDatabase mDatabase;
@@ -167,7 +168,8 @@ public class ICFootprintDescDatabase {
                     " USING fts3 (" +
                     KEY_FILENAME + ", " +
                     KEY_DESCRIPTION + ");";
-        
+        //Create a helper object to create, open, and/or manage a database. This method always returns very quickly. 
+        //The database is not actually created or opened until one of getWritableDatabase() or getReadableDatabase() is called.
 		public ICFootprintOpenHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
             mHelperContext = context;
@@ -183,19 +185,26 @@ public class ICFootprintDescDatabase {
 		private void loadICFootprintTable(){
 			//TODO: async operation is creating problems. Maybe do this in blocking mode?
 			//drawback in blocking mode is user has to wait when this app first starts.
-			//Need to test if this is acceptable.
-			new Thread(new Runnable() {
-                public void run() {
-                    try {
-                    	loadICFootprintLines();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }).start();
+			//Need to test if this is acceptable. (done)
+//			new Thread(new Runnable() {
+//                public void run() {
+//                    try {
+//                    	loadICFootprintLines();
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            }).start();
+			
+			try {
+            	loadICFootprintLines();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 		}
 		
 		private void loadICFootprintLines() throws IOException {
+			//Read the footprintlist file and store the names into database.
             Log.d(TAG, "Loading words...");
             final Resources resources = mHelperContext.getResources();
             InputStream inputStream = resources.openRawResource(R.raw.footprintlist);
@@ -227,6 +236,7 @@ public class ICFootprintDescDatabase {
 		
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			//if upgrading, drop old table entirely, and recreate the table by calling onCreate method.
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS " + FPN_VIRTUAL_TABLE);

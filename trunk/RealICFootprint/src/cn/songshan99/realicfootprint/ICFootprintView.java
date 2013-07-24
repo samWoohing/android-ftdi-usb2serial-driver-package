@@ -3,13 +3,9 @@ package cn.songshan99.realicfootprint;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
-import cn.songshan99.FootprintParser.FootprintParserLexer;
-import cn.songshan99.FootprintParser.FootprintParserParser;
-import cn.songshan99.FootprintParser.FootprintParserParser.ElementContext;
-import cn.songshan99.FootprintParser.ICFootprint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,6 +15,10 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import cn.songshan99.FootprintParser.FootprintParserLexer;
+import cn.songshan99.FootprintParser.FootprintParserParser;
+import cn.songshan99.FootprintParser.FootprintParserParser.ElementContext;
+import cn.songshan99.FootprintParser.ICFootprint;
 
 
 public class ICFootprintView extends View {
@@ -43,6 +43,7 @@ public class ICFootprintView extends View {
 
 	public DisplayMetrics mDisplayMetrics;//TODO: change to private later
 	
+	//TODO: think about compatibility?
 	private int mActivePointerId = MotionEvent.INVALID_POINTER_ID;
 	
 	private void setmICFootprintRender(ICFootprintRender mICFootprintRender) {
