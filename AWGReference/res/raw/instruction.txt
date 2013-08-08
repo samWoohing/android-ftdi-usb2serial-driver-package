@@ -1,8 +1,0 @@
-<H1>Instructions to use:</H1>
-select AWG wire size from the drop down list.<br><br>
-Press &quot;Show actual wire size&quot; button to view the real wire size.<br><br>
-Press back button or &quot;close&quot; button to navigate back from wire size display to main screen.<br><br>
-Select &quot;Unit:&quot; menu on the action bar to switch unit between metric and imperial.<br><br>
-Single-click on any number to copy it to clipboard.<br><br>
-Some Android system provides wrong display metrics information and thus results in wrong display dimension. 
-If you find the displayed IC footprint dimension is wrong, go to "calibration" menu and follow the instruction to do the screen calibration.<br><br>

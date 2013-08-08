@@ -1,8 +1,0 @@
-<H1>Disclaimer:</H1>
-This software is provided "AS IS," without warranties of any kind. 
-The author of this software (Shan Song) disclaims all warranties with regard to this software, 
-including the implied warranties of merchantability and fitness for purpose. 
-In no event shall the author be liable for any damages whatsoever arising from the use of, or inability to use, this software.<br>
-<br>
-Whilst every effort is made to ensure the correct operation and accuracy of this software, 
-the author (Shan Song) cannot be held responsible for any errors resulting from its use.
