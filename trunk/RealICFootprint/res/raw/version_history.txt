@@ -1,4 +1,0 @@
-<H1>Version History:</H1>
-v1.0.0:<br>
--Initial release.<br>
-

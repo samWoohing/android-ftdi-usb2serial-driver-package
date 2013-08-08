@@ -1,6 +1,0 @@
-<H1>Version History:</H1>
-v1.1.0:<br>
--Add screen calibration function<br><br>
-
-v1.0.0:<br>
--Initial release.<br>

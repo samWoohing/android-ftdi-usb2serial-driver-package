@@ -1,9 +1,0 @@
-<H1>Instructions to use:</H1>
-Select footprint from the drop down list to display it.<br><br>
-Touch the screen and slide to move the footprint around.<br><br>
-Press the rotate button to rotate the footprint 90-degree clockwise or counter-clockwise.<br><br>
-Press the lock button to lock the footprint on the screen. The move and rotate function will not work.<br><br>
-Press the lock button again to unlock the footprint so that the move and rotate function can work.<br><br>
-To search for a footprint, press the search button, input the footprint name or description, and search.<br><br>
-Some Android system provides wrong display metrics information and thus results in wrong display dimension. 
-If you find the displayed IC footprint dimension is wrong, go to "calibration" menu and follow the instruction to do the screen calibration.<br><br>
